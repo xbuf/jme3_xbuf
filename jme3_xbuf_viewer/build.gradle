@@ -1,0 +1,65 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'net.alchim31.gradle:gradle-getdown-plugin:0.4.1'
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'provided-base'
+apply plugin: 'eclipse'
+apply plugin: "org.xtend.xtend"
+
+//WARNING: this project is 1.7 compatible but ModelViewer require javafx and java 8u20+ to run
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+
+def description = "A standalone viewer for xbuf (and some other format supported by jme3) + remote xbuf editor support for remote edition (eg: via blender)"
+
+sourceSets.main.resources.srcDir 'src/main/java'
+
+def v_slf4j = '1.7.7'
+def v_jme3 = '3.0.10'
+
+dependencies {
+	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.7.+'
+	compile "org.slf4j:slf4j-api:${v_slf4j}"
+	compile project(':jme3_xbuf_loader')
+	compile project(':jme3_xbuf_remote')
+	compile "org.slf4j:jul-to-slf4j:${v_slf4j}"
+	compile 'net.alchim31.jme3:jme3_ext_spatial_explorer:0.7+'
+	compile 'com.beust:jcommander:1.35'
+	compile "com.jme3:jme3-core:${v_jme3}"
+	compile "com.jme3:jme3-blender:${v_jme3}"
+	runtime "com.jme3:jme3-desktop:${v_jme3}"
+	runtime "com.jme3:jme3-lwjgl:${v_jme3}"
+	runtime 'ch.qos.logback:logback-classic:1.1.2'
+	testCompile 'junit:junit:4.12'
+}
+
+//------------------------------------------------------------------------------
+apply plugin: 'application'
+apply plugin: 'net.alchim31.getdown'
+
+mainClassName = 'jme3_ext_assettools.Main'
+applicationDefaultJvmArgs = []
+
+import bundles.Platform
+getdown {
+	urlbase = "http://www.xbuf.org/download/jme3_xbuf_viewer"
+	checklatest = false
+	mainClassName = project.mainClassName
+	jvmArgs = project.applicationDefaultJvmArgs
+	platforms = [Platform.LINUX_I586, Platform.WINDOWS_I586]
+	//platforms = [Platform.LINUX_I586] //Platform.values()
+	tmplGetdownTxt = tmplGetdownTxt + "\nallow_offline = true"
+}
+//project.afterEvaluate {
+//	project.getdown.distSpec.eachFile {
+//		println "$it.name"
+//	}
+//}

@@ -1,0 +1,52 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:1.12.+'
+	}
+}
+
+apply plugin: 'provided-base'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+version = "0.1.0"
+group = "org.xbuf.jme3.samples"
+def description = "a demo of Xbuf at runtime with jMonkeyEngine"
+
+
+repositories {
+	mavenLocal()
+	jcenter()
+	maven { url "http://updates.jmonkeyengine.org/maven/"}
+	maven { url "http://dl.bintray.com/jmonkeyengine/contrib" }
+}
+
+sourceSets.main.resources.srcDir 'src/main/java'
+
+def v_slf4j = '1.7.7'
+def v_jme3 = '3.0.10'
+
+dependencies {
+	// logging
+	compile "org.slf4j:slf4j-api:${v_slf4j}"
+	runtime "org.slf4j:jul-to-slf4j:${v_slf4j}"
+	runtime 'ch.qos.logback:logback-classic:1.1.2'
+
+	// jme
+	//compile 'net.alchim31.jme3:jme3_ext_spatial_explorer:0.7+'
+	compile 'org.xbuf.jme3:jme3_xbuf_loader:0.4+'
+	compile "com.jme3:jme3-core:${v_jme3}"
+	compile "com.jme3:jme3-effects:${v_jme3}"
+	runtime "com.jme3:jme3-desktop:${v_jme3}"
+	runtime "com.jme3:jme3-lwjgl:${v_jme3}"
+
+	//utils
+}
+
+apply from: 'https://gist.githubusercontent.com/davidB/4c520c9dc1b3fddcf0ec/raw/copyDeps.gradle'

@@ -1,0 +1,15 @@
+include 'jme3_xbuf_loader', 'jme3_xbuf_remote', 'jme3_xbuf_viewer'
+
+//inlcude 'samples:xbuf_jaime'
+
+// def subProjectDirs = rootDir.listFiles(new FileFilter() {
+//   public boolean accept(File file) {
+//     return (
+//       file.isDirectory()
+//       && !["build", "buildsrc", "tmp", ".gradle"].contains(file.name.toLowerCase(Locale.US))
+//       //&& new File(file, 'build.gradle').exists()
+//       );
+//   }
+// });
+// subProjectDirs.each { File dir ->  include dir.name }
+//
