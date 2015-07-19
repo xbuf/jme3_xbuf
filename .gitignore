@@ -12,6 +12,7 @@ build
 # native created when running
 *.so
 *.dll
+*.dylib
 
 # xtend
 xtend-gen
