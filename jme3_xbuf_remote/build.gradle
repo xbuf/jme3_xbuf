@@ -18,7 +18,7 @@ dependencies {
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile 'io.netty:netty-handler:4.0.24.Final'
 	compile project(':jme3_xbuf_loader')
-	compile 'net.alchim31.xbuf:xbuf:0+'
+	compile 'org.xbuf:xbuf:0+'
 	provided "com.jme3:jme3-core:${v_jme3}"
 	testCompile 'junit:junit:4.12'
 }
