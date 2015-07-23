@@ -15,7 +15,7 @@
 
 	<!-- logger name="jme3_ext.AppState0" level="warn" /-->
 
-	<root level="info">
+	<root level="debug">
 		<appender-ref ref="STDOUT" />
 	</root>
 </configuration>

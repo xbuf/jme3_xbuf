@@ -49,6 +49,8 @@ import xbuf_ext.AnimationsKf.SampledTransform
 import xbuf_ext.CustomParams
 import xbuf_ext.CustomParams.CustomParam
 import xbuf_ext.CustomParams.CustomParamList
+import com.jme3.texture.Texture.WrapAxis
+import com.jme3.texture.Texture.WrapMode
 
 // TODO use a Validation object (like in scala/scalaz) with option to log/dump stacktrace
 public class Xbuf {
@@ -805,7 +807,7 @@ public class Xbuf {
 	}
 
 	def Texture getValue(Datas.Texture t, Logger log) {
-		switch(t.getDataCase()){
+		val tex = switch(t.getDataCase()){
 			case DATA_NOT_SET: null
 			case RPATH:
 				assetManager.loadTexture(t.getRpath())
@@ -817,6 +819,8 @@ public class Xbuf {
 			default:
 				throw new IllegalArgumentException("doesn't support more than texture format:" + t.getDataCase())
 		}
+		tex.wrap = WrapMode.Repeat
+		tex
 	}
 
 	def Material newMaterial(Datas.Material m, Logger log) {
