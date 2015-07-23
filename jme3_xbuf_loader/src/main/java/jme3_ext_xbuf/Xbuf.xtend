@@ -34,7 +34,7 @@ import com.jme3.shader.VarType
 import com.jme3.texture.Image
 import com.jme3.texture.Texture
 import com.jme3.texture.Texture2D
-import com.jme3.util.TangentBinormalGenerator
+import com.jme3.util.TangentBinormalGenerator_31
 import java.nio.ByteBuffer
 import java.util.HashMap
 import java.util.List
@@ -201,7 +201,8 @@ public class Xbuf {
 //		}
 		//TODO optimize lazy create Tangent when needed (for normal map ?)
 		if (dst.getBuffer(VertexBuffer.Type.Tangent) == null && dst.getBuffer(VertexBuffer.Type.TexCoord) != null) {
-			TangentBinormalGenerator.generate(dst)
+			TangentBinormalGenerator_31.setToleranceAngle(90)
+			TangentBinormalGenerator_31.generate(dst)
 		}
 
 		dst.updateCounts()
@@ -210,23 +211,19 @@ public class Xbuf {
 	}
 
 	def Mesh applySkin(Datas.Skin skin, Mesh dst, Logger log) {
-		dst.clearBuffer(Type.BoneIndex);
-		dst.clearBuffer(Type.BoneWeight);
-
-		var maxWeightsPerVert = 0
+		dst.clearBuffer(Type.BoneIndex)
+		dst.clearBuffer(Type.BoneWeight)
 		val nb = skin.boneCountCount
-		val indexPad4 = ByteBuffer.allocate(nb * 4)
-		val weightPad4 = newFloatArrayOfSize(nb * 4)
+		val maxWeightPerVert = Math.min(4, skin.boneCountList.reduce[p1, p2|Math.max(p1,p2)])
+		val indexPad = ByteBuffer.allocate(nb * maxWeightPerVert)
+		val weightPad = newFloatArrayOfSize(nb * maxWeightPerVert)
 		var isrc = 0
 		for(var i = 0; i < nb; i++) {
-			var totalWeight = 0f
+			var totalWeightPad = 0f
 			val cnt = skin.boneCountList.get(i)
-			if (cnt > 4) {
-				log.warn("vertex influenced by more than 4 bones : {}, only the 4 higher are keep.", cnt)
-			}
-			maxWeightsPerVert = Math.max(maxWeightsPerVert, Math.min(4, cnt))
+			val wpv = Math.min(maxWeightPerVert, cnt)
 			val k0 = i * 4
-			for(var j = 0;  j < 4; j++) {
+			for(var j = 0;  j < maxWeightPerVert; j++) {
 				val k = k0 + j
 				var index = 0 as byte
 				var weight = 0f
@@ -234,22 +231,30 @@ public class Xbuf {
 					weight = skin.boneWeightList.get(isrc + j)
 					index = skin.boneIndexList.get(isrc + j).byteValue
 				}
-				totalWeight += weight
-				indexPad4.put(k, index)
-				weightPad4.set(k, weight)
+				totalWeightPad += weight
+				indexPad.put(k, index)
+				weightPad.set(k, weight)
 			}
-			if (totalWeight > 0) {
-				val normalizer = 1.0f / totalWeight
-				for(var j = 0;  j < 4; j++) {
+			if (totalWeightPad > 0) {
+				var totalWeight = 0.0f
+				for(var j = 0;  j < cnt; j++) {
+					totalWeight += skin.boneWeightList.get(isrc + j)
+				}
+				
+				val normalizer = totalWeight / totalWeightPad
+				for(var j = 0;  j < wpv; j++) {
 					val k = k0 + j
-					weightPad4.set(k, weightPad4.get(k) * normalizer)
+					weightPad.set(k, weightPad.get(k) * normalizer)
+				}
+				if (cnt > maxWeightPerVert && totalWeight != totalWeightPad) {
+					log.warn("vertex influenced by more than {} bones : {}, only the {} higher are keep for total weight keep/orig: {}/{}.", maxWeightPerVert, cnt, wpv, totalWeightPad, totalWeight)
 				}
 			}
 			isrc += cnt
 		}
-		dst.setBuffer(Type.BoneIndex, 4, indexPad4)
-		dst.setBuffer(Type.BoneWeight, 4, weightPad4)
-		dst.setMaxNumWeights(maxWeightsPerVert)
+		dst.setBuffer(Type.BoneIndex, maxWeightPerVert, indexPad)
+		dst.setBuffer(Type.BoneWeight, maxWeightPerVert, weightPad)
+		dst.setMaxNumWeights(maxWeightPerVert)
 
 		//creating empty buffers for HW skinning
 		//the buffers will be setup if ever used.
