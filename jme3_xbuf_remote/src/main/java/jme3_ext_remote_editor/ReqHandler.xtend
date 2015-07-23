@@ -241,7 +241,11 @@ class ReqHandler {
 					}
 				}
 				cinematic.addListener(cel)
-				cinematic.fitDuration()
+				try {
+					cinematic.fitDuration()
+				} catch(NullPointerException exc) {
+					log.warn("ignore NPE in cinematic.fitDuration() (it's a bug in jME 3.0)")
+				}
 				app.stateManager.attach(cinematic)
 				cinematic.play()
 			}
