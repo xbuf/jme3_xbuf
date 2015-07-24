@@ -5,7 +5,6 @@ import com.jme3.animation.AnimControl
 import com.jme3.animation.Animation
 import com.jme3.animation.Bone
 import com.jme3.animation.Skeleton
-import com.jme3.animation.SkeletonControl
 import com.jme3.animation.SpatialTrack
 import com.jme3.asset.AssetManager
 import com.jme3.light.AmbientLight
@@ -51,6 +50,7 @@ import xbuf_ext.CustomParams.CustomParam
 import xbuf_ext.CustomParams.CustomParamList
 import com.jme3.texture.Texture.WrapAxis
 import com.jme3.texture.Texture.WrapMode
+import com.jme3.animation.SkeletonControl_31
 
 // TODO use a Validation object (like in scala/scalaz) with option to log/dump stacktrace
 public class Xbuf {
@@ -217,14 +217,14 @@ public class Xbuf {
 		dst.clearBuffer(Type.BoneWeight)
 		val nb = skin.boneCountCount
 		val maxWeightPerVert = Math.min(4, skin.boneCountList.reduce[p1, p2|Math.max(p1,p2)])
-		val indexPad = ByteBuffer.allocate(nb * maxWeightPerVert)
+		val indexPad = newByteArrayOfSize(nb * maxWeightPerVert)
 		val weightPad = newFloatArrayOfSize(nb * maxWeightPerVert)
 		var isrc = 0
 		for(var i = 0; i < nb; i++) {
 			var totalWeightPad = 0f
 			val cnt = skin.boneCountList.get(i)
 			val wpv = Math.min(maxWeightPerVert, cnt)
-			val k0 = i * 4
+			val k0 = i * maxWeightPerVert
 			for(var j = 0;  j < maxWeightPerVert; j++) {
 				val k = k0 + j
 				var index = 0 as byte
@@ -234,7 +234,7 @@ public class Xbuf {
 					index = skin.boneIndexList.get(isrc + j).byteValue
 				}
 				totalWeightPad += weight
-				indexPad.put(k, index)
+				indexPad.set(k, index)
 				weightPad.set(k, weight)
 			}
 			if (totalWeightPad > 0) {
@@ -684,8 +684,8 @@ public class Xbuf {
 					if (op2 instanceof Spatial) { // Geometry, Node
 						var c = op2.getControl(typeof(AnimControl))
 						if (c == null) {
-							val sc = op2.getControl(typeof(SkeletonControl))
-							c = if (sc != null) new AnimControl(sc.skeleton) else new AnimControl()
+							val sc = op2.getControl(typeof(SkeletonControl_31))
+							c = if (sc != null) new AnimControl(sc.getSkeleton) else new AnimControl()
 							op2.addControl(c)
 						}
 						c.addAnim(op1)
@@ -746,7 +746,7 @@ public class Xbuf {
 
 	// see http://hub.jmonkeyengine.org/t/skeletoncontrol-or-animcontrol-to-host-skeleton/31478/4
 	def link(Spatial v, Skeleton sk) {
-		v.removeControl(typeof(SkeletonControl))
+		v.removeControl(typeof(SkeletonControl_31))
 		//update AnimControl if related to skeleton
 		val ac = v.getControl(typeof(AnimControl))
 		if (ac != null/* && ac.getSkeleton() != null*/) {
@@ -761,7 +761,7 @@ public class Xbuf {
 			v.addControl(new AnimControl(sk))
 		}
 		// SkeletonControl should be after AnimControl in the list of Controls
-		v.addControl(new SkeletonControl(sk))
+		v.addControl(new SkeletonControl_31(sk))
 	}
 
 	def Spatial mergeToUserData(CustomParam p, Spatial dst, Logger log) {
