@@ -79,9 +79,9 @@ subprojects {
 			repo = 'jme3stuff'
 			name = project.name
 			desc = project.description
-			websiteUrl = "https://github.com/davidB/${rootProject.name}"
-			issueTrackerUrl = "https://github.com/davidB/${rootProject.name}/issues"
-			vcsUrl = "https://github.com/davidB/${rootProject.name}.git"
+			websiteUrl = "https://github.com/xbuf/${rootProject.name}"
+			issueTrackerUrl = "https://github.com/xbuf/${rootProject.name}/issues"
+			vcsUrl = "https://github.com/xbuf/${rootProject.name}.git"
 			licenses = ['CC0-1.0']
 			labels = ['jme3']
 			publicDownloadNumbers = true
