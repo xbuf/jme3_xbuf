@@ -27,6 +27,10 @@ import jme3_ext_xbuf.XbufLoader
 import jme3_ext_remote_editor.AppState4RemoteCommand
 import jme3_ext_spatial_explorer.Helper
 import org.slf4j.bridge.SLF4JBridgeHandler
+import jme3_ext_spatial_explorer.AppStateSpatialExplorer
+import org.controlsfx.control.action.Action
+import javafx.stage.FileChooser
+import javafx.stage.DirectoryChooser
 
 public class ModelViewer {
 	/////////////////////////////////////////////////////////////////////////////////
@@ -223,6 +227,32 @@ public class ModelViewer {
 	//Setup SpatialExplorer
 	def setupSpatialExplorer() {
 		Helper.setupSpatialExplorerWithAll(app)
+		val fileChooser = new FileChooser()
+		val dirChooser = new DirectoryChooser()
+		fileChooser.initialDirectoryProperty.bindBidirectional(dirChooser.initialDirectoryProperty)
+		//val lastDirectory = new SimpleProperty<java.io.File>
+		app.enqueue[
+			val exp = app.stateManager.getState(AppStateSpatialExplorer).spatialExplorer
+			exp.barActions.add(new Action("Add AssetDir...", [evt |
+				dirChooser.title = "Add AssetDir..."
+				val f = dirChooser.showDialog(exp.stage)
+	            if (f != null) {
+	            	addAssetDirs(#[f])
+	            	dirChooser.initialDirectory = f
+				}
+			]));
+			exp.barActions.add(new Action("Import Model...", [evt |
+				fileChooser.title = "Import Model..."
+				val fs = fileChooser.showOpenMultipleDialog(exp.stage)
+				for(f : fs) {
+	            	showModel(f.getName(), f, true)
+				}
+				if (!fs.empty) {
+            		fileChooser.initialDirectory = fs.get(0).parentFile
+           		}
+				//TODO refresh treeItem
+			]));
+		]
 	}
 
 	def setupRemoteCommand(int port) {
@@ -267,15 +297,15 @@ public class ModelViewer {
 		if (dirs == null || dirs.isEmpty()){
 			 return
 		}
-		for(File f : dirs) {
-			if (f.isDirectory()) {
-				this.assetDirs.add(f)
-				app.enqueue [
+		app.enqueue [
+			for(File f : dirs) {
+				if (f.isDirectory()) {
+					this.assetDirs.add(f)
 					app.getAssetManager().registerLocator(f.getAbsolutePath(), typeof(FileLocator))
-					null
-				]
+				}
 			}
-		}
+			null
+		]
 	}
 
 	def showModel(String name, File f, boolean autoAddAssetFolder) {
