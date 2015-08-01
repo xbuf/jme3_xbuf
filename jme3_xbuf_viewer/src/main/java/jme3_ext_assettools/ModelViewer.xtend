@@ -244,10 +244,10 @@ public class ModelViewer {
 			exp.barActions.add(new Action("Import Model...", [evt |
 				fileChooser.title = "Import Model..."
 				val fs = fileChooser.showOpenMultipleDialog(exp.stage)
-				for(f : fs) {
-	            	showModel(f.getName(), f, true)
-				}
-				if (!fs.empty) {
+				if (fs != null && !fs.empty) {
+					for(f : fs) {
+		            	showModel(f.getName(), f, true)
+					}
             		fileChooser.initialDirectory = fs.get(0).parentFile
            		}
 				//TODO refresh treeItem
