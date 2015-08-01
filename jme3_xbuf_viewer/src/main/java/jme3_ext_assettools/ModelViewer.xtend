@@ -31,6 +31,7 @@ import jme3_ext_spatial_explorer.AppStateSpatialExplorer
 import org.controlsfx.control.action.Action
 import javafx.stage.FileChooser
 import javafx.stage.DirectoryChooser
+import com.jme3.asset.DesktopAssetManager
 
 public class ModelViewer {
 	/////////////////////////////////////////////////////////////////////////////////
@@ -245,6 +246,7 @@ public class ModelViewer {
 				fileChooser.title = "Import Model..."
 				val fs = fileChooser.showOpenMultipleDialog(exp.stage)
 				if (fs != null && !fs.empty) {
+					(app.assetManager as DesktopAssetManager).clearCache()
 					for(f : fs) {
 		            	showModel(f.getName(), f, true)
 					}
