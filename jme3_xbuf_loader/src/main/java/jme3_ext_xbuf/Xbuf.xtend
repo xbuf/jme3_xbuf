@@ -34,7 +34,6 @@ import com.jme3.texture.Image
 import com.jme3.texture.Texture
 import com.jme3.texture.Texture2D
 import com.jme3.util.TangentBinormalGenerator_31
-import java.nio.ByteBuffer
 import java.util.HashMap
 import java.util.List
 import java.util.Map
@@ -48,20 +47,23 @@ import xbuf_ext.AnimationsKf.SampledTransform
 import xbuf_ext.CustomParams
 import xbuf_ext.CustomParams.CustomParam
 import xbuf_ext.CustomParams.CustomParamList
-import com.jme3.texture.Texture.WrapAxis
 import com.jme3.texture.Texture.WrapMode
 import com.jme3.animation.SkeletonControl_31
+import com.jme3.asset.AssetNotFoundException
 
 // TODO use a Validation object (like in scala/scalaz) with option to log/dump stacktrace
 public class Xbuf {
 	final AssetManager assetManager;
 	final Material defaultMaterial;
+	final Texture  defaultTexture;
 	public final ExtensionRegistry registry;
 
 	new(AssetManager assetManager) {
 		this.assetManager = assetManager
 		registry = setupExtensionRegistry(ExtensionRegistry.newInstance())
 		defaultMaterial = newDefaultMaterial()
+		defaultTexture = assetManager.loadTexture("Textures/debug_8_64.png")
+		defaultTexture.wrap = WrapMode.Repeat
 	}
 
 	protected def ExtensionRegistry setupExtensionRegistry(ExtensionRegistry r) {
@@ -202,7 +204,9 @@ public class Xbuf {
 //			}
 //		}
 		//TODO optimize lazy create Tangent when needed (for normal map ?)
-		if (dst.getBuffer(VertexBuffer.Type.Tangent) == null && dst.getBuffer(VertexBuffer.Type.TexCoord) != null) {
+		if (dst.getBuffer(VertexBuffer.Type.Tangent) == null && dst.getBuffer(VertexBuffer.Type.Binormal) == null 
+			&& dst.getBuffer(VertexBuffer.Type.Normal) != null && dst.getBuffer(VertexBuffer.Type.TexCoord) != null
+		) {
 			TangentBinormalGenerator_31.setToleranceAngle(90)
 			TangentBinormalGenerator_31.generate(dst)
 		}
@@ -271,12 +275,15 @@ public class Xbuf {
 		dst
 	}
 
-	def Geometry cnv(Datas.Geometry src, Geometry dst, Logger log) {
+	//TODO support multi mesh, may replace geometry by node and use one Geometry per mesh
+	def Geometry cnv(Datas.Geometry src, Geometry dst, Map<String, Object> components, Logger log) {
 		if (src.getMeshesCount() > 1) {
 			throw new IllegalArgumentException("doesn't support more than 1 mesh")
 		}
 		dst.setName(if (src.hasName()) { src.getName() } else { src.getId()})
-		dst.setMesh(cnv(src.getMeshes(0), new Mesh(), log))
+		val mesh = cnv(src.getMeshes(0), new Mesh(), log)
+		components.put(src.getMeshes(0).id, mesh)
+		dst.setMesh(mesh)
 		dst.updateModelBound()
 		dst
 	}
@@ -630,7 +637,7 @@ public class Xbuf {
 				root.attachChild(child)
 				components.put(id, child)
 			}
-			child = cnv(g, child, log)
+			child = cnv(g, child, components, log)
 		}
 	}
 
@@ -721,7 +728,16 @@ public class Xbuf {
 						done = true
 					}
 				} else if (op1 instanceof Material) { // <--> xbuf.Datas.Material
-					if (op2 instanceof Node) {
+					if (op2 instanceof Mesh) {
+						//TODO optimize/refactor
+						val t = components.values.findFirst[v | v instanceof Geometry && (v as Geometry).mesh == op2] as Geometry
+						if (t == null) {
+							log.warn("doesn't found Geometry for mesh :" + r.getRef2)
+						} else {
+							t.setMaterial(op1)
+							done = true
+						}
+					} else if (op2 instanceof Node) {
 						op2.setMaterial(op1)
 						done = true
 					}
@@ -730,7 +746,6 @@ public class Xbuf {
 						link(op2, op1)
 						done = true
 					}
-					done = true
 				} else if (op1 instanceof Node) { // <--> xbuf.Datas.TObject
 					if (op2 instanceof Node) {
 						op1.attachChild(op2)
@@ -810,7 +825,12 @@ public class Xbuf {
 		val tex = switch(t.getDataCase()){
 			case DATA_NOT_SET: null
 			case RPATH:
-				assetManager.loadTexture(t.getRpath())
+				try {
+					assetManager.loadTexture(t.rpath)
+				} catch(AssetNotFoundException ex) {
+					log.warn("failed to load texture:", t.rpath, ex)
+					defaultTexture.clone()
+				}
 			case TEX2D: {
 				val t2di = t.getTex2D()
 				val img = new Image(getValue(t2di.getFormat(), log), t2di.getWidth(), t2di.getHeight(), t2di.getData().asReadOnlyByteBuffer());
