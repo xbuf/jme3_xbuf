@@ -50,6 +50,8 @@ import xbuf_ext.CustomParams.CustomParamList
 import com.jme3.texture.Texture.WrapMode
 import com.jme3.animation.SkeletonControl_31
 import com.jme3.asset.AssetNotFoundException
+import com.jme3.texture.Texture.MagFilter
+import com.jme3.texture.Texture.MinFilter
 
 // TODO use a Validation object (like in scala/scalaz) with option to log/dump stacktrace
 public class Xbuf {
@@ -61,9 +63,8 @@ public class Xbuf {
 	new(AssetManager assetManager) {
 		this.assetManager = assetManager
 		registry = setupExtensionRegistry(ExtensionRegistry.newInstance())
+		defaultTexture = newDefaultTexture()
 		defaultMaterial = newDefaultMaterial()
-		defaultTexture = assetManager.loadTexture("Textures/debug_8_64.png")
-		defaultTexture.wrap = WrapMode.Repeat
 	}
 
 	protected def ExtensionRegistry setupExtensionRegistry(ExtensionRegistry r) {
@@ -74,8 +75,18 @@ public class Xbuf {
 
 	protected def Material newDefaultMaterial() {
 		val m = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
-		m.setColor("Color", ColorRGBA.Gray)
+		m.setColor("Color", ColorRGBA.Pink)
+		m.setTexture("ColorMap", defaultTexture)
 		m
+	}
+
+	protected def Texture newDefaultTexture() {
+		val tex = assetManager.loadTexture("Textures/debug_8_64.png")
+		tex.wrap = WrapMode.Repeat
+		tex.magFilter = MagFilter.Nearest
+		tex.minFilter = MinFilter.NearestLinearMipMap
+		tex.anisotropicFilter = 2
+		tex
 	}
 
 	def Vector2f cnv(Datas.Vec2 src, Vector2f dst) {
@@ -276,13 +287,9 @@ public class Xbuf {
 	}
 
 	//TODO support multi mesh, may replace geometry by node and use one Geometry per mesh
-	def Geometry cnv(Datas.Geometry src, Geometry dst, Map<String, Object> components, Logger log) {
-		if (src.getMeshesCount() > 1) {
-			throw new IllegalArgumentException("doesn't support more than 1 mesh")
-		}
+	def Geometry cnv(Datas.Mesh src, Geometry dst, Logger log) {
 		dst.setName(if (src.hasName()) { src.getName() } else { src.getId()})
-		val mesh = cnv(src.getMeshes(0), new Mesh(), log)
-		components.put(src.getMeshes(0).id, mesh)
+		val mesh = cnv(src, new Mesh(), log)
 		dst.setMesh(mesh)
 		dst.updateModelBound()
 		dst
@@ -291,7 +298,7 @@ public class Xbuf {
 	//TODO optimize to create less intermediate node
 	def merge(Datas.Data src, Node root, Map<String, Object> components, Logger log) {
 		mergeTObjects(src, root, components, log)
-		mergeGeometries(src, root, components, log)
+		mergeMeshes(src, root, components, log)
 		mergeMaterials(src, components, log)
 		mergeLights(src, root, components, log)
 		mergeSkeletons(src, root, components, log)
@@ -625,38 +632,22 @@ public class Xbuf {
 		}
 	}
 
-	def mergeGeometries(Datas.Data src, Node root, Map<String, Object> components, Logger log) {
-		for(Datas.Geometry g : src.getGeometriesList()) {
+	def mergeMeshes(Datas.Data src, Node root, Map<String, Object> components, Logger log) {
+		for(Datas.Mesh g : src.getMeshesList()) {
 			//TODO manage parent hierarchy
 			val id = g.getId()
-			val o = components.get(id)
-			var child = if (o instanceof Node)  toGeometry(o) else (o as Geometry)
+			var child = components.get(id) as Geometry
 			if (child == null) {
 				child = new Geometry()
 				child.setMaterial(defaultMaterial)
 				root.attachChild(child)
+				//log.debug("add Geometry for xbuf.Mesh.id: {}", id)
 				components.put(id, child)
 			}
-			child = cnv(g, child, components, log)
+			child = cnv(g, child, log)
 		}
 	}
 
-	def Geometry toGeometry(Node src) {
-		val dst = new Geometry()
-		dst.setName(src.getName())
-		dst.setBatchHint(src.getBatchHint())
-		dst.setCullHint(src.getLocalCullHint())
-		dst.setLocalTransform(src.getLocalTransform())
-		val ls = src.getLocalLightList()
-		for(Light l: ls) {
-			dst.addLight(l);
-		}
-		ls.clear();
-		for(String k : src.getUserDataKeys()) {
-			dst.setUserData(k, src.getUserData(k));
-		}
-		dst
-	}
 	def mergeMaterials(Datas.Data src, Map<String, Object> components, Logger log) {
 		for(Datas.Material m : src.getMaterialsList()) {
 			//TODO update / remove previous material
@@ -705,40 +696,31 @@ public class Xbuf {
 						}
 						done = true
 					}
-				}else if (op1 instanceof Geometry) { // <--> xbuf.Datas.Geometry
-					if (op2 instanceof XbufLightControl) {
-						op2.getSpatial().removeControl(op2);
-						op1.addControl(op2)
+				} else if (op1 instanceof XbufLightControl) { // <--> xbuf.Datas.Light
+					if (op2 instanceof Geometry) {
+						op1.getSpatial().removeControl(op1);
+						op2.addControl(op1)
 						// TODO raise an alert, strange to link LightNode and Geometry
 						done = true
-					} else if (op2 instanceof Material) {
-						op1.setMaterial(op2)
-						done = true
 					} else if (op2 instanceof Node) {
-						op2.attachChild(op1)
-						done = true
-					} else if (op2 instanceof Skeleton) {
-						link(op1, op2)
-						done = true
-					}
-				} else if (op1 instanceof XbufLightControl) { // <--> xbuf.Datas.Light
-					if (op2 instanceof Node) {
 						op1.getSpatial().removeControl(op1)
 						op2.addControl(op1)
 						done = true
 					}
 				} else if (op1 instanceof Material) { // <--> xbuf.Datas.Material
-					if (op2 instanceof Mesh) {
-						//TODO optimize/refactor
-						val t = components.values.findFirst[v | v instanceof Geometry && (v as Geometry).mesh == op2] as Geometry
-						if (t == null) {
-							log.warn("doesn't found Geometry for mesh :" + r.getRef2)
-						} else {
-							t.setMaterial(op1)
-							done = true
-						}
+					if (op2 instanceof Geometry) {
+						op2.setMaterial(op1)
+						done = true
 					} else if (op2 instanceof Node) {
 						op2.setMaterial(op1)
+						done = true
+					}
+				} else if (op1 instanceof Geometry) { // <--> xbuf.Datas.Mesh
+					if (op2 instanceof Node) {
+						op2.attachChild(op1)
+						done = true
+					} else if (op2 instanceof Skeleton) {
+						link(op1, op2)
 						done = true
 					}
 				} else if (op1 instanceof Skeleton) { // <--> xbuf.Datas.Skeleton
