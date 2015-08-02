@@ -32,6 +32,13 @@ import org.controlsfx.control.action.Action
 import javafx.stage.FileChooser
 import javafx.stage.DirectoryChooser
 import com.jme3.asset.DesktopAssetManager
+import com.jme3.light.PointLight
+import com.jme3.scene.LightNode
+import com.jme3.scene.control.CameraControl
+import org.controlsfx.glyphfont.GlyphFontRegistry
+import org.controlsfx.glyphfont.FontAwesome
+import javafx.application.Platform
+import javafx.scene.control.Button
 
 public class ModelViewer {
 	/////////////////////////////////////////////////////////////////////////////////
@@ -227,6 +234,7 @@ public class ModelViewer {
 
 	//Setup SpatialExplorer
 	def setupSpatialExplorer() {
+		Helper.initJfx()
 		Helper.setupSpatialExplorerWithAll(app)
 		val fileChooser = new FileChooser()
 		val dirChooser = new DirectoryChooser()
@@ -234,7 +242,7 @@ public class ModelViewer {
 		//val lastDirectory = new SimpleProperty<java.io.File>
 		app.enqueue[
 			val exp = app.stateManager.getState(AppStateSpatialExplorer).spatialExplorer
-			exp.barActions.add(new Action("Add AssetDir...", [evt |
+			exp.barActions.add(Helper.makeAction("Add AssetDir...", FontAwesome.Glyph.PICTURE_ALT, [evt |
 				dirChooser.title = "Add AssetDir..."
 				val f = dirChooser.showDialog(exp.stage)
 	            if (f != null) {
@@ -242,7 +250,7 @@ public class ModelViewer {
 	            	dirChooser.initialDirectory = f
 				}
 			]));
-			exp.barActions.add(new Action("Import Model...", [evt |
+			exp.barActions.add(Helper.makeAction("Import Model...", FontAwesome.Glyph.FOLDER_OPEN, [evt |
 				fileChooser.title = "Import Model..."
 				val fs = fileChooser.showOpenMultipleDialog(exp.stage)
 				if (fs != null && !fs.empty) {
@@ -253,7 +261,24 @@ public class ModelViewer {
             		fileChooser.initialDirectory = fs.get(0).parentFile
            		}
 				//TODO refresh treeItem
-			]));
+			]))
+			val cameraLight = new PointLight()
+			cameraLight.color = ColorRGBA.White
+			cameraLight.radius = 20f
+			val cameraLightNode = new LightNode("cameraLight", cameraLight)
+			cameraLightNode.addControl(new CameraControl(app.camera, CameraControl.ControlDirection.CameraToSpatial)) 
+			exp.barActions.add(Helper.makeAction("CameraLight", FontAwesome.Glyph.LIGHTBULB_ALT, [evt|
+				app.enqueue[
+					if (cameraLightNode.parent == null) {
+						app.rootNode.addLight(cameraLight)
+						app.rootNode.attachChild(cameraLightNode)
+					} else {
+						app.rootNode.removeLight(cameraLight)
+						app.rootNode.detachChild(cameraLightNode)
+					}
+				]
+			]))
+			null
 		]
 	}
 
