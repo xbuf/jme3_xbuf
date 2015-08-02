@@ -215,7 +215,7 @@ public class Xbuf {
 //			}
 //		}
 		//TODO optimize lazy create Tangent when needed (for normal map ?)
-		if (dst.getBuffer(VertexBuffer.Type.Tangent) == null && dst.getBuffer(VertexBuffer.Type.Binormal) == null 
+		if ((dst.getBuffer(VertexBuffer.Type.Tangent) == null || dst.getBuffer(VertexBuffer.Type.Binormal) == null) 
 			&& dst.getBuffer(VertexBuffer.Type.Normal) != null && dst.getBuffer(VertexBuffer.Type.TexCoord) != null
 		) {
 			TangentBinormalGenerator_31.setToleranceAngle(90)
@@ -830,8 +830,8 @@ public class Xbuf {
 		val def = if (lightFamily) "Common/MatDefs/Light/Lighting.j3md" else "Common/MatDefs/Misc/Unshaded.j3md"
 		val mat = new Material(assetManager, def)
 		if (lightFamily) {
-			mat.setBoolean("UseMaterialColors", true)
-			mat.setBoolean("UseVertexColor", true)
+			//mat.setBoolean("UseMaterialColors", true)
+			//mat.setBoolean("UseVertexColor", true)
 		}
 		mat
 	}
@@ -872,6 +872,7 @@ public class Xbuf {
 		if (has) {
 			val name = findMaterialParamName(names, VarType.Texture2D, scope, log)
 			if (name != null) {
+				println(">>>> SET Texture: " + src.rpath + " into " + name )
 				dst.setTexture(name, getValue(src, log))
 			} else {
 				log.warn("can't find a matching name for : [{}] ({})", ",".join(names), VarType.Texture2D)
