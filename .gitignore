@@ -27,3 +27,6 @@ bin
 
 # crash
 hs_err_pid*.log
+
+/samples/unittest/textures
+*.blend1
