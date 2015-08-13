@@ -146,7 +146,7 @@ public class Xbuf {
 		case points: Mode.Points
 		case triangle_strip: Mode.TriangleStrip
 		case triangles: Mode.Triangles
-		default: throw new IllegalArgumentException(String.format("doesn't support %s : %s", v.getClass(), v))
+		default: throw new IllegalArgumentException(String.format("doesn't support %s : %s", v?.getClass(), v))
 		}
 	}
 
@@ -165,7 +165,7 @@ public class Xbuf {
 		case texcoord6: Type.TexCoord6
 		case texcoord7: Type.TexCoord7
 		case texcoord8: Type.TexCoord8
-		default: throw new IllegalArgumentException(String.format("doesn't support %s : %s", v.getClass(), v))
+		default: throw new IllegalArgumentException(String.format("doesn't support %s : %s", v?.getClass(), v))
 		}
 	}
 
@@ -829,10 +829,6 @@ public class Xbuf {
 		val lightFamily = !m.getShadeless()
 		val def = if (lightFamily) "Common/MatDefs/Light/Lighting.j3md" else "Common/MatDefs/Misc/Unshaded.j3md"
 		val mat = new Material(assetManager, def)
-		if (lightFamily) {
-			//mat.setBoolean("UseMaterialColors", true)
-			//mat.setBoolean("UseVertexColor", true)
-		}
 		mat
 	}
 
@@ -854,6 +850,15 @@ public class Xbuf {
 		setTexture2D(src.hasSpecularPowerMap(), src.getSpecularPowerMap(), dst, #["SpecularPowerMap", "ShininessMap"], md, log)
 		setColor(src.hasEmission(), src.getEmission(), dst, #["Emission", "GlowColor"], md, log)
 		setTexture2D(src.hasEmissionMap(), src.getEmissionMap(), dst, #["EmissionMap", "GlowMap"], md, log)
+		if (!src.getShadeless()) {
+    		if (!src.hasColorMap) {
+    		    if (src.hasColor) {
+    		        dst.setBoolean("UseMaterialColors", true)
+    		    } else {
+    		        dst.setBoolean("UseVertexColor", true)
+    		    }
+    		}
+		}
 		dst
 	}
 
