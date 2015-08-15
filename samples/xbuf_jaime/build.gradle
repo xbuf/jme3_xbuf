@@ -1,15 +1,6 @@
-buildscript {
-	repositories {
-		jcenter()
-	}
-	dependencies {
-		classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:1.12.+'
-	}
-}
-
-apply plugin: 'provided-base'
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'application'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
@@ -24,8 +15,11 @@ repositories {
 	mavenLocal()
 	jcenter()
 	maven { url "http://updates.jmonkeyengine.org/maven/"}
-	maven { url "http://dl.bintray.com/jmonkeyengine/contrib" }
+	maven { url "https://jitpack.io" }
 }
+
+mainClassName = System.properties.get('mainClassName', 'jme3test.animation.TestJaimeXbuf')
+applicationDefaultJvmArgs = []
 
 sourceSets.main.resources.srcDir 'src/main/java'
 
@@ -39,8 +33,7 @@ dependencies {
 	runtime 'ch.qos.logback:logback-classic:1.1.2'
 
 	// jme
-	//compile 'net.alchim31.jme3:jme3_ext_spatial_explorer:0.7+'
-	compile 'org.xbuf.jme3:jme3_xbuf_loader:0.4+'
+	compile 'com.github.xbuf.jme3_xbuf:jme3_xbuf_loader:213c6a499d'
 	compile "com.jme3:jme3-core:${v_jme3}"
 	compile "com.jme3:jme3-effects:${v_jme3}"
 	runtime "com.jme3:jme3-desktop:${v_jme3}"
@@ -48,5 +41,3 @@ dependencies {
 
 	//utils
 }
-
-apply from: 'https://gist.githubusercontent.com/davidB/4c520c9dc1b3fddcf0ec/raw/copyDeps.gradle'
