@@ -33,7 +33,7 @@ dependencies {
 	runtime 'ch.qos.logback:logback-classic:1.1.2'
 
 	// jme
-	compile 'com.github.xbuf.jme3_xbuf:jme3_xbuf_loader:213c6a499d'
+	compile 'org.xbuf.jme3_xbuf:jme3_xbuf_loader:213c6a499d'
 	compile "com.jme3:jme3-core:${v_jme3}"
 	compile "com.jme3:jme3-effects:${v_jme3}"
 	runtime "com.jme3:jme3-desktop:${v_jme3}"
