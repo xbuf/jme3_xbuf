@@ -1,0 +1,42 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+version = "0.1.0"
+group = "org.xbuf.jme3_xbuf.samples"
+def description = "a demo of load static mesh"
+
+
+repositories {
+	mavenLocal()
+	jcenter()
+	maven { url "http://updates.jmonkeyengine.org/maven/"}
+	maven { url "https://jitpack.io" }
+}
+
+mainClassName = System.properties.get('mainClassName', 'sandbox.SimpleXbuf')
+applicationDefaultJvmArgs = []
+
+sourceSets.main.resources.srcDir 'src/main/java'
+
+def v_slf4j = '1.7.7'
+def v_jme3 = '3.0.10'
+
+dependencies {
+	// logging
+	//compile "org.slf4j:slf4j-api:${v_slf4j}"
+	//runtime "org.slf4j:jul-to-slf4j:${v_slf4j}"
+	//runtime 'ch.qos.logback:logback-classic:1.1.2'
+
+	// jme
+	compile 'org.xbuf.jme3_xbuf:jme3_xbuf_loader:213c6a499d'
+	compile "com.jme3:jme3-core:${v_jme3}"
+	runtime "com.jme3:jme3-desktop:${v_jme3}"
+	runtime "com.jme3:jme3-lwjgl:${v_jme3}"
+
+	//utils
+}
