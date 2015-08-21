@@ -40,9 +40,9 @@ class ReqHandler {
 	def enable() {
 		println("ENABLE")
 		app.enqueue[|
-			val cam0 = app.getCamera().clone()
+			remoteCtx.cam.camera = app.getCamera().clone()
 			//cam0.setViewPort(1f, 0f, 2f, 1f) // black screen if the camera is outside of viewport(0-1, 0-1, 0-1, 0-1)
-			val vp = app.getRenderManager().createPreView("remoteHandler_" + System.currentTimeMillis(), cam0)
+			val vp = app.getRenderManager().createPreView("remoteHandler_" + System.currentTimeMillis(), remoteCtx.cam.camera)
 			//val vp = app.getRenderManager().createPostView("remoteHandler_" + System.currentTimeMillis(), cam0)
 			vp.setBackgroundColor(ColorRGBA.Gray)
 			vp.addProcessor(remoteCtx.view)
@@ -148,28 +148,23 @@ class ReqHandler {
 			val rot = xbuf.cnv(cmd.getRotation(), cam.getLocalRotation());
 			cam.setLocalRotation(rot.clone());
 			cam.setLocalTranslation(xbuf.cnv(cmd.getLocation(), cam.getLocalTranslation()));
-			val cam0 = rc
-					.view
-					.getViewPort()
-					.getCamera()
-			cam.setCamera(cam0);
 			//if (cmd.hasNear()) cam0.setFrustumNear(cmd.getNear())
 			//if (cmd.hasFar()) cam0.setFrustumFar(cmd.getFar())
 			if (cmd.hasProjection()) {
 				val proj = xbuf.cnv(cmd.getProjection(), new Matrix4f());
-				cam0.setParallelProjection(cmd.getProjMode() == ProjMode.orthographic)
+				cam.camera.setParallelProjection(cmd.getProjMode() == ProjMode.orthographic)
 				if (cmd.getProjMode() == ProjMode.orthographic) {
 					val lr = pairOf(proj.m00, proj.m03)
 					val bt = pairOf(proj.m11, proj.m13)
 					val nf = pairOf(-proj.m22, proj.m23)
-					cam0.setFrustum(nf.key, nf.value, lr.key, lr.value, bt.value, bt.key)
+					cam.camera.setFrustum(nf.key, nf.value, lr.key, lr.value, bt.value, bt.key)
 				} else {
 					val fovY = 2f * FastMath.RAD_TO_DEG * FastMath.atan(1f / proj.m11)
 					val aspect = proj.m11 / proj.m00
-					cam0.setFrustumPerspective(fovY, aspect, cmd.getNear(), cmd.getFar())
+					cam.camera.setFrustumPerspective(fovY, aspect, cmd.getNear(), cmd.getFar())
 				}
 			}
-			cam0.update()
+			cam.camera.update()
 			cam.setEnabled(true)
 		]
 	}
