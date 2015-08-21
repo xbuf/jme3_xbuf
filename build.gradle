@@ -10,13 +10,6 @@ buildscript {
 		classpath "pl.allegro.tech.build:axion-release-plugin:1.3.0"
 	}
 }
-apply plugin: "pl.allegro.tech.build.axion-release"
-scmVersion {
-		tag {
-				prefix = ''
-				versionSeparator = ''
-		}
-}
 
 //------------------------------------------------------------------------------
 // Global
@@ -25,7 +18,7 @@ scmVersion {
 
 allprojects {
 	group = "org.xbuf.jme3_xbuf"
-	project.version = scmVersion.version
+	project.version = "0.6.1-SNAPSHOT"
 	def description = 'xbuf lib and tools for jMonkeyEngine (jme3)'
 }
 
