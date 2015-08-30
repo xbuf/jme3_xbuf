@@ -59,6 +59,7 @@ public class Xbuf {
 	final Material defaultMaterial;
 	final Texture  defaultTexture;
 	public final ExtensionRegistry registry;
+	final MaterialReplicator materialReplicator = new MaterialReplicator()
 
 	new(AssetManager assetManager) {
 		this.assetManager = assetManager
@@ -218,7 +219,7 @@ public class Xbuf {
 		if ((dst.getBuffer(VertexBuffer.Type.Tangent) == null || dst.getBuffer(VertexBuffer.Type.Binormal) == null) 
 			&& dst.getBuffer(VertexBuffer.Type.Normal) != null && dst.getBuffer(VertexBuffer.Type.TexCoord) != null
 		) {
-			TangentBinormalGenerator_31.setToleranceAngle(90)
+			TangentBinormalGenerator_31.setToleranceAngle(179) //remove warnings
 			TangentBinormalGenerator_31.generate(dst)
 		}
 
@@ -640,6 +641,7 @@ public class Xbuf {
 			var child = components.get(id) as Geometry
 			if (child == null) {
 				child = new Geometry()
+				//child.setMaterial(materialReplicator.newReplica(defaultMaterial))
 				child.setMaterial(defaultMaterial)
 				root.attachChild(child)
 				//log.debug("add Geometry for xbuf.Mesh.id: {}", id)
@@ -660,6 +662,7 @@ public class Xbuf {
 			//}
 			mat.setName(if (m.hasName()) m.getName() else m.getId())
 			mergeToMaterial(m, mat, log)
+			materialReplicator.syncReplicas(mat)
 		}
 	}
 
@@ -668,78 +671,78 @@ public class Xbuf {
 		for(Datas.Relation r : src.getRelationsList()) {
 			val op1 = components.get(r.getRef1());
 			val op2 = components.get(r.getRef2());
-			if (op1 == null) {
-				log.warn("can't link op1 not found : {}", r.getRef1());
-			}
-			if (op2 == null) {
-				log.warn("can't link op2 not found : {}", r.getRef2());
+			
+			if (op1 == null || op2 == null) {
+				val t1str = if (op1 != null) op1.getClass.simpleName else "not found"
+				val t2str = if (op2 != null) op2.getClass.simpleName else "not found"
+				log.warn("can't link: missing entity,  {}({}) -- {}({})\n", r.getRef1(), t1str, r.getRef2(), t2str);
+				return;
 			}
 			if (op1 == op2) {
-				log.warn("can't link op to itself (op1 == op2): {}", r.getRef1());
+				log.warn("can't link: op to itself (op1 == op2): {}({})", r.getRef1(), op1.getClass);
+				return
 			}
-			if (op1 != null && op2 != null) {
-				var done = false;
-				if (op1 instanceof Animation) {
-					if (op2 instanceof Spatial) { // Geometry, Node
-						var c = op2.getControl(typeof(AnimControl))
-						if (c == null) {
-							val sc = op2.getControl(typeof(SkeletonControl_31))
-							c = if (sc != null) new AnimControl(sc.getSkeleton) else new AnimControl()
-							op2.addControl(c)
-						}
-						c.addAnim(op1)
-						done = true
+			var done = false;
+			if (op1 instanceof Animation) {
+				if (op2 instanceof Spatial) { // Geometry, Node
+					var c = op2.getControl(typeof(AnimControl))
+					if (c == null) {
+						val sc = op2.getControl(typeof(SkeletonControl_31))
+						c = if (sc != null) new AnimControl(sc.getSkeleton) else new AnimControl()
+						op2.addControl(c)
 					}
-				} else if (op1 instanceof CustomParamList) { // <--> xbuf_ext.Customparams.CustomParams
-					if (op2 instanceof Spatial) { // Geometry, Node
-						for(CustomParam p : op1.getParamsList()) {
-							mergeToUserData(p, op2, log)
-						}
-						done = true
-					}
-				} else if (op1 instanceof XbufLightControl) { // <--> xbuf.Datas.Light
-					if (op2 instanceof Geometry) {
-						op1.getSpatial().removeControl(op1);
-						op2.addControl(op1)
-						// TODO raise an alert, strange to link LightNode and Geometry
-						done = true
-					} else if (op2 instanceof Node) {
-						op1.getSpatial().removeControl(op1)
-						op2.addControl(op1)
-						done = true
-					}
-				} else if (op1 instanceof Material) { // <--> xbuf.Datas.Material
-					if (op2 instanceof Geometry) {
-						op2.setMaterial(op1)
-						cloneMaterialOnGeometry(op2)
-						done = true
-					} else if (op2 instanceof Node) {
-						op2.setMaterial(op1)
-                        cloneMaterialOnGeometry(op2)
-						done = true
-					}
-				} else if (op1 instanceof Geometry) { // <--> xbuf.Datas.Mesh
-					if (op2 instanceof Node) {
-						op2.attachChild(op1)
-						done = true
-					} else if (op2 instanceof Skeleton) {
-						link(op1, op2)
-						done = true
-					}
-				} else if (op1 instanceof Skeleton) { // <--> xbuf.Datas.Skeleton
-					if (op2 instanceof Node) {
-						link(op2, op1)
-						done = true
-					}
-				} else if (op1 instanceof Node) { // <--> xbuf.Datas.TObject
-					if (op2 instanceof Node) {
-						op1.attachChild(op2)
-						done = true
-					}
+					c.addAnim(op1)
+					done = true
 				}
-				if (!done) {
-					log.warn("doesn't know how to make relation {}({}) -- {}({})\n", r.getRef1(), op1.getClass(), r.getRef2(), op2.getClass());
+			} else if (op1 instanceof CustomParamList) { // <--> xbuf_ext.Customparams.CustomParams
+				if (op2 instanceof Spatial) { // Geometry, Node
+					for(CustomParam p : op1.getParamsList()) {
+						mergeToUserData(p, op2, log)
+					}
+					done = true
 				}
+			} else if (op1 instanceof XbufLightControl) { // <--> xbuf.Datas.Light
+				if (op2 instanceof Geometry) {
+					op1.getSpatial().removeControl(op1);
+					op2.addControl(op1)
+					// TODO raise an alert, strange to link LightNode and Geometry
+					done = true
+				} else if (op2 instanceof Node) {
+					op1.getSpatial().removeControl(op1)
+					op2.addControl(op1)
+					done = true
+				}
+			} else if (op1 instanceof Material) { // <--> xbuf.Datas.Material
+				if (op2 instanceof Geometry) {
+					op2.setMaterial(op1)
+					cloneMaterialOnGeometry(op2)
+					done = true
+				} else if (op2 instanceof Node) {
+					op2.setMaterial(op1)
+                    cloneMaterialOnGeometry(op2)
+					done = true
+				}
+			} else if (op1 instanceof Geometry) { // <--> xbuf.Datas.Mesh
+				if (op2 instanceof Node) {
+					op2.attachChild(op1)
+					done = true
+				} else if (op2 instanceof Skeleton) {
+					link(op1, op2)
+					done = true
+				}
+			} else if (op1 instanceof Skeleton) { // <--> xbuf.Datas.Skeleton
+				if (op2 instanceof Node) {
+					link(op2, op1)
+					done = true
+				}
+			} else if (op1 instanceof Node) { // <--> xbuf.Datas.TObject
+				if (op2 instanceof Node) {
+					op1.attachChild(op2)
+					done = true
+				}
+			}
+			if (!done) {
+				log.warn("can't link: doesn't know how to make relation {}({}) -- {}({})\n", r.getRef1(), op1.getClass(), r.getRef2(), op2.getClass());
 			}
 		}
 	}
@@ -761,7 +764,6 @@ public class Xbuf {
 			v.addControl(new AnimControl(sk))
 		}
 		// SkeletonControl should be after AnimControl in the list of Controls
-		println(">>>>>>>>>>>>>> add Skeleton : " + sk)
 		v.addControl(new SkeletonControl_31(sk))
 		cloneMaterialOnGeometry(v)
 	}
@@ -769,14 +771,16 @@ public class Xbuf {
     // TO avoid "java.lang.UnsupportedOperationException: Material instances cannot be shared when hardware skinning is used. Ensure all models use unique material instances."
     def void cloneMaterialOnGeometry(Spatial v) {
         if (v instanceof Geometry) {
-            v.material = v.material.clone()
-            v.material.clearParam("BoneMatrices")
+        	if (!materialReplicator.isReplica(v.material)) {
+            	v.material = materialReplicator.newReplica(v.material)
+           	}
         } else if (v instanceof Node) {
             for (child : v.children) {
                 cloneMaterialOnGeometry(child)
             }
         }        
     }
+
 
 	def Spatial mergeToUserData(CustomParam p, Spatial dst, Logger log) {
 		val name = p.getName()
@@ -894,7 +898,6 @@ public class Xbuf {
 		if (has) {
 			val name = findMaterialParamName(names, VarType.Texture2D, scope, log)
 			if (name != null) {
-				println(">>>> SET Texture: " + src.rpath + " into " + name )
 				dst.setTexture(name, getValue(src, log))
 			} else {
 				log.warn("can't find a matching name for : [{}] ({})", ",".join(names), VarType.Texture2D)
