@@ -243,7 +243,6 @@ public class SkeletonControl_31 extends SkeletonControl implements Cloneable {
         offsetMatrices = skeleton.computeSkinningMatrices();
         for (Material m : materials) {
             MatParam currentParam = m.getParam("BoneMatrices");
-
             if (currentParam != null) {
                 if (currentParam.getValue() != offsetMatrices) {
                     // Check to see if other SkeletonControl
@@ -252,11 +251,10 @@ public class SkeletonControl_31 extends SkeletonControl implements Cloneable {
                     // when hardware skinning used.
                     throw new UnsupportedOperationException(
                             "Material instances cannot be shared when hardware skinning is used. " +
-                            "Ensure all models use unique material instances."
+                            "Ensure all models use unique material instances : " + m.getName()
                     );
                 }
-            }
-            
+            }            
             m.setParam("BoneMatrices", VarType.Matrix4Array, offsetMatrices);
         }
     }

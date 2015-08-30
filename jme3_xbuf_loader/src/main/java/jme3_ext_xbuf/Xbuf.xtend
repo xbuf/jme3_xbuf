@@ -231,14 +231,14 @@ public class Xbuf {
 		dst.clearBuffer(Type.BoneIndex)
 		dst.clearBuffer(Type.BoneWeight)
 		val nb = skin.boneCountCount
-		val maxWeightPerVert = Math.min(4, skin.boneCountList.reduce[p1, p2|Math.max(p1,p2)])
+		//val maxWeightPerVert = Math.min(4, skin.boneCountList.reduce[p1, p2|Math.max(p1,p2)])
+		val maxWeightPerVert = 4// jME 3.0 only support fixed 4 weights per vertex
 		val indexPad = newByteArrayOfSize(nb * maxWeightPerVert)
 		val weightPad = newFloatArrayOfSize(nb * maxWeightPerVert)
 		var isrc = 0
 		for(var i = 0; i < nb; i++) {
 			var totalWeightPad = 0f
 			val cnt = skin.boneCountList.get(i)
-			val wpv = Math.min(maxWeightPerVert, cnt)
 			val k0 = i * maxWeightPerVert
 			for(var j = 0;  j < maxWeightPerVert; j++) {
 				val k = k0 + j
@@ -259,6 +259,7 @@ public class Xbuf {
 				}
 				
 				val normalizer = totalWeight / totalWeightPad
+                val wpv = Math.min(maxWeightPerVert, cnt)
 				for(var j = 0;  j < wpv; j++) {
 					val k = k0 + j
 					weightPad.set(k, weightPad.get(k) * normalizer)
@@ -710,9 +711,11 @@ public class Xbuf {
 				} else if (op1 instanceof Material) { // <--> xbuf.Datas.Material
 					if (op2 instanceof Geometry) {
 						op2.setMaterial(op1)
+						cloneMaterialOnGeometry(op2)
 						done = true
 					} else if (op2 instanceof Node) {
 						op2.setMaterial(op1)
+                        cloneMaterialOnGeometry(op2)
 						done = true
 					}
 				} else if (op1 instanceof Geometry) { // <--> xbuf.Datas.Mesh
@@ -758,8 +761,22 @@ public class Xbuf {
 			v.addControl(new AnimControl(sk))
 		}
 		// SkeletonControl should be after AnimControl in the list of Controls
+		println(">>>>>>>>>>>>>> add Skeleton : " + sk)
 		v.addControl(new SkeletonControl_31(sk))
+		cloneMaterialOnGeometry(v)
 	}
+
+    // TO avoid "java.lang.UnsupportedOperationException: Material instances cannot be shared when hardware skinning is used. Ensure all models use unique material instances."
+    def void cloneMaterialOnGeometry(Spatial v) {
+        if (v instanceof Geometry) {
+            v.material = v.material.clone()
+            v.material.clearParam("BoneMatrices")
+        } else if (v instanceof Node) {
+            for (child : v.children) {
+                cloneMaterialOnGeometry(child)
+            }
+        }        
+    }
 
 	def Spatial mergeToUserData(CustomParam p, Spatial dst, Logger log) {
 		val name = p.getName()
