@@ -727,12 +727,12 @@ public class Xbuf {
 					op2.attachChild(op1)
 					done = true
 				} else if (op2 instanceof Skeleton) {
-					link(op1, op2)
+					link(op1, op2, findAnimLinkedToRef(src, r.ref2, components))
 					done = true
 				}
 			} else if (op1 instanceof Skeleton) { // <--> xbuf.Datas.Skeleton
 				if (op2 instanceof Node) {
-					link(op2, op1)
+					link(op2, op1, findAnimLinkedToRef(src, r.ref1, components))
 					done = true
 				}
 			} else if (op1 instanceof Node) { // <--> xbuf.Datas.TObject
@@ -748,24 +748,40 @@ public class Xbuf {
 	}
 
 	// see http://hub.jmonkeyengine.org/t/skeletoncontrol-or-animcontrol-to-host-skeleton/31478/4
-	def link(Spatial v, Skeleton sk) {
+	def link(Spatial v, Skeleton sk, Iterable<Animation> skAnims) {
 		v.removeControl(typeof(SkeletonControl_31))
 		//update AnimControl if related to skeleton
-		val ac = v.getControl(typeof(AnimControl))
-		if (ac != null/* && ac.getSkeleton() != null*/) {
-			v.removeControl(ac)
+		val ac0 = v.getControl(typeof(AnimControl))
+		val ac1 = if (ac0 != null/* && ac.getSkeleton() != null*/) {
+			v.removeControl(ac0)
 			val ac2 = new AnimControl(sk)
 			val anims = new HashMap<String, Animation>()
-			ac.animationNames.forEach[name | anims.put(name, ac.getAnim(name).clone())]
+			ac0.animationNames.forEach[name | anims.put(name, ac0.getAnim(name).clone())]
 			ac2.animations = anims
 			v.addControl(ac2)
+			ac2
 		} else {
 			//always add AnimControl else NPE when SkeletonControl.clone
-			v.addControl(new AnimControl(sk))
+			val ac2 = new AnimControl(sk)
+			v.addControl(ac2)
+			ac2
 		}
 		// SkeletonControl should be after AnimControl in the list of Controls
 		v.addControl(new SkeletonControl_31(sk))
+		skAnims.forEach[ac1.addAnim(it)]
 		cloneMaterialOnGeometry(v)
+	}
+	
+	def findAnimLinkedToRef(Datas.Data src, String ref,  Map<String, Object> components) {
+		src.getRelationsList().map[r|
+			if (r.ref1 == ref && components.get(r.ref2) instanceof Animation) {
+				components.get(r.ref2) as Animation
+			} else if (r.ref2 == ref && components.get(r.ref1) instanceof Animation) {
+				components.get(r.ref1) as Animation
+			} else {
+				null
+			}
+		].filter[it != null]
 	}
 
     // TO avoid "java.lang.UnsupportedOperationException: Material instances cannot be shared when hardware skinning is used. Ensure all models use unique material instances."
