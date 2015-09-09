@@ -8,14 +8,8 @@ buildscript {
 		classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:1.12.+'
 		classpath "org.xtend:xtend-gradle-plugin:0.3.4"
 		classpath "pl.allegro.tech.build:axion-release-plugin:1.3.0"
+		classpath "com.dmdirc:git-version:1.0"
 	}
-}
-apply plugin: "pl.allegro.tech.build.axion-release"
-scmVersion {
-		tag {
-				prefix = ''
-				versionSeparator = ''
-		}
 }
 
 //------------------------------------------------------------------------------
@@ -24,8 +18,10 @@ scmVersion {
 //------------------------------------------------------------------------------
 
 allprojects {
+    apply plugin: 'com.dmdirc.git-version'
+
 	group = "org.xbuf.jme3_xbuf"
-	project.version = "0.6.1"
+	//project.version = "0.6.1"
 	def description = 'xbuf lib and tools for jMonkeyEngine (jme3)'
 }
 
