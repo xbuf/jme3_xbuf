@@ -17,21 +17,41 @@ class NamedBoneTrack implements Track{
 
 	@Accessors(PUBLIC_GETTER) var String boneName
 	var int boneIndex = -1
-
+	
+	var float[] times
+	var Vector3f[] translations
+	var Quaternion[] rotations
+	var Vector3f[] scales
 
 	new(){}
 
+	/**
+	 * translations, rotations and scales are in the PARENT space (and not relative to RestPose)
+	 */
 	new(String name, float[] times, Vector3f[] translations, Quaternion[] rotations, Vector3f[] scales){
 		boneName = name
-		delegate = new BoneTrack(boneIndex, times, translations, rotations, scales)
+		this.times = times
+		this.translations = translations
+		this.rotations = rotations
+		this.scales = scales
+		delegate = null
 	}
-
-	def int findBoneIndex(AnimControl control) {
+	
+	def setupBoneTrack(AnimControl control) {
 		val skel = control.skeleton
 		if (skel != null && boneIndex < 0) {
 			boneIndex = skel.getBoneIndex(boneName)
 			if (boneIndex > -1) {
-				delegate = new BoneTrack(boneIndex, delegate.times, delegate.translations, delegate.rotations, delegate.scales)
+				val bone = skel.getBone(boneIndex)
+				//Convert rotations, translations, scales to the "bind pose" space (BoneTrack combine initialXxx with transformation)
+				val rotationInv = bone.worldBindRotation.inverse() // wrong name : it's the initialRot in PARENT Bone space
+				val scaleInv = new Vector3f(1f/bone.worldBindScale.x, 1/bone.worldBindScale.y, 1/bone.worldBindScale.z)  // wrong name : it's the initialScale in PARENT Bone space
+				val translationInv = bone.worldBindPosition.mult(-1) // wrong name : it's the initialPos in PARENT Bone space
+				delegate = new BoneTrack(boneIndex, times,
+					translations.map[v|v.add(translationInv)],
+					rotations.map[v|rotationInv.mult(v)],
+					scales.map[v|v.mult(scaleInv)]
+				)
 			}
 		}
 		boneIndex
@@ -39,7 +59,7 @@ class NamedBoneTrack implements Track{
 
 	override setTime(float time, float weight, AnimControl control, AnimChannel channel, TempVars vars) {
 		try {
-			if (findBoneIndex(control) > -1) {
+			if (setupBoneTrack(control) > -1) {
 				delegate.setTime(time, weight, control, channel, vars)
 			} else {
 				System.out.println("no boneId for boneName :" + boneName + " on " + control.skeleton)
@@ -50,18 +70,24 @@ class NamedBoneTrack implements Track{
 	}
 
 	override clone() {
-		new NamedBoneTrack(boneName, delegate.times, delegate.translations, delegate.rotations, delegate.scales)
+		new NamedBoneTrack(boneName, times, translations, rotations, scales)
 	}
 
 	override write(JmeExporter ex) {
 		val oc = ex.getCapsule(this)
 		oc.write(boneName, "boneName", null)
-		oc.write(delegate, "delegate", null)
+        oc.write(times, "times", null);
+        oc.write(translations, "translations", null);
+        oc.write(rotations, "rotations", null);
+        oc.write(scales, "scales", null);
 	}
 
 	override read(JmeImporter im) {
 		val ic = im.getCapsule(this)
 		boneName = ic.readString("boneName", null)
-		delegate = ic.readSavable("delegate", null) as BoneTrack
+        times = ic.readFloatArray("times", null);
+		translations = ic.readSavableArray("translations", null) as Vector3f[]
+        rotations = ic.readSavableArray("rotations", null)  as Quaternion[]
+        scales = ic.readSavableArray("scales", null) as Vector3f[]
 	}
 }
