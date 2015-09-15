@@ -5,8 +5,10 @@ import com.jme3.animation.AnimControl
 import com.jme3.animation.Animation
 import com.jme3.animation.Bone
 import com.jme3.animation.Skeleton
+import com.jme3.animation.SkeletonControl_31
 import com.jme3.animation.SpatialTrack
 import com.jme3.asset.AssetManager
+import com.jme3.asset.AssetNotFoundException
 import com.jme3.light.AmbientLight
 import com.jme3.light.DirectionalLight
 import com.jme3.light.Light
@@ -32,6 +34,9 @@ import com.jme3.scene.VertexBuffer.Type
 import com.jme3.shader.VarType
 import com.jme3.texture.Image
 import com.jme3.texture.Texture
+import com.jme3.texture.Texture.MagFilter
+import com.jme3.texture.Texture.MinFilter
+import com.jme3.texture.Texture.WrapMode
 import com.jme3.texture.Texture2D
 import com.jme3.util.TangentBinormalGenerator_31
 import java.util.HashMap
@@ -39,19 +44,28 @@ import java.util.List
 import java.util.Map
 import jme3_ext_animation.NamedBoneTrack
 import org.slf4j.Logger
-import xbuf.Datas
 import xbuf.Datas.Data
+import xbuf.Lights
+import xbuf.Materials
+import xbuf.Meshes
+import xbuf.Meshes.FloatBuffer
+import xbuf.Meshes.IndexArray
+import xbuf.Meshes.Skin
+import xbuf.Meshes.UintBuffer
+import xbuf.Meshes.VertexArray
+import xbuf.Primitives
+import xbuf.Primitives.Color
+import xbuf.Primitives.Mat4
+import xbuf.Primitives.Texture2DInline
+import xbuf.Relations.Relation
+import xbuf.Skeletons
+import xbuf.Tobjects.TObject
 import xbuf_ext.AnimationsKf
 import xbuf_ext.AnimationsKf.AnimationKF
 import xbuf_ext.AnimationsKf.SampledTransform
 import xbuf_ext.CustomParams
 import xbuf_ext.CustomParams.CustomParam
 import xbuf_ext.CustomParams.CustomParamList
-import com.jme3.texture.Texture.WrapMode
-import com.jme3.animation.SkeletonControl_31
-import com.jme3.asset.AssetNotFoundException
-import com.jme3.texture.Texture.MagFilter
-import com.jme3.texture.Texture.MinFilter
 
 // TODO use a Validation object (like in scala/scalaz) with option to log/dump stacktrace
 public class Xbuf {
@@ -90,37 +104,37 @@ public class Xbuf {
 		tex
 	}
 
-	def Vector2f cnv(Datas.Vec2 src, Vector2f dst) {
+	def Vector2f cnv(Primitives.Vec2 src, Vector2f dst) {
 		dst.set(src.getX(), src.getY());
 		return dst;
 	}
 
-	def Vector3f cnv(Datas.Vec3 src, Vector3f dst) {
+	def Vector3f cnv(Primitives.Vec3 src, Vector3f dst) {
 		dst.set(src.getX(), src.getY(), src.getZ());
 		return dst;
 	}
 
-	def Vector4f cnv(Datas.Vec4 src, Vector4f dst) {
+	def Vector4f cnv(Primitives.Vec4 src, Vector4f dst) {
 		dst.set(src.getX(), src.getY(), src.getZ(), src.getW());
 		return dst;
 	}
 
-	def Quaternion cnv(Datas.Quaternion src, Quaternion dst) {
+	def Quaternion cnv(Primitives.Quaternion src, Quaternion dst) {
 		dst.set(src.getX(), src.getY(), src.getZ(), src.getW());
 		return dst;
 	}
 
-	def Vector4f cnv(Datas.Quaternion src, Vector4f dst) {
+	def Vector4f cnv(Primitives.Quaternion src, Vector4f dst) {
 		dst.set(src.getX(), src.getY(), src.getZ(), src.getW());
 		return dst;
 	}
 
-	def ColorRGBA cnv(Datas.Color src, ColorRGBA dst) {
+	def ColorRGBA cnv(Primitives.Color src, ColorRGBA dst) {
 		dst.set(src.getR(), src.getG(), src.getB(), src.getA());
 		return dst;
 	}
 
-	def Matrix4f cnv(Datas.Mat4 src, Matrix4f dst) {
+	def Matrix4f cnv(Mat4 src, Matrix4f dst) {
 		dst.m00 = src.getC00();
 		dst.m10 = src.getC10();
 		dst.m20 = src.getC20();
@@ -140,7 +154,7 @@ public class Xbuf {
 		return dst;
 	}
 
-	def Mesh.Mode cnv(Datas.Mesh.Primitive v) {
+	def Mesh.Mode cnv(Meshes.Mesh.Primitive v) {
 		switch(v) {
 		case line_strip: Mode.LineStrip
 		case lines: Mode.Lines
@@ -151,7 +165,7 @@ public class Xbuf {
 		}
 	}
 
-	def VertexBuffer.Type cnv(Datas.VertexArray.Attrib v) {
+	def VertexBuffer.Type cnv(VertexArray.Attrib v) {
 		switch(v) {
 		case position: Type.Position
 		case normal: Type.Normal
@@ -171,7 +185,7 @@ public class Xbuf {
 	}
 
 	//TODO use an optim version: including a patch for no autoboxing : https://code.google.com/p/protobuf/issues/detail?id=464
-	def float[] hack_cnv(Datas.FloatBuffer src) {
+	def float[] hack_cnv(FloatBuffer src) {
 		val b = newFloatArrayOfSize(src.getValuesCount())
 		val l = src.getValuesList()
 		for(var i = 0; i < b.length; i++) b.set(i, l.get(i))
@@ -179,14 +193,14 @@ public class Xbuf {
 	}
 
 	//TODO use an optim version: including a patch for no autoboxing : https://code.google.com/p/protobuf/issues/detail?id=464
-	def int[] hack_cnv(Datas.UintBuffer src) {
+	def int[] hack_cnv(UintBuffer src) {
 		val b = newIntArrayOfSize(src.getValuesCount())
 		val l = src.getValuesList();
 		for(var i = 0; i < b.length; i++) b.set(i, l.get(i))
 		b
 	}
 
-	def Mesh cnv(Datas.Mesh src, Mesh dst, Logger log) {
+	def Mesh cnv(Meshes.Mesh src, Mesh dst, Logger log) {
 		if (src.getIndexArraysCount() > 1) {
 			throw new IllegalArgumentException("doesn't support more than 1 index array")
 		}
@@ -195,12 +209,12 @@ public class Xbuf {
 		}
 
 		dst.setMode(cnv(src.getPrimitive()));
-		for(Datas.VertexArray va : src.getVertexArraysList()) {
+		for(VertexArray va : src.getVertexArraysList()) {
 			val type = cnv(va.getAttrib())
 			dst.setBuffer(type, va.getFloats().getStep(), hack_cnv(va.getFloats()))
 			log.debug("add {}", dst.getBuffer(type))
 		}
-		for(Datas.IndexArray va : src.getIndexArraysList()) {
+		for(IndexArray va : src.getIndexArraysList()) {
 			dst.setBuffer(VertexBuffer.Type.Index, va.getInts().getStep(), hack_cnv(va.getInts()))
 		}
 		if (src.hasSkin) {
@@ -228,7 +242,7 @@ public class Xbuf {
 		dst
 	}
 
-	def Mesh applySkin(Datas.Skin skin, Mesh dst, Logger log) {
+	def Mesh applySkin(Skin skin, Mesh dst, Logger log) {
 		dst.clearBuffer(Type.BoneIndex)
 		dst.clearBuffer(Type.BoneWeight)
 		val nb = skin.boneCountCount
@@ -289,7 +303,7 @@ public class Xbuf {
 	}
 
 	//TODO support multi mesh, may replace geometry by node and use one Geometry per mesh
-	def Geometry cnv(Datas.Mesh src, Geometry dst, Logger log) {
+	def Geometry cnv(Meshes.Mesh src, Geometry dst, Logger log) {
 		dst.setName(if (src.hasName()) { src.getName() } else { src.getId()})
 		val mesh = cnv(src, new Mesh(), log)
 		dst.setMesh(mesh)
@@ -298,7 +312,7 @@ public class Xbuf {
 	}
 
 	//TODO optimize to create less intermediate node
-	def merge(Datas.Data src, Node root, Map<String, Object> components, Logger log) {
+	def merge(Data src, Node root, Map<String, Object> components, Logger log) {
 		mergeTObjects(src, root, components, log)
 		mergeMeshes(src, root, components, log)
 		mergeMaterials(src, components, log)
@@ -310,8 +324,8 @@ public class Xbuf {
 		mergeRelations(src, root, components, log)
 	}
 
-	def mergeAnimations(Datas.Data src, Map<String, Object> components, Logger log) {
-		for(AnimationsKf.AnimationKF e : src.getExtension(AnimationsKf.animationsKf)) {
+	def mergeAnimations(Data src, Map<String, Object> components, Logger log) {
+		for(AnimationsKf.AnimationKF e : src.animationsKfList) {
 			val id = e.getId()
 			//TODO: merge with existing
 			val child = makeAnimation(e, log)
@@ -483,8 +497,8 @@ public class Xbuf {
 //		}
 //	}
 
-	def void mergeSkeletons(Datas.Data src, Node root, Map<String, Object> components, Logger log) {
-		for(Datas.Skeleton e : src.getSkeletonsList()) {
+	def void mergeSkeletons(Data src, Node root, Map<String, Object> components, Logger log) {
+		for(e : src.skeletonsList) {
 			//TODO manage parent hierarchy
 			val id = e.getId();
 			//TODO: merge with existing
@@ -494,8 +508,8 @@ public class Xbuf {
 		}
 	}
 
-	def Skeleton makeSkeleton(Datas.Skeleton e, Logger log) {
-		val bones = <Bone>newArrayOfSize(e.getBonesCount())
+	def Skeleton makeSkeleton(Skeletons.Skeleton e, Logger log) {
+		val bones = <Bone>newArrayOfSize(e.bonesCount)
 		val db = new HashMap<String, Bone>()
 		for(var i = 0; i < bones.length; i++) {
 			val src = e.getBones(i)
@@ -507,7 +521,7 @@ public class Xbuf {
 			db.put(src.getId(), b)
 			bones.set(i, b)
 		}
-		for(Datas.Relation r : e.getBonesGraphList()) {
+		for(Relation r : e.getBonesGraphList()) {
 			val parent = db.get(r.getRef1())
 			val child = db.get(r.getRef2())
 			parent.addChild(child)
@@ -518,14 +532,14 @@ public class Xbuf {
 	}
 
 	def mergeCustomParams(Data src, Map<String, Object> components, Logger log) {
-		for(CustomParams.CustomParamList srccp : src.getExtension(CustomParams.customParams)) {
+		for(CustomParams.CustomParamList srccp : src.customParamsList) {
 			//TODO merge with existing
 			components.put(srccp.getId(), srccp)
 		}
 	}
 
 	def mergeLights(Data src, Node root, Map<String, Object> components, Logger log) {
-		for(Datas.Light srcl : src.getLightsList()) {
+		for(srcl : src.lightsList) {
 			//TODO manage parent hierarchy
 			val id = srcl.getId()
 			var dst = components.get(id) as XbufLightControl
@@ -598,7 +612,7 @@ public class Xbuf {
 		}
 	}
 
-	def Light makeLight(Datas.Light srcl, Logger log) {
+	def Light makeLight(Lights.Light srcl, Logger log) {
 		var l0 = null as Light
 		switch(srcl.getKind()) {
 			case ambient:
@@ -620,8 +634,8 @@ public class Xbuf {
 		l0
 	}
 
-	def mergeTObjects(Datas.Data src, Node root, Map<String, Object> components, Logger log) {
-		for(Datas.TObject n : src.getTobjectsList()) {
+	def mergeTObjects(Data src, Node root, Map<String, Object> components, Logger log) {
+		for(TObject n : src.getTobjectsList()) {
 			val id = n.getId()
 			var child = components.get(id) as Spatial
 			if (child == null) {
@@ -634,8 +648,8 @@ public class Xbuf {
 		}
 	}
 
-	def mergeMeshes(Datas.Data src, Node root, Map<String, Object> components, Logger log) {
-		for(Datas.Mesh g : src.getMeshesList()) {
+	def mergeMeshes(Data src, Node root, Map<String, Object> components, Logger log) {
+		for(g : src.meshesList) {
 			//TODO manage parent hierarchy
 			val id = g.getId()
 			var child = components.get(id) as Geometry
@@ -651,8 +665,8 @@ public class Xbuf {
 		}
 	}
 
-	def mergeMaterials(Datas.Data src, Map<String, Object> components, Logger log) {
-		for(Datas.Material m : src.getMaterialsList()) {
+	def mergeMaterials(Data src, Map<String, Object> components, Logger log) {
+		for(m : src.materialsList) {
 			//TODO update / remove previous material
 			val id = m.getId()
 			//val mat = components.get(id) as Material
@@ -667,8 +681,8 @@ public class Xbuf {
 	}
 
 	//TODO use dispatch or pattern matching of Xtend
-	def void mergeRelations(Datas.Data src, Node root, Map<String, Object> components, Logger log) {
-		for(Datas.Relation r : src.getRelationsList()) {
+	def void mergeRelations(Data src, Node root, Map<String, Object> components, Logger log) {
+		for(r : src.relationsList) {
 			val op1 = components.get(r.getRef1());
 			val op2 = components.get(r.getRef2());
 			
@@ -701,7 +715,7 @@ public class Xbuf {
 					}
 					done = true
 				}
-			} else if (op1 instanceof XbufLightControl) { // <--> xbuf.Datas.Light
+			} else if (op1 instanceof XbufLightControl) { // <--> xbuf.Light
 				if (op2 instanceof Geometry) {
 					op1.getSpatial().removeControl(op1);
 					op2.addControl(op1)
@@ -712,7 +726,7 @@ public class Xbuf {
 					op2.addControl(op1)
 					done = true
 				}
-			} else if (op1 instanceof Material) { // <--> xbuf.Datas.Material
+			} else if (op1 instanceof Material) { // <--> xbuf.Material
 				if (op2 instanceof Geometry) {
 					op2.setMaterial(op1)
 					cloneMaterialOnGeometry(op2)
@@ -722,7 +736,7 @@ public class Xbuf {
                     cloneMaterialOnGeometry(op2)
 					done = true
 				}
-			} else if (op1 instanceof Geometry) { // <--> xbuf.Datas.Mesh
+			} else if (op1 instanceof Geometry) { // <--> xbuf.Mesh
 				if (op2 instanceof Node) {
 					op2.attachChild(op1)
 					done = true
@@ -730,12 +744,12 @@ public class Xbuf {
 					link(op1, op2, findAnimLinkedToRef(src, r.ref2, components))
 					done = true
 				}
-			} else if (op1 instanceof Skeleton) { // <--> xbuf.Datas.Skeleton
+			} else if (op1 instanceof Skeleton) { // <--> xbuf.Skeleton
 				if (op2 instanceof Node) {
 					link(op2, op1, findAnimLinkedToRef(src, r.ref1, components))
 					done = true
 				}
-			} else if (op1 instanceof Node) { // <--> xbuf.Datas.TObject
+			} else if (op1 instanceof Node) { // <--> xbuf.TObject
 				if (op2 instanceof Node) {
 					op1.attachChild(op2)
 					done = true
@@ -772,7 +786,7 @@ public class Xbuf {
 		cloneMaterialOnGeometry(v)
 	}
 	
-	def findAnimLinkedToRef(Datas.Data src, String ref,  Map<String, Object> components) {
+	def findAnimLinkedToRef(Data src, String ref,  Map<String, Object> components) {
 		src.getRelationsList().map[r|
 			if (r.ref1 == ref && components.get(r.ref2) instanceof Animation) {
 				components.get(r.ref2) as Animation
@@ -831,7 +845,7 @@ public class Xbuf {
 		return dst;
 	}
 
-	def Image.Format getValue(Datas.Texture2DInline.Format f, Logger log) {
+	def Image.Format getValue(Texture2DInline.Format f, Logger log) {
 		switch(f){
 			//case bgra8: return Image.Format.BGR8;
 			case rgb8: Image.Format.RGB8
@@ -840,7 +854,7 @@ public class Xbuf {
 		}
 	}
 
-	def Texture getValue(Datas.Texture t, Logger log) {
+	def Texture getValue(Primitives.Texture t, Logger log) {
 		val tex = switch(t.getDataCase()){
 			case DATA_NOT_SET: null
 			case RPATH:
@@ -862,14 +876,14 @@ public class Xbuf {
 		tex
 	}
 
-	def Material newMaterial(Datas.Material m, Logger log) {
+	def Material newMaterial(Materials.Material m, Logger log) {
 		val lightFamily = !m.getShadeless()
 		val def = if (lightFamily) "Common/MatDefs/Light/Lighting.j3md" else "Common/MatDefs/Misc/Unshaded.j3md"
 		val mat = new Material(assetManager, def)
 		mat
 	}
 
-	def Material mergeToMaterial(Datas.Material src, Material dst, Logger log) {
+	def Material mergeToMaterial(Materials.Material src, Material dst, Logger log) {
 		val md = dst.getMaterialDef()
 		setColor(src.hasColor(), src.getColor(), dst, #["Color", "Diffuse"], md, log)
 		setTexture2D(src.hasColorMap(), src.getColorMap(), dst, #["ColorMap", "DiffuseMap"], md, log)
@@ -899,7 +913,7 @@ public class Xbuf {
 		dst
 	}
 
-	def setColor(boolean has, Datas.Color src, Material dst, String[] names, MaterialDef scope, Logger log){
+	def setColor(boolean has, Color src, Material dst, String[] names, MaterialDef scope, Logger log){
 		if (has) {
 			val name = findMaterialParamName(names, VarType.Vector4, scope, log)
 			if (name != null) {
@@ -910,7 +924,7 @@ public class Xbuf {
 		}
 	}
 
-	def setTexture2D(boolean has, Datas.Texture src, Material dst, String[] names, MaterialDef scope, Logger log){
+	def setTexture2D(boolean has, Primitives.Texture src, Material dst, String[] names, MaterialDef scope, Logger log){
 		if (has) {
 			val name = findMaterialParamName(names, VarType.Texture2D, scope, log)
 			if (name != null) {
@@ -943,7 +957,7 @@ public class Xbuf {
 		null
 	}
 
-	def void merge(Datas.Transform src, Spatial dst, Logger log) {
+	def void merge(Primitives.Transform src, Spatial dst, Logger log) {
 		dst.setLocalRotation(cnv(src.getRotation(), dst.getLocalRotation()))
 		dst.setLocalTranslation(cnv(src.getTranslation(), dst.getLocalTranslation()))
 		dst.setLocalScale(cnv(src.getScale(), dst.getLocalScale()))
