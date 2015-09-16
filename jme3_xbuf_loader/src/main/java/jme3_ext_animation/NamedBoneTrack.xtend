@@ -37,6 +37,12 @@ class NamedBoneTrack implements Track{
 		delegate = null
 	}
 	
+	override toString() {
+		val startAt = if (times.length > 0) times.get(0) else 0
+		val stopAt = if (times.length > 0) times.get(times.length-1) else 0
+		String.format("%s(%s, %.2f-%.2f, %d, %d, %d):%d", this.class.simpleName, boneName, startAt, stopAt, translations.length, rotations.length, scales.length, boneIndex) 
+	}
+	
 	def setupBoneTrack(AnimControl control) {
 		val skel = control.skeleton
 		if (skel != null && boneIndex < 0) {
