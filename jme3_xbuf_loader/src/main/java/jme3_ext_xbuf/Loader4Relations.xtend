@@ -34,7 +34,10 @@ class Loader4Relations {
 	def void merge(Data src, Node root, Map<String, Object> components, Logger log) {
 		src.relationsList.map[r|
 			newRelationExpanded(r, src, components, log)
-		].filter[it != null].sortWith(new KindComparator()).forEach[re |
+		]
+		.filter[it != null]
+		.sortWith(new KindComparator())
+		.forEach[re |
 			merge(re, src, root, components, log)
 		]
 	}
@@ -147,10 +150,9 @@ class Loader4Relations {
 		} else if (op1 instanceof Geometry) { // <--> xbuf.Mesh
 			if (op2 instanceof Node) {
 				//TODO replace clone by instanciation
-				val mesh  = if (op1.parent != null) {
-					println(">> double mesh :" + re.ref1 + " .. " + op1.name + " from " + re.ref2)
-					val c = op1.clone(false)
-					c.material = materialReplicator.newReplica(op1.material)
+				val mesh  = if (op1.parent != null && op1.parent != root) {
+					val c = op1.clone(true)
+					//c.material = materialReplicator.newReplica(op1.material)
 					c
 				} else {
 					op1
