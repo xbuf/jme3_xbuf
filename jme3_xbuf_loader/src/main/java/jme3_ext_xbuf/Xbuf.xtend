@@ -1,43 +1,26 @@
 package jme3_ext_xbuf;
 
 import com.google.protobuf.ExtensionRegistry
-import com.jme3.animation.AnimControl
 import com.jme3.animation.Animation
 import com.jme3.animation.Bone
 import com.jme3.animation.Skeleton
-import com.jme3.animation.SkeletonControl_31
 import com.jme3.animation.SpatialTrack
 import com.jme3.asset.AssetManager
-import com.jme3.asset.AssetNotFoundException
 import com.jme3.light.AmbientLight
 import com.jme3.light.DirectionalLight
 import com.jme3.light.Light
 import com.jme3.light.PointLight
 import com.jme3.light.SpotLight
-import com.jme3.material.MatParam
-import com.jme3.material.Material
-import com.jme3.material.MaterialDef
 import com.jme3.math.ColorRGBA
 import com.jme3.math.FastMath
-import com.jme3.math.Matrix4f
 import com.jme3.math.Quaternion
-import com.jme3.math.Vector2f
 import com.jme3.math.Vector3f
-import com.jme3.math.Vector4f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Mesh
-import com.jme3.scene.Mesh.Mode
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.VertexBuffer
 import com.jme3.scene.VertexBuffer.Type
-import com.jme3.shader.VarType
-import com.jme3.texture.Image
-import com.jme3.texture.Texture
-import com.jme3.texture.Texture.MagFilter
-import com.jme3.texture.Texture.MinFilter
-import com.jme3.texture.Texture.WrapMode
-import com.jme3.texture.Texture2D
 import com.jme3.util.TangentBinormalGenerator_31
 import java.util.HashMap
 import java.util.List
@@ -46,17 +29,11 @@ import jme3_ext_animation.NamedBoneTrack
 import org.slf4j.Logger
 import xbuf.Datas.Data
 import xbuf.Lights
-import xbuf.Materials
 import xbuf.Meshes
-import xbuf.Meshes.FloatBuffer
 import xbuf.Meshes.IndexArray
 import xbuf.Meshes.Skin
-import xbuf.Meshes.UintBuffer
 import xbuf.Meshes.VertexArray
 import xbuf.Primitives
-import xbuf.Primitives.Color
-import xbuf.Primitives.Mat4
-import xbuf.Primitives.Texture2DInline
 import xbuf.Relations.Relation
 import xbuf.Skeletons
 import xbuf.Tobjects.TObject
@@ -64,22 +41,23 @@ import xbuf_ext.AnimationsKf
 import xbuf_ext.AnimationsKf.AnimationKF
 import xbuf_ext.AnimationsKf.SampledTransform
 import xbuf_ext.CustomParams
-import xbuf_ext.CustomParams.CustomParam
-import xbuf_ext.CustomParams.CustomParamList
+
+import static jme3_ext_xbuf.Converters.*
 
 // TODO use a Validation object (like in scala/scalaz) with option to log/dump stacktrace
 public class Xbuf {
-	final AssetManager assetManager;
-	final Material defaultMaterial;
-	final Texture  defaultTexture;
-	public final ExtensionRegistry registry;
-	final MaterialReplicator materialReplicator = new MaterialReplicator()
+	val AssetManager assetManager
+	
+	val materialReplicator = new MaterialReplicator()
+	val Loader4Materials loader4Materials
+	val Loader4Relations loader4Relations
+	public val ExtensionRegistry registry
 
 	new(AssetManager assetManager) {
 		this.assetManager = assetManager
+		loader4Materials = new Loader4Materials(assetManager, materialReplicator)
+		loader4Relations = new Loader4Relations(materialReplicator, loader4Materials)
 		registry = setupExtensionRegistry(ExtensionRegistry.newInstance())
-		defaultTexture = newDefaultTexture()
-		defaultMaterial = newDefaultMaterial()
 	}
 
 	protected def ExtensionRegistry setupExtensionRegistry(ExtensionRegistry r) {
@@ -88,117 +66,6 @@ public class Xbuf {
 		r
 	}
 
-	protected def Material newDefaultMaterial() {
-		val m = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
-		m.setColor("Color", ColorRGBA.Pink)
-		m.setTexture("ColorMap", defaultTexture)
-		m
-	}
-
-	protected def Texture newDefaultTexture() {
-		val tex = assetManager.loadTexture("Textures/debug_8_64.png")
-		tex.wrap = WrapMode.Repeat
-		tex.magFilter = MagFilter.Nearest
-		tex.minFilter = MinFilter.NearestLinearMipMap
-		tex.anisotropicFilter = 2
-		tex
-	}
-
-	def Vector2f cnv(Primitives.Vec2 src, Vector2f dst) {
-		dst.set(src.getX(), src.getY());
-		return dst;
-	}
-
-	def Vector3f cnv(Primitives.Vec3 src, Vector3f dst) {
-		dst.set(src.getX(), src.getY(), src.getZ());
-		return dst;
-	}
-
-	def Vector4f cnv(Primitives.Vec4 src, Vector4f dst) {
-		dst.set(src.getX(), src.getY(), src.getZ(), src.getW());
-		return dst;
-	}
-
-	def Quaternion cnv(Primitives.Quaternion src, Quaternion dst) {
-		dst.set(src.getX(), src.getY(), src.getZ(), src.getW());
-		return dst;
-	}
-
-	def Vector4f cnv(Primitives.Quaternion src, Vector4f dst) {
-		dst.set(src.getX(), src.getY(), src.getZ(), src.getW());
-		return dst;
-	}
-
-	def ColorRGBA cnv(Primitives.Color src, ColorRGBA dst) {
-		dst.set(src.getR(), src.getG(), src.getB(), src.getA());
-		return dst;
-	}
-
-	def Matrix4f cnv(Mat4 src, Matrix4f dst) {
-		dst.m00 = src.getC00();
-		dst.m10 = src.getC10();
-		dst.m20 = src.getC20();
-		dst.m30 = src.getC30();
-		dst.m01 = src.getC01();
-		dst.m11 = src.getC11();
-		dst.m21 = src.getC21();
-		dst.m31 = src.getC31();
-		dst.m02 = src.getC02();
-		dst.m12 = src.getC12();
-		dst.m22 = src.getC22();
-		dst.m32 = src.getC32();
-		dst.m03 = src.getC03();
-		dst.m13 = src.getC13();
-		dst.m23 = src.getC23();
-		dst.m33 = src.getC33();
-		return dst;
-	}
-
-	def Mesh.Mode cnv(Meshes.Mesh.Primitive v) {
-		switch(v) {
-		case line_strip: Mode.LineStrip
-		case lines: Mode.Lines
-		case points: Mode.Points
-		case triangle_strip: Mode.TriangleStrip
-		case triangles: Mode.Triangles
-		default: throw new IllegalArgumentException(String.format("doesn't support %s : %s", v?.getClass(), v))
-		}
-	}
-
-	def VertexBuffer.Type cnv(VertexArray.Attrib v) {
-		switch(v) {
-		case position: Type.Position
-		case normal: Type.Normal
-		case bitangent: Type.Binormal
-		case tangent: Type.Tangent
-		case color: Type.Color
-		case texcoord: Type.TexCoord
-		case texcoord2: Type.TexCoord2
-		case texcoord3: Type.TexCoord3
-		case texcoord4: Type.TexCoord4
-		case texcoord5: Type.TexCoord5
-		case texcoord6: Type.TexCoord6
-		case texcoord7: Type.TexCoord7
-		case texcoord8: Type.TexCoord8
-		default: throw new IllegalArgumentException(String.format("doesn't support %s : %s", v?.getClass(), v))
-		}
-	}
-
-	//TODO use an optim version: including a patch for no autoboxing : https://code.google.com/p/protobuf/issues/detail?id=464
-	def float[] hack_cnv(FloatBuffer src) {
-		val b = newFloatArrayOfSize(src.getValuesCount())
-		val l = src.getValuesList()
-		for(var i = 0; i < b.length; i++) b.set(i, l.get(i))
-		b
-	}
-
-	//TODO use an optim version: including a patch for no autoboxing : https://code.google.com/p/protobuf/issues/detail?id=464
-	def int[] hack_cnv(UintBuffer src) {
-		val b = newIntArrayOfSize(src.getValuesCount())
-		val l = src.getValuesList();
-		for(var i = 0; i < b.length; i++) b.set(i, l.get(i))
-		b
-	}
 
 	def Mesh cnv(Meshes.Mesh src, Mesh dst, Logger log) {
 		if (src.getIndexArraysCount() > 1) {
@@ -315,13 +182,13 @@ public class Xbuf {
 	def merge(Data src, Node root, Map<String, Object> components, Logger log) {
 		mergeTObjects(src, root, components, log)
 		mergeMeshes(src, root, components, log)
-		mergeMaterials(src, components, log)
+		loader4Materials.mergeMaterials(src, components, log)
 		mergeLights(src, root, components, log)
 		mergeSkeletons(src, root, components, log)
 		mergeCustomParams(src, components, log)
 		mergeAnimations(src, components, log)
 		// relations should be the last because it reuse data provide by other (put in components)
-		mergeRelations(src, root, components, log)
+		loader4Relations.merge(src, root, components, log)
 	}
 
 	def mergeAnimations(Data src, Map<String, Object> components, Logger log) {
@@ -656,305 +523,13 @@ public class Xbuf {
 			if (child == null) {
 				child = new Geometry()
 				//child.setMaterial(materialReplicator.newReplica(defaultMaterial))
-				child.setMaterial(defaultMaterial)
+				child.setMaterial(loader4Materials.newDefaultMaterial())
 				root.attachChild(child)
 				//log.debug("add Geometry for xbuf.Mesh.id: {}", id)
 				components.put(id, child)
 			}
 			child = cnv(g, child, log)
 		}
-	}
-
-	def mergeMaterials(Data src, Map<String, Object> components, Logger log) {
-		for(m : src.materialsList) {
-			//TODO update / remove previous material
-			val id = m.getId()
-			//val mat = components.get(id) as Material
-			//if (mat == null) {
-				val mat = newMaterial(m, log)
-				components.put(id, mat)
-			//}
-			mat.setName(if (m.hasName()) m.getName() else m.getId())
-			mergeToMaterial(m, mat, log)
-			materialReplicator.syncReplicas(mat)
-		}
-	}
-
-	//TODO use dispatch or pattern matching of Xtend
-	def void mergeRelations(Data src, Node root, Map<String, Object> components, Logger log) {
-		for(r : src.relationsList) {
-			val op1 = components.get(r.getRef1());
-			val op2 = components.get(r.getRef2());
-			
-			if (op1 == null || op2 == null) {
-				val t1str = if (op1 != null) op1.getClass.simpleName else "not found"
-				val t2str = if (op2 != null) op2.getClass.simpleName else "not found"
-				log.warn("can't link: missing entity,  {}({}) -- {}({})\n", r.getRef1(), t1str, r.getRef2(), t2str);
-				return;
-			}
-			if (op1 == op2) {
-				log.warn("can't link: op to itself (op1 == op2): {}({})", r.getRef1(), op1.getClass);
-				return
-			}
-			var done = false;
-			if (op1 instanceof Animation) {
-				if (op2 instanceof Spatial) { // Geometry, Node
-					var c = op2.getControl(typeof(AnimControl))
-					if (c == null) {
-						val sc = op2.getControl(typeof(SkeletonControl_31))
-						c = if (sc != null) new AnimControl(sc.getSkeleton) else new AnimControl()
-						op2.addControl(c)
-					}
-					c.addAnim(op1)
-					done = true
-				}
-			} else if (op1 instanceof CustomParamList) { // <--> xbuf_ext.Customparams.CustomParams
-				if (op2 instanceof Spatial) { // Geometry, Node
-					for(CustomParam p : op1.getParamsList()) {
-						mergeToUserData(p, op2, log)
-					}
-					done = true
-				}
-			} else if (op1 instanceof XbufLightControl) { // <--> xbuf.Light
-				if (op2 instanceof Geometry) {
-					op1.getSpatial().removeControl(op1);
-					op2.addControl(op1)
-					// TODO raise an alert, strange to link LightNode and Geometry
-					done = true
-				} else if (op2 instanceof Node) {
-					op1.getSpatial().removeControl(op1)
-					op2.addControl(op1)
-					done = true
-				}
-			} else if (op1 instanceof Material) { // <--> xbuf.Material
-				if (op2 instanceof Geometry) {
-					op2.setMaterial(op1)
-					cloneMaterialOnGeometry(op2)
-					done = true
-				} else if (op2 instanceof Node) {
-					op2.setMaterial(op1)
-                    cloneMaterialOnGeometry(op2)
-					done = true
-				}
-			} else if (op1 instanceof Geometry) { // <--> xbuf.Mesh
-				if (op2 instanceof Node) {
-					op2.attachChild(op1)
-					done = true
-				} else if (op2 instanceof Skeleton) {
-					link(op1, op2, findAnimLinkedToRef(src, r.ref2, components))
-					done = true
-				}
-			} else if (op1 instanceof Skeleton) { // <--> xbuf.Skeleton
-				if (op2 instanceof Node) {
-					link(op2, op1, findAnimLinkedToRef(src, r.ref1, components))
-					done = true
-				}
-			} else if (op1 instanceof Node) { // <--> xbuf.TObject
-				if (op2 instanceof Node) {
-					op1.attachChild(op2)
-					done = true
-				}
-			}
-			if (!done) {
-				log.warn("can't link: doesn't know how to make relation {}({}) -- {}({})\n", r.getRef1(), op1.getClass(), r.getRef2(), op2.getClass());
-			}
-		}
-	}
-
-	// see http://hub.jmonkeyengine.org/t/skeletoncontrol-or-animcontrol-to-host-skeleton/31478/4
-	def link(Spatial v, Skeleton sk, Iterable<Animation> skAnims) {
-		v.removeControl(typeof(SkeletonControl_31))
-		//update AnimControl if related to skeleton
-		val ac0 = v.getControl(typeof(AnimControl))
-		val ac1 = if (ac0 != null/* && ac.getSkeleton() != null*/) {
-			v.removeControl(ac0)
-			val ac2 = new AnimControl(sk)
-			val anims = new HashMap<String, Animation>()
-			ac0.animationNames.forEach[name | anims.put(name, ac0.getAnim(name).clone())]
-			ac2.animations = anims
-			v.addControl(ac2)
-			ac2
-		} else {
-			//always add AnimControl else NPE when SkeletonControl.clone
-			val ac2 = new AnimControl(sk)
-			v.addControl(ac2)
-			ac2
-		}
-		// SkeletonControl should be after AnimControl in the list of Controls
-		v.addControl(new SkeletonControl_31(sk))
-		skAnims.forEach[ac1.addAnim(it)]
-		cloneMaterialOnGeometry(v)
-	}
-	
-	def findAnimLinkedToRef(Data src, String ref,  Map<String, Object> components) {
-		src.getRelationsList().map[r|
-			if (r.ref1 == ref && components.get(r.ref2) instanceof Animation) {
-				components.get(r.ref2) as Animation
-			} else if (r.ref2 == ref && components.get(r.ref1) instanceof Animation) {
-				components.get(r.ref1) as Animation
-			} else {
-				null
-			}
-		].filter[it != null]
-	}
-
-    // TO avoid "java.lang.UnsupportedOperationException: Material instances cannot be shared when hardware skinning is used. Ensure all models use unique material instances."
-    def void cloneMaterialOnGeometry(Spatial v) {
-        if (v instanceof Geometry) {
-        	if (!materialReplicator.isReplica(v.material)) {
-            	v.material = materialReplicator.newReplica(v.material)
-           	}
-        } else if (v instanceof Node) {
-            for (child : v.children) {
-                cloneMaterialOnGeometry(child)
-            }
-        }        
-    }
-
-
-	def Spatial mergeToUserData(CustomParam p, Spatial dst, Logger log) {
-		val name = p.getName()
-		switch(p.getValueCase()) {
-		case VALUE_NOT_SET:
-			dst.setUserData(name, null)
-		case VBOOL:
-			dst.setUserData(name, p.vbool)
-		case VCOLOR:
-			dst.setUserData(name, cnv(p.vcolor, new ColorRGBA()))
-		case VFLOAT:
-			dst.setUserData(name, p.vfloat)
-		case VINT:
-			dst.setUserData(name, p.vint)
-		case VMAT4:
-			dst.setUserData(name, cnv(p.vmat4, new Matrix4f()))
-		case VQUAT:
-			dst.setUserData(name, cnv(p.vquat, new Vector4f()))
-		case VSTRING:
-			dst.setUserData(name, p.vstring)
-		case VTEXTURE:
-			dst.setUserData(name, getValue(p.vtexture, log))
-		case VVEC2:
-			dst.setUserData(name, cnv(p.vvec2, new Vector2f()))
-		case VVEC3:
-			dst.setUserData(name, cnv(p.vvec3, new Vector3f()))
-		case VVEC4:
-			dst.setUserData(name, cnv(p.vvec4, new Vector4f()))
-		default:
-			log.warn("Material doesn't support parameter : {} of type {}", name, p.getValueCase().name())
-		}
-		return dst;
-	}
-
-	def Image.Format getValue(Texture2DInline.Format f, Logger log) {
-		switch(f){
-			//case bgra8: return Image.Format.BGR8;
-			case rgb8: Image.Format.RGB8
-			case rgba8: Image.Format.RGBA8
-			default: throw new UnsupportedOperationException("image format :" + f)
-		}
-	}
-
-	def Texture getValue(Primitives.Texture t, Logger log) {
-		val tex = switch(t.getDataCase()){
-			case DATA_NOT_SET: null
-			case RPATH:
-				try {
-					assetManager.loadTexture(t.rpath)
-				} catch(AssetNotFoundException ex) {
-					log.warn("failed to load texture:", t.rpath, ex)
-					defaultTexture.clone()
-				}
-			case TEX2D: {
-				val t2di = t.getTex2D()
-				val img = new Image(getValue(t2di.getFormat(), log), t2di.getWidth(), t2di.getHeight(), t2di.getData().asReadOnlyByteBuffer());
-				new Texture2D(img)
-			}
-			default:
-				throw new IllegalArgumentException("doesn't support more than texture format:" + t.getDataCase())
-		}
-		tex.wrap = WrapMode.Repeat
-		tex
-	}
-
-	def Material newMaterial(Materials.Material m, Logger log) {
-		val lightFamily = !m.getShadeless()
-		val def = if (lightFamily) "Common/MatDefs/Light/Lighting.j3md" else "Common/MatDefs/Misc/Unshaded.j3md"
-		val mat = new Material(assetManager, def)
-		mat
-	}
-
-	def Material mergeToMaterial(Materials.Material src, Material dst, Logger log) {
-		val md = dst.getMaterialDef()
-		setColor(src.hasColor(), src.getColor(), dst, #["Color", "Diffuse"], md, log)
-		setTexture2D(src.hasColorMap(), src.getColorMap(), dst, #["ColorMap", "DiffuseMap"], md, log)
-		//setTexture2D(src.hasNormalMap(), src.getNormalMap(), dst, new String[]{"ColorMap", "DiffuseMap"], md, log)
-		setFloat(src.hasOpacity(), src.getOpacity(), dst, #["Alpha", "Opacity"], md, log)
-		setTexture2D(src.hasOpacityMap(), src.getOpacityMap(), dst, #["AlphaMap", "OpacityMap"], md, log)
-		setTexture2D(src.hasNormalMap(), src.getNormalMap(), dst, #["NormalMap"], md, log)
-		setFloat(src.hasRoughness(), src.getRoughness(), dst, #["Roughness"], md, log)
-		setTexture2D(src.hasRoughnessMap(), src.getRoughnessMap(), dst, #["RoughnessMap"], md, log)
-		setFloat(src.hasMetalness(), src.getMetalness(), dst, #["Metalness"], md, log)
-		setTexture2D(src.hasMetalnessMap(), src.getMetalnessMap(), dst, #["MetalnessMap"], md, log)
-		setColor(src.hasSpecular(), src.getSpecular(), dst, #["Specular"], md, log)
-		setTexture2D(src.hasSpecularMap(), src.getSpecularMap(), dst, #["SpecularMap"], md, log)
-		setFloat(src.hasSpecularPower(), src.getSpecularPower(), dst, #["SpecularPower", "Shininess"], md, log)
-		setTexture2D(src.hasSpecularPowerMap(), src.getSpecularPowerMap(), dst, #["SpecularPowerMap", "ShininessMap"], md, log)
-		setColor(src.hasEmission(), src.getEmission(), dst, #["Emission", "GlowColor"], md, log)
-		setTexture2D(src.hasEmissionMap(), src.getEmissionMap(), dst, #["EmissionMap", "GlowMap"], md, log)
-		if (!src.getShadeless()) {
-    		if (!src.hasColorMap) {
-    		    if (src.hasColor) {
-    		        dst.setBoolean("UseMaterialColors", true)
-    		    } else {
-    		        dst.setBoolean("UseVertexColor", true)
-    		    }
-    		}
-		}
-		dst
-	}
-
-	def setColor(boolean has, Color src, Material dst, String[] names, MaterialDef scope, Logger log){
-		if (has) {
-			val name = findMaterialParamName(names, VarType.Vector4, scope, log)
-			if (name != null) {
-				dst.setColor(name, cnv(src, new ColorRGBA()))
-			} else {
-				log.warn("can't find a matching name for : [{}] ({})", ",".join(names), VarType.Vector4)
-			}
-		}
-	}
-
-	def setTexture2D(boolean has, Primitives.Texture src, Material dst, String[] names, MaterialDef scope, Logger log){
-		if (has) {
-			val name = findMaterialParamName(names, VarType.Texture2D, scope, log)
-			if (name != null) {
-				dst.setTexture(name, getValue(src, log))
-			} else {
-				log.warn("can't find a matching name for : [{}] ({})", ",".join(names), VarType.Texture2D)
-			}
-		}
-	}
-
-	def setFloat(boolean has, float src, Material dst, String[] names, MaterialDef scope, Logger log){
-		if (has) {
-			val name = findMaterialParamName(names, VarType.Float, scope, log)
-			if (name != null) {
-				dst.setFloat(name, src)
-			} else {
-				log.warn("can't find a matching name for : [{}] ({})", ",".join(names), VarType.Float)
-			}
-		}
-	}
-
-	def String findMaterialParamName(String[] names, VarType type, MaterialDef scope, Logger log) {
-		for(String name2 : names){
-			for(MatParam mp : scope.getMaterialParams()) {
-				if (mp.getName().equalsIgnoreCase(name2) && mp.getVarType() == type) {
-					return mp.getName()
-				}
-			}
-		}
-		null
 	}
 
 	def void merge(Primitives.Transform src, Spatial dst, Logger log) {

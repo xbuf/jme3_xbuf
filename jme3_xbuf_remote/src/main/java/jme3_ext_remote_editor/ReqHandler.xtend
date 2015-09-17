@@ -26,6 +26,7 @@ import xbuf.Datas
 
 import static io.netty.buffer.Unpooled.wrappedBuffer
 import com.jme3.math.FastMath
+import static jme3_ext_xbuf.Converters.*
 
 @FinalFieldsConstructor
 class ReqHandler {
@@ -145,13 +146,13 @@ class ReqHandler {
 	def setEye(ChannelHandlerContext ctx, Cmds.SetEye cmd) {
 		todo[rc |
 			val cam = rc.cam
-			val rot = xbuf.cnv(cmd.getRotation(), cam.getLocalRotation());
+			val rot = cnv(cmd.getRotation(), cam.getLocalRotation());
 			cam.setLocalRotation(rot.clone());
-			cam.setLocalTranslation(xbuf.cnv(cmd.getLocation(), cam.getLocalTranslation()));
+			cam.setLocalTranslation(cnv(cmd.getLocation(), cam.getLocalTranslation()));
 			//if (cmd.hasNear()) cam0.setFrustumNear(cmd.getNear())
 			//if (cmd.hasFar()) cam0.setFrustumFar(cmd.getFar())
 			if (cmd.hasProjection()) {
-				val proj = xbuf.cnv(cmd.getProjection(), new Matrix4f());
+				val proj = cnv(cmd.getProjection(), new Matrix4f());
 				cam.camera.setParallelProjection(cmd.getProjMode() == ProjMode.orthographic)
 				if (cmd.getProjMode() == ProjMode.orthographic) {
 					val lr = pairOf(proj.m00, proj.m03)
