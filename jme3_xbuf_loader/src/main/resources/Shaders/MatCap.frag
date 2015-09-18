@@ -45,8 +45,12 @@ void main() {
     vec3 diffuseColor = texture2D(m_DiffuseMap, uv).rgb;
 
     #ifdef CHESS_SIZE
-        vec3 p = step(vec3(0.5), fract(vPositionM / vec3(m_ChessSize))) * vec3(2.0) + vec3(-1.0);
-        float coeff = 0.8 + 0.4 * step(0.0, p.x * p.y * p.z);
+        //vec3 v = fract(vPositionM / vec3(m_ChessSize))+vec3(0.01);
+        //vec3 p = smoothstep(vec3(0.495), vec3(0.505), v);
+        vec3 v = cos(vPositionM * 2 * 3.14159/ vec3(m_ChessSize));
+        vec3 p = smoothstep(vec3(-0.1), vec3(0.1), v);
+        p = p * vec3(2.0) + vec3(-1.0);
+        float coeff = 0.8 + 0.4 * smoothstep(-0.05, 0.05, p.x * p.y * p.z);
         diffuseColor.rgb *= coeff;
     #endif 
     #ifdef MULTIPLY_COLOR
