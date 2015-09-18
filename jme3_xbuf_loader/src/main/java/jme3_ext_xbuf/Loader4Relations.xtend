@@ -87,15 +87,23 @@ class Loader4Relations {
 		}
 	}
 	
-	static class KindComparator implements Comparator<RelationExpanded> {
+    static class KindComparator implements Comparator<RelationExpanded> {
+        //higher priority first
+        val order = #[
+            "Material-Mesh", // before Mesh-TObject because mesh could be clone with material (shared in modeler)
+            "TObject-TObject", "Mesh-TObject", 
+            "Material-TObject",
+            "Skeleton-TObject", "Mesh-Skeleton",
+            "Animation-TObject", "Animation-Mesh"
+        ]
 		
 		override compare(RelationExpanded o1, RelationExpanded o2) {
-			if (o1.kind == o2.kind) return 0
-			if (o1.kind == "Material-Mesh") return 1
-			if (o1.kind == "Mesh-TObject") return 1
-			if (o1.kind == "Material-TObject") return 1
-			if (o1.kind == "Animation-Mesh") return 1
-			return -1
+		    if (o1.kind == o2.kind) return 0
+            for(k: order) {
+                if (o1.kind == k) return -1
+                if (o2.kind == k) return 1
+			}
+			return 1
 		}
 		
 		override equals(Object obj) {
