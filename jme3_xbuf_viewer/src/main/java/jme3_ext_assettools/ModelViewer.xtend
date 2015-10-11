@@ -114,7 +114,7 @@ public class ModelViewer {
 		public var boolean addGrid = true;
 
 		@Parameter(names = "--addLights", description = "add a directionnal + ambient light in 3D scene")
-		public var boolean addLights = false;
+		public var boolean addLights = true;
 
 		@Parameter(names = #["-e", "--spatialExplorer"], description = "enable Spatial Explorer")
 		public var boolean spatialExplorer = true;
