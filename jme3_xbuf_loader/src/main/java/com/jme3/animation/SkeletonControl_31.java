@@ -249,10 +249,12 @@ public class SkeletonControl_31 extends SkeletonControl implements Cloneable {
                     // is operating on this material, in that case, user
                     // is sharing materials between models which is NOT allowed
                     // when hardware skinning used.
-                    throw new UnsupportedOperationException(
-                            "Material instances cannot be shared when hardware skinning is used. " +
-                            "Ensure all models use unique material instances : " + m.getName()
-                    );
+//                    throw new UnsupportedOperationException(
+//                            "Material instances cannot be shared when hardware skinning is used. " +
+//                            "Ensure all models use unique material instances : " + m.getName()
+//                    );
+                	Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Material instances cannot be shared when hardware skinning is used. " +
+                            "Ensure all models use unique material instances : " + m.getName());
                 }
             }            
             m.setParam("BoneMatrices", VarType.Matrix4Array, offsetMatrices);
@@ -494,7 +496,7 @@ public class SkeletonControl_31 extends SkeletonControl implements Cloneable {
                 // Skip this vertex if the first weight is zero.
                 if (weights[idxWeights] == 0) {
                     idxPositions += 3;
-                    idxWeights += maxWeightsPerVert;
+                    idxWeights += 4;
                     continue;
                 }
 
