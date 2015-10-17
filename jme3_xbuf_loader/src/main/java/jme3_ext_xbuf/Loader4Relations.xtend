@@ -159,9 +159,8 @@ class Loader4Relations {
 			if (op2 instanceof Node) {
 				//TODO replace clone by instanciation
 				val mesh  = if (op1.parent != null && op1.parent != root) {
-					val c = op1.clone(true)
-					//c.material = materialReplicator.newReplica(op1.material)
-					c
+					//TODO use materialReplicator ?
+					op1.clone(true)
 				} else {
 					op1
 				}
