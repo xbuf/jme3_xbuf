@@ -4,11 +4,15 @@ import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.ParameterException
 import com.jme3.app.SimpleApplication
+import com.jme3.asset.DesktopAssetManager
 import com.jme3.asset.plugins.FileLocator
 import com.jme3.light.AmbientLight
 import com.jme3.light.DirectionalLight
+import com.jme3.light.PointLight
 import com.jme3.math.ColorRGBA
 import com.jme3.math.Vector3f
+import com.jme3.scene.LightNode
+import com.jme3.scene.control.CameraControl
 import com.jme3.scene.plugins.OBJLoader
 import com.jme3.scene.plugins.blender.BlenderLoader
 import com.jme3.system.AppSettings
@@ -22,23 +26,16 @@ import java.util.logging.Handler
 import java.util.logging.Level
 import java.util.logging.LogManager
 import java.util.logging.Logger
+import javafx.stage.DirectoryChooser
+import javafx.stage.FileChooser
+import jme3_ext_assettools.ModelViewer.Options
+import jme3_ext_remote_editor.AppState4RemoteCommand
+import jme3_ext_spatial_explorer.AppStateSpatialExplorer
+import jme3_ext_spatial_explorer.Helper
 import jme3_ext_xbuf.Xbuf
 import jme3_ext_xbuf.XbufLoader
-import jme3_ext_remote_editor.AppState4RemoteCommand
-import jme3_ext_spatial_explorer.Helper
-import org.slf4j.bridge.SLF4JBridgeHandler
-import jme3_ext_spatial_explorer.AppStateSpatialExplorer
-import org.controlsfx.control.action.Action
-import javafx.stage.FileChooser
-import javafx.stage.DirectoryChooser
-import com.jme3.asset.DesktopAssetManager
-import com.jme3.light.PointLight
-import com.jme3.scene.LightNode
-import com.jme3.scene.control.CameraControl
-import org.controlsfx.glyphfont.GlyphFontRegistry
 import org.controlsfx.glyphfont.FontAwesome
-import javafx.application.Platform
-import javafx.scene.control.Button
+import org.slf4j.bridge.SLF4JBridgeHandler
 
 public class ModelViewer {
 	/////////////////////////////////////////////////////////////////////////////////
