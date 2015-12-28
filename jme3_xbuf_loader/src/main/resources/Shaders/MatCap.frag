@@ -1,3 +1,5 @@
+#import "Common/ShaderLib/GLSLCompat.glsllib"
+
 uniform sampler2D m_DiffuseMap;
 
 #ifdef NORMALMAP

@@ -44,8 +44,8 @@ MaterialDef MatCap {
     }
  
     Technique {
-          VertexShader GLSL100:   Shaders/MatCap.vert
-          FragmentShader GLSL100: Shaders/MatCap.frag
+        VertexShader GLSL150:   Shaders/MatCap.vert
+        FragmentShader GLSL150: Shaders/MatCap.frag
  
         WorldParameters {
             WorldViewProjectionMatrix
@@ -62,145 +62,20 @@ MaterialDef MatCap {
     }
 
     Technique {
-    }
-
-    Technique PreNormalPass {
-
-          VertexShader GLSL100 :   Common/MatDefs/SSAO/normal.vert
-          FragmentShader GLSL100 : Common/MatDefs/SSAO/normal.frag
-
-          WorldParameters {
-              WorldViewProjectionMatrix
-              WorldViewMatrix
-              NormalMatrix
-          }
-
-          Defines {
-              NUM_BONES : NumberOfBones
-          }
-   }
-
-    Technique PreShadow {
-
-        VertexShader GLSL100 :   Common/MatDefs/Shadow/PreShadow.vert
-        FragmentShader GLSL100 : Common/MatDefs/Shadow/PreShadow.frag
-
+        VertexShader GLSL100:   Shaders/MatCap.vert
+        FragmentShader GLSL100: Shaders/MatCap.frag
+ 
         WorldParameters {
             WorldViewProjectionMatrix
+            NormalMatrix
             WorldViewMatrix
         }
-
+ 
         Defines {
-            COLOR_MAP : ColorMap
-            DISCARD_ALPHA : AlphaDiscardThreshold
-            NUM_BONES : NumberOfBones
-        }
-
-        ForcedRenderState {
-            FaceCull Off
-            DepthTest On
-            DepthWrite On
-            PolyOffset 5 3
-            ColorWrite Off
-        }
-
-    }
-
-
-    Technique PostShadow15{
-        VertexShader GLSL150:   Common/MatDefs/Shadow/PostShadow.vert
-        FragmentShader GLSL150: Common/MatDefs/Shadow/PostShadow15.frag
-
-        WorldParameters {
-            WorldViewProjectionMatrix
-            WorldMatrix
-        }
-
-        Defines {
-            HARDWARE_SHADOWS : HardwareShadows
-            FILTER_MODE : FilterMode
-            PCFEDGE : PCFEdge
-            DISCARD_ALPHA : AlphaDiscardThreshold           
-            COLOR_MAP : ColorMap
-            SHADOWMAP_SIZE : ShadowMapSize
-            FADE : FadeInfo
-            PSSM : Splits
-            POINTLIGHT : LightViewProjectionMatrix5
-            NUM_BONES : NumberOfBones
-        }
-
-        ForcedRenderState {
-            Blend Modulate
-            DepthWrite Off                 
-            PolyOffset -0.1 0
-        }
-    }
-
-    Technique PostShadow{
-        VertexShader GLSL100:   Common/MatDefs/Shadow/PostShadow.vert
-        FragmentShader GLSL100: Common/MatDefs/Shadow/PostShadow.frag
-
-        WorldParameters {
-            WorldViewProjectionMatrix
-            WorldMatrix
-        }
-
-        Defines {
-            HARDWARE_SHADOWS : HardwareShadows
-            FILTER_MODE : FilterMode
-            PCFEDGE : PCFEdge
-            DISCARD_ALPHA : AlphaDiscardThreshold           
-            COLOR_MAP : ColorMap
-            SHADOWMAP_SIZE : ShadowMapSize
-            FADE : FadeInfo
-            PSSM : Splits
-            POINTLIGHT : LightViewProjectionMatrix5
-            NUM_BONES : NumberOfBones
-        }
-
-        ForcedRenderState {
-            Blend Modulate
-            DepthWrite Off   
-            PolyOffset -0.1 0  
-        }
-    }
-
-    Technique Glow {
-
-        VertexShader GLSL100:   Common/MatDefs/Misc/Unshaded.vert
-        FragmentShader GLSL100: Common/MatDefs/Light/Glow.frag
-
-        WorldParameters {
-            WorldViewProjectionMatrix
-        }
-
-        Defines {
-            NEED_TEXCOORD1
-            HAS_GLOWMAP : GlowMap
-            HAS_GLOWCOLOR : GlowColor
+            NORMALMAP : NormalMap
+            CHESS_SIZE : ChessSize
+            MULTIPLY_COLOR : Multiply_Color
             NUM_BONES : NumberOfBones
         }
     }
-
-
-
-
-
-Technique Refract {
-
-    VertexShader GLSL100:   ShaderBlow/Filters/SimpleRefraction/Refract.vert
-    FragmentShader GLSL100: ShaderBlow/Filters/SimpleRefraction/Refract.frag
-
-    WorldParameters {
-      WorldViewProjectionMatrix
-    }
-
-    Defines {
-       DO_REFRACT : DoRefract
-       MASK_TEXTURE : Mask_Texture
-       NUM_BONES : NumberOfBones
-  }
- }
-
-
 }
