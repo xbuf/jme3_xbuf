@@ -1,6 +1,6 @@
 apply plugin: 'java'
-apply plugin: 'provided-base'
-apply plugin: "org.xtend.xtend"
+apply plugin: 'nebula.provided-base'
+apply plugin: 'org.xtext.xtend'
 
 //WARNING: this project is 1.7 compatible but ModelViewer require javafx and java 8u20+ to run
 sourceCompatibility = JavaVersion.VERSION_1_7
@@ -15,7 +15,7 @@ def v_slf4j = '1.7.7'
 def v_jme3 = '3.0.10'
 
 dependencies {
-	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.7.+'
+	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.9.+'
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile 'org.xbuf:xbuf:0.7+'
 	provided "com.jme3:jme3-core:${v_jme3}"
