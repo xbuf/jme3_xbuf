@@ -28,6 +28,7 @@ allprojects {
 subprojects {
 	apply plugin: 'java' // assets are managed like java resource + code
 	apply plugin: 'maven'
+    apply plugin: 'eclipse'
 
 	repositories {
 		mavenLocal()
