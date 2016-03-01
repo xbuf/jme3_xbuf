@@ -20,3 +20,7 @@ Libraries are availables at [bintray / jmonkeyengine / contrib](https://bintray.
 ```
 gradle publishToMavenLocal
 ```
+
+# Screenshot (of the viewer)
+
+![](http://i.imgur.com/MEV4AMa.png)
