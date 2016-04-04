@@ -10,13 +10,13 @@ import xbuf.Datas.Data
 import com.jme3.asset.AssetManager
 
 class XbufLoader implements AssetLoader {
-    static public var (AssetManager)=>Xbuf xbufFactory = [AssetManager assetManager| new Xbuf(assetManager)]
-    
+	static public var (AssetManager)=>Xbuf xbufFactory = [AssetManager assetManager|new Xbuf(assetManager)]
+
 	override Object load(AssetInfo assetInfo) {
 		val xbuf = XbufLoader.xbufFactory.apply(assetInfo.getManager())
 		val root = new Node(assetInfo.getKey().getName())
 		var in = null as InputStream
-		val logger = new LoggerCollector("parse:"+ assetInfo.getKey().getName())
+		val logger = new LoggerCollector("parse:" + assetInfo.getKey().getName())
 		try {
 			in = assetInfo.openStream()
 			val src = Data.parseFrom(in, xbuf.registry)
@@ -25,8 +25,12 @@ class XbufLoader implements AssetLoader {
 			in?.close()
 		}
 		logger.dumpTo(LoggerFactory.getLogger(this.getClass()))
-		//TODO check and transfert Lights on root if quantity == 1
-		if (root.getQuantity() == 1) { root.getChild(0) } else { root }
+		// TODO check and transfert Lights on root if quantity == 1
+		if (root.getQuantity() == 1) {
+			root.getChild(0)
+		} else {
+			root
+		}
 	}
 
 }

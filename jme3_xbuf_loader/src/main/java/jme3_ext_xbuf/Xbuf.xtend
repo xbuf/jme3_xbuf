@@ -51,19 +51,21 @@ public class Xbuf {
 	public val Loader4Relations loader4Relations
 	public val ExtensionRegistry registry
 
-    /**
-     * A full constructor that allow to define every service (to injection).
-     * @param assetManager the AssetManager used to load assets (texture, sound,...)
-     * @param registry the protobuf registry for extensions
-     * @param loader4Relations the xbuf way to load relations (null => default implementation)
-     * @param loader4Relations the xbuf way to load relations (null => default implementation)
-     */
-	new(AssetManager assetManager, ExtensionRegistry registry, Loader4Materials loader4Materials, Loader4Relations loader4Relations) {
+	/**
+	 * A full constructor that allow to define every service (to injection).
+	 * @param assetManager the AssetManager used to load assets (texture, sound,...)
+	 * @param registry the protobuf registry for extensions
+	 * @param loader4Relations the xbuf way to load relations (null => default implementation)
+	 * @param loader4Relations the xbuf way to load relations (null => default implementation)
+	 */
+	new(AssetManager assetManager, ExtensionRegistry registry, Loader4Materials loader4Materials,
+		Loader4Relations loader4Relations) {
 		this.assetManager = assetManager
 		this.loader4Materials = loader4Materials ?: new Loader4Materials(assetManager, null)
-        this.loader4Relations = loader4Relations ?: new Loader4Relations(this.loader4Materials.materialReplicator, this.loader4Materials)
-        this.registry = registry ?: ExtensionRegistry.newInstance()
-        setupExtensionRegistry(this.registry)
+		this.loader4Relations = loader4Relations ?:
+			new Loader4Relations(this.loader4Materials.materialReplicator, this.loader4Materials)
+		this.registry = registry ?: ExtensionRegistry.newInstance()
+		setupExtensionRegistry(this.registry)
 	}
 
 	new(AssetManager assetManager) {
@@ -81,16 +83,16 @@ public class Xbuf {
 			throw new IllegalArgumentException("doesn't support more than 1 index array")
 		}
 		if (src.getLod() > 1) {
-			throw new IllegalArgumentException("doesn't support lod > 1 : "+ src.getLod())
+			throw new IllegalArgumentException("doesn't support lod > 1 : " + src.getLod())
 		}
 
 		dst.setMode(cnv(src.getPrimitive()));
-		for(VertexArray va : src.getVertexArraysList()) {
+		for (VertexArray va : src.getVertexArraysList()) {
 			val type = cnv(va.getAttrib())
 			dst.setBuffer(type, va.getFloats().getStep(), hack_cnv(va.getFloats()))
 			log.debug("add {}", dst.getBuffer(type))
 		}
-		for(IndexArray va : src.getIndexArraysList()) {
+		for (IndexArray va : src.getIndexArraysList()) {
 			dst.setBuffer(VertexBuffer.Type.Index, va.getInts().getStep(), hack_cnv(va.getInts()))
 		}
 		if (src.hasSkin) {
@@ -105,11 +107,10 @@ public class Xbuf {
 //				}
 //			}
 //		}
-		//TODO optimize lazy create Tangent when needed (for normal map ?)
-		if ((dst.getBuffer(VertexBuffer.Type.Tangent) == null || dst.getBuffer(VertexBuffer.Type.Binormal) == null) 
-			&& dst.getBuffer(VertexBuffer.Type.Normal) != null && dst.getBuffer(VertexBuffer.Type.TexCoord) != null
-		) {
-			TangentBinormalGenerator_31.setToleranceAngle(179) //remove warnings
+		// TODO optimize lazy create Tangent when needed (for normal map ?)
+		if ((dst.getBuffer(VertexBuffer.Type.Tangent) == null || dst.getBuffer(VertexBuffer.Type.Binormal) == null) &&
+			dst.getBuffer(VertexBuffer.Type.Normal) != null && dst.getBuffer(VertexBuffer.Type.TexCoord) != null) {
+			TangentBinormalGenerator_31.setToleranceAngle(179) // remove warnings
 			TangentBinormalGenerator_31.generate(dst)
 		}
 
@@ -122,16 +123,16 @@ public class Xbuf {
 		dst.clearBuffer(Type.BoneIndex)
 		dst.clearBuffer(Type.BoneWeight)
 		val nb = skin.boneCountCount
-		//val maxWeightPerVert = Math.min(4, skin.boneCountList.reduce[p1, p2|Math.max(p1,p2)])
-		val maxWeightPerVert = 4// jME 3.0 only support fixed 4 weights per vertex
+		// val maxWeightPerVert = Math.min(4, skin.boneCountList.reduce[p1, p2|Math.max(p1,p2)])
+		val maxWeightPerVert = 4 // jME 3.0 only support fixed 4 weights per vertex
 		val indexPad = newByteArrayOfSize(nb * maxWeightPerVert)
 		val weightPad = newFloatArrayOfSize(nb * maxWeightPerVert)
 		var isrc = 0
-		for(var i = 0; i < nb; i++) {
+		for (var i = 0; i < nb; i++) {
 			var totalWeightPad = 0f
 			val cnt = skin.boneCountList.get(i)
 			val k0 = i * maxWeightPerVert
-			for(var j = 0;  j < maxWeightPerVert; j++) {
+			for (var j = 0; j < maxWeightPerVert; j++) {
 				val k = k0 + j
 				var index = 0 as byte
 				var weight = 0f
@@ -145,18 +146,20 @@ public class Xbuf {
 			}
 			if (totalWeightPad > 0) {
 				var totalWeight = 0.0f
-				for(var j = 0;  j < cnt; j++) {
+				for (var j = 0; j < cnt; j++) {
 					totalWeight += skin.boneWeightList.get(isrc + j)
 				}
-				
+
 				val normalizer = totalWeight / totalWeightPad
-                val wpv = Math.min(maxWeightPerVert, cnt)
-				for(var j = 0;  j < wpv; j++) {
+				val wpv = Math.min(maxWeightPerVert, cnt)
+				for (var j = 0; j < wpv; j++) {
 					val k = k0 + j
 					weightPad.set(k, weightPad.get(k) * normalizer)
 				}
 				if (cnt > maxWeightPerVert && totalWeight != totalWeightPad) {
-					log.warn("vertex influenced by more than {} bones : {}, only the {} higher are keep for total weight keep/orig: {}/{}.", maxWeightPerVert, cnt, wpv, totalWeightPad, totalWeight)
+					log.warn(
+						"vertex influenced by more than {} bones : {}, only the {} higher are keep for total weight keep/orig: {}/{}.",
+						maxWeightPerVert, cnt, wpv, totalWeightPad, totalWeight)
 				}
 			}
 			isrc += cnt
@@ -165,11 +168,11 @@ public class Xbuf {
 		dst.setBuffer(Type.BoneWeight, maxWeightPerVert, weightPad)
 		dst.setMaxNumWeights(maxWeightPerVert)
 
-		//creating empty buffers for HW skinning
-		//the buffers will be setup if ever used.
+		// creating empty buffers for HW skinning
+		// the buffers will be setup if ever used.
 		val weightsHW = new VertexBuffer(Type.HWBoneWeight);
 		val indicesHW = new VertexBuffer(Type.HWBoneIndex);
-		//setting usage to cpuOnly so that the buffer is not send empty to the GPU
+		// setting usage to cpuOnly so that the buffer is not send empty to the GPU
 		indicesHW.setUsage(VertexBuffer.Usage.CpuOnly)
 		weightsHW.setUsage(VertexBuffer.Usage.CpuOnly)
 		dst.setBuffer(weightsHW)
@@ -178,16 +181,20 @@ public class Xbuf {
 		dst
 	}
 
-	//TODO support multi mesh, may replace geometry by node and use one Geometry per mesh
+	// TODO support multi mesh, may replace geometry by node and use one Geometry per mesh
 	def Geometry cnv(Meshes.Mesh src, Geometry dst, Logger log) {
-		dst.setName(if (src.hasName()) { src.getName() } else { src.getId()})
+		dst.setName(if (src.hasName()) {
+			src.getName()
+		} else {
+			src.getId()
+		})
 		val mesh = cnv(src, new Mesh(), log)
 		dst.setMesh(mesh)
 		dst.updateModelBound()
 		dst
 	}
 
-	//TODO optimize to create less intermediate node
+	// TODO optimize to create less intermediate node
 	def merge(Data src, Node root, Map<String, Object> components, Logger log) {
 		mergeTObjects(src, root, components, log)
 		mergeMeshes(src, root, components, log)
@@ -201,23 +208,23 @@ public class Xbuf {
 	}
 
 	def mergeAnimations(Data src, Map<String, Object> components, Logger log) {
-		for(AnimationsKf.AnimationKF e : src.animationsKfList) {
+		for (AnimationsKf.AnimationKF e : src.animationsKfList) {
 			val id = e.getId()
-			//TODO: merge with existing
+			// TODO: merge with existing
 			val child = makeAnimation(e, log)
 			components.put(id, child)
 		}
 	}
 
 	def Animation makeAnimation(AnimationKF e, Logger log) {
-		val a =  new Animation(e.getName(), (e.getDuration() as float) / 1000f)
-		for(AnimationsKf.Clip clip: e.getClipsList()) {
+		val a = new Animation(e.getName(), (e.getDuration() as float) / 1000f)
+		for (AnimationsKf.Clip clip : e.getClipsList()) {
 			if (clip.hasSampledTransform()) {
 				val t = if (clip.sampledTransform.hasBoneName()) {
-					makeTrackBone(clip.sampledTransform)
-				} else {
-					makeTrackSpatial(clip.sampledTransform)
-				}
+						makeTrackBone(clip.sampledTransform)
+					} else {
+						makeTrackSpatial(clip.sampledTransform)
+					}
 				a.addTrack(t)
 			}
 		}
@@ -225,34 +232,36 @@ public class Xbuf {
 	}
 
 	static def valOf(List<Float> values, int i, float vdef) {
-		if (values.size > i) values.get(i) else vdef
+		if(values.size > i) values.get(i) else vdef
 	}
 
 	def cnvToVector3fArray(List<Float> xs, List<Float> ys, List<Float> zs) {
 		val size = Math.max(Math.max(xs.size, ys.size), zs.size)
 		if (size > 0) {
 			val l = <Vector3f>newArrayOfSize(size)
-			for(var i = 0; i < size; i++) {
+			for (var i = 0; i < size; i++) {
 				l.set(i, new Vector3f(xs.valOf(i, 0f), ys.valOf(i, 0f), zs.valOf(i, 0f)))
 			}
 			l
-		} else null
+		} else
+			null
 	}
 
 	def cnvToQuaternionArray(List<Float> xs, List<Float> ys, List<Float> zs, List<Float> ws) {
 		val size = Math.max(Math.max(xs.size, ys.size), zs.size)
 		if (size > 0) {
 			val l = <Quaternion>newArrayOfSize(size)
-			for(var i = 0; i < size; i++) {
+			for (var i = 0; i < size; i++) {
 				l.set(i, new Quaternion(xs.valOf(i, 0f), ys.valOf(i, 0f), zs.valOf(i, 0f), ws.valOf(i, 0f)))
 			}
 			l
-		} else null
+		} else
+			null
 	}
 
 	def makeTrackBone(SampledTransform bt) {
 		val times = newFloatArrayOfSize(bt.atCount)
-		bt.atList.forEach[v, i| times.set(i, (v as float)/ 1000f)]
+		bt.atList.forEach[v, i|times.set(i, (v as float) / 1000f)]
 		val translations = cnvToVector3fArray(bt.translationXList, bt.translationYList, bt.translationZList)
 		val rotations = cnvToQuaternionArray(bt.rotationXList, bt.rotationYList, bt.rotationZList, bt.rotationWList)
 		val scales = cnvToVector3fArray(bt.scaleXList, bt.scaleYList, bt.scaleZList)
@@ -261,7 +270,7 @@ public class Xbuf {
 
 	def makeTrackSpatial(SampledTransform bt) {
 		val times = newFloatArrayOfSize(bt.atCount)
-		bt.atList.forEach[v, i| times.set(i, (v as float)/ 1000f)]
+		bt.atList.forEach[v, i|times.set(i, (v as float) / 1000f)]
 		val translations = cnvToVector3fArray(bt.translationXList, bt.translationYList, bt.translationZList)
 		val rotations = cnvToQuaternionArray(bt.rotationXList, bt.rotationYList, bt.rotationZList, bt.rotationWList)
 		val scales = cnvToVector3fArray(bt.scaleXList, bt.scaleYList, bt.scaleZList)
@@ -283,7 +292,6 @@ public class Xbuf {
 //		}
 //		a
 //	}
-
 //	def Track makeTrackSpatial(TransformKF transforms) {
 //		val track = new CompositeTrack()
 //		val vkf = transforms.getTranslation()
@@ -372,32 +380,32 @@ public class Xbuf {
 //			}
 //		}
 //	}
-
 	def void mergeSkeletons(Data src, Node root, Map<String, Object> components, Logger log) {
-		for(e : src.skeletonsList) {
-			//TODO manage parent hierarchy
+		for (e : src.skeletonsList) {
+			// TODO manage parent hierarchy
 			val id = e.getId();
-			//TODO: merge with existing
+			// TODO: merge with existing
 			val child = makeSkeleton(e, log);
 			components.put(id, child);
-			//Skeleton child = (Skeleton)components.get(id);
+		// Skeleton child = (Skeleton)components.get(id);
 		}
 	}
 
 	def Skeleton makeSkeleton(Skeletons.Skeleton e, Logger log) {
 		val bones = <Bone>newArrayOfSize(e.bonesCount)
 		val db = new HashMap<String, Bone>()
-		for(var i = 0; i < bones.length; i++) {
+		for (var i = 0; i < bones.length; i++) {
 			val src = e.getBones(i)
 			val b = new Bone(src.getName())
-			b.setBindTransforms(cnv(src.getTransform().getTranslation(), new Vector3f())
-				, cnv(src.getTransform().getRotation(), new Quaternion())
-				, cnv(src.getTransform().getScale(), new Vector3f())
+			b.setBindTransforms(
+				cnv(src.getTransform().getTranslation(), new Vector3f()),
+				cnv(src.getTransform().getRotation(), new Quaternion()),
+				cnv(src.getTransform().getScale(), new Vector3f())
 			)
 			db.put(src.getId(), b)
 			bones.set(i, b)
 		}
-		for(Relation r : e.getBonesGraphList()) {
+		for (Relation r : e.getBonesGraphList()) {
 			val parent = db.get(r.getRef1())
 			val child = db.get(r.getRef2())
 			parent.addChild(child)
@@ -408,15 +416,15 @@ public class Xbuf {
 	}
 
 	def mergeCustomParams(Data src, Map<String, Object> components, Logger log) {
-		for(CustomParams.CustomParamList srccp : src.customParamsList) {
-			//TODO merge with existing
+		for (CustomParams.CustomParamList srccp : src.customParamsList) {
+			// TODO merge with existing
 			components.put(srccp.getId(), srccp)
 		}
 	}
 
 	def mergeLights(Data src, Node root, Map<String, Object> components, Logger log) {
-		for(srcl : src.lightsList) {
-			//TODO manage parent hierarchy
+		for (srcl : src.lightsList) {
+			// TODO manage parent hierarchy
 			val id = srcl.getId()
 			var dst = components.get(id) as XbufLightControl
 			if (dst == null) {
@@ -433,64 +441,68 @@ public class Xbuf {
 			if (srcl.hasColor()) {
 				dst.light.setColor(cnv(srcl.getColor(), new ColorRGBA()).mult(srcl.getIntensity()))
 			}
-			//TODO manage attenuation
-			//TODO manage conversion of type
-			switch(srcl.getKind()) {
-			case spot: {
-				val l = dst.light as SpotLight
-				if (srcl.hasSpotAngle()) {
-					val max = srcl.getSpotAngle().getMax()
-					switch(srcl.getSpotAngle().getCurveCase()) {
-						case CURVE_NOT_SET: {
-							l.setSpotOuterAngle(max)
-							l.setSpotInnerAngle(max)
+			// TODO manage attenuation
+			// TODO manage conversion of type
+			switch (srcl.getKind()) {
+				case spot: {
+					val l = dst.light as SpotLight
+					if (srcl.hasSpotAngle()) {
+						val max = srcl.getSpotAngle().getMax()
+						switch (srcl.getSpotAngle().getCurveCase()) {
+							case CURVE_NOT_SET: {
+								l.setSpotOuterAngle(max)
+								l.setSpotInnerAngle(max)
+							}
+							case LINEAR: {
+								l.setSpotOuterAngle(max * srcl.getSpotAngle().getLinear().getEnd())
+								l.setSpotInnerAngle(max * srcl.getSpotAngle().getLinear().getBegin())
+							}
+							default: {
+								l.setSpotOuterAngle(max)
+								l.setSpotInnerAngle(max)
+								log.warn("doesn't support curve like {} for spot_angle",
+									srcl.getSpotAngle().getCurveCase())
+							}
 						}
-						case LINEAR: {
-							l.setSpotOuterAngle(max * srcl.getSpotAngle().getLinear().getEnd())
-							l.setSpotInnerAngle(max * srcl.getSpotAngle().getLinear().getBegin())
-						}
-						default: {
-							l.setSpotOuterAngle(max)
-							l.setSpotInnerAngle(max)
-							log.warn("doesn't support curve like {} for spot_angle", srcl.getSpotAngle().getCurveCase())
-						}
-					}
 
-				}
-				if (srcl.hasRadialDistance()) {
-					l.setSpotRange(srcl.getRadialDistance().getMax());
-				}
-			}
-			case point: {
-				val l = dst.light as PointLight
-				if (srcl.hasRadialDistance()) {
-					val max = srcl.getRadialDistance().getMax();
-					switch(srcl.getRadialDistance().getCurveCase()) {
-					case CURVE_NOT_SET: {
-						l.setRadius(max);
 					}
-					case LINEAR: {
-						l.setRadius(max * srcl.getSpotAngle().getLinear().getEnd());
-					}
-					case SMOOTH: {
-						l.setRadius(max * srcl.getSpotAngle().getSmooth().getEnd());
-					}
-					default: {
-						l.setRadius(max);
-						log.warn("doesn't support curve like {} for spot_angle", srcl.getSpotAngle().getCurveCase());
-					}
+					if (srcl.hasRadialDistance()) {
+						l.setSpotRange(srcl.getRadialDistance().getMax());
 					}
 				}
-			}
-			case ambient: {}
-			case directional: {}
+				case point: {
+					val l = dst.light as PointLight
+					if (srcl.hasRadialDistance()) {
+						val max = srcl.getRadialDistance().getMax();
+						switch (srcl.getRadialDistance().getCurveCase()) {
+							case CURVE_NOT_SET: {
+								l.setRadius(max);
+							}
+							case LINEAR: {
+								l.setRadius(max * srcl.getSpotAngle().getLinear().getEnd());
+							}
+							case SMOOTH: {
+								l.setRadius(max * srcl.getSpotAngle().getSmooth().getEnd());
+							}
+							default: {
+								l.setRadius(max);
+								log.warn("doesn't support curve like {} for spot_angle",
+									srcl.getSpotAngle().getCurveCase());
+							}
+						}
+					}
+				}
+				case ambient: {
+				}
+				case directional: {
+				}
 			}
 		}
 	}
 
 	def Light makeLight(Lights.Light srcl, Logger log) {
 		var l0 = null as Light
-		switch(srcl.getKind()) {
+		switch (srcl.getKind()) {
 			case ambient:
 				l0 = new AmbientLight()
 			case directional:
@@ -506,12 +518,12 @@ public class Xbuf {
 				l0 = new PointLight()
 		}
 		l0.setColor(ColorRGBA.White.mult(2))
-		l0.setName(if (srcl.hasName()) srcl.getName() else srcl.getId())
+		l0.setName(if(srcl.hasName()) srcl.getName() else srcl.getId())
 		l0
 	}
 
 	def mergeTObjects(Data src, Node root, Map<String, Object> components, Logger log) {
-		for(TObject n : src.getTobjectsList()) {
+		for (TObject n : src.getTobjectsList()) {
 			val id = n.getId()
 			var child = components.get(id) as Spatial
 			if (child == null) {
@@ -519,22 +531,22 @@ public class Xbuf {
 				root.attachChild(child)
 				components.put(id, child)
 			}
-			child.setName(if (n.hasName()) n.getName() else n.getId())
+			child.setName(if(n.hasName()) n.getName() else n.getId())
 			merge(n.getTransform(), child, log)
 		}
 	}
 
 	def mergeMeshes(Data src, Node root, Map<String, Object> components, Logger log) {
-		for(g : src.meshesList) {
-			//TODO manage parent hierarchy
+		for (g : src.meshesList) {
+			// TODO manage parent hierarchy
 			val id = g.getId()
 			var child = components.get(id) as Geometry
 			if (child == null) {
 				child = new Geometry()
-				//child.setMaterial(materialReplicator.newReplica(defaultMaterial))
+				// child.setMaterial(materialReplicator.newReplica(defaultMaterial))
 				child.setMaterial(loader4Materials.newDefaultMaterial())
 				root.attachChild(child)
-				//log.debug("add Geometry for xbuf.Mesh.id: {}", id)
+				// log.debug("add Geometry for xbuf.Mesh.id: {}", id)
 				components.put(id, child)
 			}
 			child = cnv(g, child, log)
@@ -549,11 +561,10 @@ public class Xbuf {
 
 	static def String join(String sep, String[] values) {
 		val s = new StringBuilder()
-		for(v : values) {
-			if (s.length != 0) s.append(sep)
+		for (v : values) {
+			if(s.length != 0) s.append(sep)
 			s.append(v)
 		}
 		s.toString()
 	}
 }
-

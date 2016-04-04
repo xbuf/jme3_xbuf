@@ -28,29 +28,29 @@ import static extension java.lang.String.*
 class Loader4Materials {
 	public val AssetManager assetManager
 	public val MaterialReplicator materialReplicator
-	public val Texture  defaultTexture
+	public val Texture defaultTexture
 	public val Material defaultMaterial
 
-    /**
-     * A full constructor that allow to define every service (to injection).
-     * @param assetManager the AssetManager used to load assets (texture, sound,...)
-     * @param materialReplicator the service used to replicate material (null => default implementation)
-     * @param loader4Relations the xbuf way to load relations (null => default implementation)
-     * @param loader4Relations the xbuf way to load relations (null => default implementation)
-     */
+	/**
+	 * A full constructor that allow to define every service (to injection).
+	 * @param assetManager the AssetManager used to load assets (texture, sound,...)
+	 * @param materialReplicator the service used to replicate material (null => default implementation)
+	 * @param loader4Relations the xbuf way to load relations (null => default implementation)
+	 * @param loader4Relations the xbuf way to load relations (null => default implementation)
+	 */
 	new(AssetManager assetManager, MaterialReplicator materialReplicator) {
 		this.assetManager = assetManager
 		this.materialReplicator = materialReplicator ?: new MaterialReplicator()
 		defaultTexture = newDefaultTexture()
 		defaultMaterial = newDefaultMaterial()
 	}
-		
+
 	def Material newDefaultMaterial() {
-        val mat = new Material(assetManager, "MatDefs/MatCap.j3md")
-        mat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/generator8.jpg"))
-        mat.setColor("Multiply_Color", ColorRGBA.Pink)
-        mat.setFloat("ChessSize", 0.5f)
-        mat
+		val mat = new Material(assetManager, "MatDefs/MatCap.j3md")
+		mat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/generator8.jpg"))
+		mat.setColor("Multiply_Color", ColorRGBA.Pink)
+		mat.setFloat("ChessSize", 0.5f)
+		mat
 	}
 
 	protected def Texture newDefaultTexture() {
@@ -63,33 +63,32 @@ class Loader4Materials {
 	}
 
 	def mergeMaterials(Data src, Map<String, Object> components, Logger log) {
-		for(m : src.materialsList) {
-			//TODO update / remove previous material
+		for (m : src.materialsList) {
+			// TODO update / remove previous material
 			val id = m.getId()
-			//val mat = components.get(id) as Material
-			//if (mat == null) {
-				val mat = newMaterial(m, log)
-				components.put(id, mat)
-			//}
-			mat.setName(if (m.hasName()) m.getName() else m.getId())
+			// val mat = components.get(id) as Material
+			// if (mat == null) {
+			val mat = newMaterial(m, log)
+			components.put(id, mat)
+			// }
+			mat.setName(if(m.hasName()) m.getName() else m.getId())
 			mergeToMaterial(m, mat, log)
 			materialReplicator.syncReplicas(mat)
 		}
 	}
 
 	def Image.Format getValue(Texture2DInline.Format f, Logger log) {
-		switch(f){
-			//case bgra8: return Image.Format.BGR8;
+		switch (f) {
+			// case bgra8: return Image.Format.BGR8;
 			case rgb8: Image.Format.RGB8
 			case rgba8: Image.Format.RGBA8
 			default: throw new UnsupportedOperationException("image format :" + f)
 		}
 	}
 
-
 	def Material newMaterial(Materials.Material m, Logger log) {
 		val lightFamily = !m.getShadeless()
-		val def = if (lightFamily) "Common/MatDefs/Light/Lighting.j3md" else "Common/MatDefs/Misc/Unshaded.j3md"
+		val def = if(lightFamily) "Common/MatDefs/Light/Lighting.j3md" else "Common/MatDefs/Misc/Unshaded.j3md"
 		val mat = new Material(assetManager, def)
 		mat
 	}
@@ -98,7 +97,7 @@ class Loader4Materials {
 		val md = dst.getMaterialDef()
 		setColor(src.hasColor(), src.getColor(), dst, #["Color", "Diffuse"], md, log)
 		setTexture2D(src.hasColorMap(), src.getColorMap(), dst, #["ColorMap", "DiffuseMap"], md, log)
-		//setTexture2D(src.hasNormalMap(), src.getNormalMap(), dst, new String[]{"ColorMap", "DiffuseMap"], md, log)
+		// setTexture2D(src.hasNormalMap(), src.getNormalMap(), dst, new String[]{"ColorMap", "DiffuseMap"], md, log)
 		setFloat(src.hasOpacity(), src.getOpacity(), dst, #["Alpha", "Opacity"], md, log)
 		setTexture2D(src.hasOpacityMap(), src.getOpacityMap(), dst, #["AlphaMap", "OpacityMap"], md, log)
 		setTexture2D(src.hasNormalMap(), src.getNormalMap(), dst, #["NormalMap"], md, log)
@@ -109,33 +108,34 @@ class Loader4Materials {
 		setColor(src.hasSpecular(), src.getSpecular(), dst, #["Specular"], md, log)
 		setTexture2D(src.hasSpecularMap(), src.getSpecularMap(), dst, #["SpecularMap"], md, log)
 		setFloat(src.hasSpecularPower(), src.getSpecularPower(), dst, #["SpecularPower", "Shininess"], md, log)
-		setTexture2D(src.hasSpecularPowerMap(), src.getSpecularPowerMap(), dst, #["SpecularPowerMap", "ShininessMap"], md, log)
+		setTexture2D(src.hasSpecularPowerMap(), src.getSpecularPowerMap(), dst, #["SpecularPowerMap", "ShininessMap"],
+			md, log)
 		setColor(src.hasEmission(), src.getEmission(), dst, #["Emission", "GlowColor"], md, log)
 		setTexture2D(src.hasEmissionMap(), src.getEmissionMap(), dst, #["EmissionMap", "GlowMap"], md, log)
 		if (!src.getShadeless()) {
-    		if (!src.hasColorMap) {
-    		    if (src.hasColor) {
-    		        setBoolean(true, true, dst, #["UseMaterialColors"], md, log)
-    		    } else {
-                    setBoolean(true, true, dst, #["UseVertexColor"], md, log)
-    		    }
-    		}
+			if (!src.hasColorMap) {
+				if (src.hasColor) {
+					setBoolean(true, true, dst, #["UseMaterialColors"], md, log)
+				} else {
+					setBoolean(true, true, dst, #["UseVertexColor"], md, log)
+				}
+			}
 		}
 		dst
 	}
-    
-    def setBoolean(boolean has, Boolean src, Material dst, String[] names, MaterialDef scope, Logger log){
-        if (has) {
-            val name = findMaterialParamName(names, VarType.Boolean, scope, log)
-            if (name != null) {
-                dst.setBoolean(name, src)
-            } else {
-                log.warn("can't find a matching name for : [{}] ({})", ",".join(names), VarType.Vector4)
-            }
-        }
-    }
-    
-	def setColor(boolean has, Color src, Material dst, String[] names, MaterialDef scope, Logger log){
+
+	def setBoolean(boolean has, Boolean src, Material dst, String[] names, MaterialDef scope, Logger log) {
+		if (has) {
+			val name = findMaterialParamName(names, VarType.Boolean, scope, log)
+			if (name != null) {
+				dst.setBoolean(name, src)
+			} else {
+				log.warn("can't find a matching name for : [{}] ({})", ",".join(names), VarType.Vector4)
+			}
+		}
+	}
+
+	def setColor(boolean has, Color src, Material dst, String[] names, MaterialDef scope, Logger log) {
 		if (has) {
 			val name = findMaterialParamName(names, VarType.Vector4, scope, log)
 			if (name != null) {
@@ -146,7 +146,7 @@ class Loader4Materials {
 		}
 	}
 
-	def setTexture2D(boolean has, Primitives.Texture src, Material dst, String[] names, MaterialDef scope, Logger log){
+	def setTexture2D(boolean has, Primitives.Texture src, Material dst, String[] names, MaterialDef scope, Logger log) {
 		if (has) {
 			val name = findMaterialParamName(names, VarType.Texture2D, scope, log)
 			if (name != null) {
@@ -157,7 +157,7 @@ class Loader4Materials {
 		}
 	}
 
-	def setFloat(boolean has, float src, Material dst, String[] names, MaterialDef scope, Logger log){
+	def setFloat(boolean has, float src, Material dst, String[] names, MaterialDef scope, Logger log) {
 		if (has) {
 			val name = findMaterialParamName(names, VarType.Float, scope, log)
 			if (name != null) {
@@ -169,8 +169,8 @@ class Loader4Materials {
 	}
 
 	def String findMaterialParamName(String[] names, VarType type, MaterialDef scope, Logger log) {
-		for(String name2 : names){
-			for(MatParam mp : scope.getMaterialParams()) {
+		for (String name2 : names) {
+			for (MatParam mp : scope.getMaterialParams()) {
 				if (mp.getName().equalsIgnoreCase(name2) && mp.getVarType() == type) {
 					return mp.getName()
 				}
@@ -178,20 +178,22 @@ class Loader4Materials {
 		}
 		null
 	}
-	
+
 	def Texture getValue(Primitives.Texture t, Logger log) {
-		val tex = switch(t.getDataCase()){
-			case DATA_NOT_SET: null
+		val tex = switch (t.getDataCase()) {
+			case DATA_NOT_SET:
+				null
 			case RPATH:
 				try {
 					assetManager.loadTexture(t.rpath)
-				} catch(AssetNotFoundException ex) {
+				} catch (AssetNotFoundException ex) {
 					log.warn("failed to load texture:", t.rpath, ex)
-					 defaultTexture.clone()
+					defaultTexture.clone()
 				}
 			case TEX2D: {
 				val t2di = t.getTex2D()
-				val img = new Image(getValue(t2di.getFormat(), log), t2di.getWidth(), t2di.getHeight(), t2di.getData().asReadOnlyByteBuffer());
+				val img = new Image(getValue(t2di.getFormat(), log), t2di.getWidth(), t2di.getHeight(),
+					t2di.getData().asReadOnlyByteBuffer());
 				new Texture2D(img)
 			}
 			default:
