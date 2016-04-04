@@ -26,14 +26,21 @@ import static jme3_ext_xbuf.Converters.*
 import static extension java.lang.String.*
 
 class Loader4Materials {
-	val AssetManager assetManager
-	val MaterialReplicator materialReplicator
-	val Texture  defaultTexture
-	val Material defaultMaterial
+	public val AssetManager assetManager
+	public val MaterialReplicator materialReplicator
+	public val Texture  defaultTexture
+	public val Material defaultMaterial
 
+    /**
+     * A full constructor that allow to define every service (to injection).
+     * @param assetManager the AssetManager used to load assets (texture, sound,...)
+     * @param materialReplicator the service used to replicate material (null => default implementation)
+     * @param loader4Relations the xbuf way to load relations (null => default implementation)
+     * @param loader4Relations the xbuf way to load relations (null => default implementation)
+     */
 	new(AssetManager assetManager, MaterialReplicator materialReplicator) {
 		this.assetManager = assetManager
-		this.materialReplicator = materialReplicator
+		this.materialReplicator = materialReplicator ?: new MaterialReplicator()
 		defaultTexture = newDefaultTexture()
 		defaultMaterial = newDefaultMaterial()
 	}
@@ -108,15 +115,26 @@ class Loader4Materials {
 		if (!src.getShadeless()) {
     		if (!src.hasColorMap) {
     		    if (src.hasColor) {
-    		        dst.setBoolean("UseMaterialColors", true)
+    		        setBoolean(true, true, dst, #["UseMaterialColors"], md, log)
     		    } else {
-    		        dst.setBoolean("UseVertexColor", true)
+                    setBoolean(true, true, dst, #["UseVertexColor"], md, log)
     		    }
     		}
 		}
 		dst
 	}
-
+    
+    def setBoolean(boolean has, Boolean src, Material dst, String[] names, MaterialDef scope, Logger log){
+        if (has) {
+            val name = findMaterialParamName(names, VarType.Boolean, scope, log)
+            if (name != null) {
+                dst.setBoolean(name, src)
+            } else {
+                log.warn("can't find a matching name for : [{}] ({})", ",".join(names), VarType.Vector4)
+            }
+        }
+    }
+    
 	def setColor(boolean has, Color src, Material dst, String[] names, MaterialDef scope, Logger log){
 		if (has) {
 			val name = findMaterialParamName(names, VarType.Vector4, scope, log)

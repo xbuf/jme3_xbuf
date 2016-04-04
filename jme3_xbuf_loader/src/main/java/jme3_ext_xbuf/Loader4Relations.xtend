@@ -27,8 +27,8 @@ import java.util.Comparator
 
 @FinalFieldsConstructor
 class Loader4Relations {
-	val MaterialReplicator materialReplicator
-	val Loader4Materials loader4Materials
+	public val MaterialReplicator materialReplicator
+	public val Loader4Materials loader4Materials
 	
 	//TODO use dispatch or pattern matching of Xtend
 	def void merge(Data src, Node root, Map<String, Object> components, Logger log) {

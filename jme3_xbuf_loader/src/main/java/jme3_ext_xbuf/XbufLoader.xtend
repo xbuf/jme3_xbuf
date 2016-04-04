@@ -7,10 +7,13 @@ import java.io.InputStream
 import java.util.HashMap
 import org.slf4j.LoggerFactory
 import xbuf.Datas.Data
+import com.jme3.asset.AssetManager
 
 class XbufLoader implements AssetLoader {
+    static public var (AssetManager)=>Xbuf xbufFactory = [AssetManager assetManager| new Xbuf(assetManager)]
+    
 	override Object load(AssetInfo assetInfo) {
-		val xbuf = new Xbuf(assetInfo.getManager())
+		val xbuf = XbufLoader.xbufFactory.apply(assetInfo.getManager())
 		val root = new Node(assetInfo.getKey().getName())
 		var in = null as InputStream
 		val logger = new LoggerCollector("parse:"+ assetInfo.getKey().getName())

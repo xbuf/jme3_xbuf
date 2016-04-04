@@ -46,18 +46,28 @@ import static jme3_ext_xbuf.Converters.*
 
 // TODO use a Validation object (like in scala/scalaz) with option to log/dump stacktrace
 public class Xbuf {
-	val AssetManager assetManager
-	
-	val materialReplicator = new MaterialReplicator()
-	val Loader4Materials loader4Materials
-	val Loader4Relations loader4Relations
+	public val AssetManager assetManager
+	public val Loader4Materials loader4Materials
+	public val Loader4Relations loader4Relations
 	public val ExtensionRegistry registry
 
-	new(AssetManager assetManager) {
+    /**
+     * A full constructor that allow to define every service (to injection).
+     * @param assetManager the AssetManager used to load assets (texture, sound,...)
+     * @param registry the protobuf registry for extensions
+     * @param loader4Relations the xbuf way to load relations (null => default implementation)
+     * @param loader4Relations the xbuf way to load relations (null => default implementation)
+     */
+	new(AssetManager assetManager, ExtensionRegistry registry, Loader4Materials loader4Materials, Loader4Relations loader4Relations) {
 		this.assetManager = assetManager
-		loader4Materials = new Loader4Materials(assetManager, materialReplicator)
-		loader4Relations = new Loader4Relations(materialReplicator, loader4Materials)
-		registry = setupExtensionRegistry(ExtensionRegistry.newInstance())
+		this.loader4Materials = loader4Materials ?: new Loader4Materials(assetManager, null)
+        this.loader4Relations = loader4Relations ?: new Loader4Relations(this.loader4Materials.materialReplicator, this.loader4Materials)
+        this.registry = registry ?: ExtensionRegistry.newInstance()
+        setupExtensionRegistry(this.registry)
+	}
+
+	new(AssetManager assetManager) {
+		this(assetManager, null, null, null)
 	}
 
 	protected def ExtensionRegistry setupExtensionRegistry(ExtensionRegistry r) {
@@ -65,7 +75,6 @@ public class Xbuf {
 		AnimationsKf.registerAllExtensions(r)
 		r
 	}
-
 
 	def Mesh cnv(Meshes.Mesh src, Mesh dst, Logger log) {
 		if (src.getIndexArraysCount() > 1) {
