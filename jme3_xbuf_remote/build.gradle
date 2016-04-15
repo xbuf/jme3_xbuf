@@ -3,8 +3,8 @@ apply plugin: 'nebula.provided-base'
 apply plugin: "org.xtext.xtend"
 apply plugin: "application"
 
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 def description = "An experimental remote display of a jMonkeyEngine application for remote edition (eg: via blender)"

@@ -2,9 +2,8 @@ apply plugin: 'java'
 apply plugin: 'nebula.provided-base'
 apply plugin: 'org.xtext.xtend'
 
-//WARNING: this project is 1.7 compatible but ModelViewer require javafx and java 8u20+ to run
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 def description = "An experimental remote display of a jMonkeyEngine application for remote edition (eg: via blender)"
