@@ -8,9 +8,10 @@ import java.util.HashMap
 import org.slf4j.LoggerFactory
 import xbuf.Datas.Data
 import com.jme3.asset.AssetManager
+import java.util.function.Function
 
 class XbufLoader implements AssetLoader {
-	static public var (AssetManager)=>Xbuf xbufFactory = [AssetManager assetManager|new Xbuf(assetManager)]
+	static public var Function<AssetManager,Xbuf> xbufFactory = [AssetManager assetManager|new Xbuf(assetManager)]
 
 	override Object load(AssetInfo assetInfo) {
 		val xbuf = XbufLoader.xbufFactory.apply(assetInfo.getManager())
