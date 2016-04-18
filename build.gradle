@@ -6,7 +6,6 @@ buildscript {
 	dependencies {
 		classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:3.0.+'
 		classpath "org.xtext:xtext-gradle-plugin:1.0.+"
-		classpath 'com.cinnober.gradle:semver-git:2.2.+'
 	}
 }
 
@@ -16,12 +15,9 @@ buildscript {
 //------------------------------------------------------------------------------
 
 allprojects {
-	ext.nextVersion = "patch"
-	ext.snapshotSuffix = "<count>.g<sha>"
-	apply plugin: 'com.cinnober.gradle.semver-git'
-
+	project.version = "git describe --always --dirty".execute().text.trim()
+println("version : '${project.version}'")
 	group = "org.xbuf.jme3_xbuf"
-	//project.version = "0.6.1"
 	def description = 'xbuf lib and tools for jMonkeyEngine (jme3)'
 }
 
