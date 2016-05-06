@@ -26,6 +26,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import xbuf.Datas.Data;
 import xbuf.Relations.Relation;
+import xbuf.Tobjects.TObject;
 import xbuf_ext.CustomParams.CustomParam;
 import xbuf_ext.CustomParams.CustomParamList;
 
@@ -37,7 +38,8 @@ public class Loader4Relations{
 	// TODO use dispatch or pattern matching of Xtend
 
 	void merge(Data src, Node root, Map<String,Object> components, Logger log) {
-		src.getRelationsList().stream().map(r -> newRelationExpanded(r,src,components,log)).filter(i -> i!=null).sorted(new KindComparator()).forEach(
+		src.getRelationsList().stream().map(r -> newRelationExpanded(r,src,components,log))
+		.filter(i -> i!=null).sorted(new KindComparator()).forEach(
 				re->merge(re, src, root, components, log)
 		);
 	}
@@ -52,9 +54,12 @@ public class Loader4Relations{
 	}
 
 	public static RelationExpanded newRelationExpanded(Relation r, Data src, Map<String,Object> components, Logger log) {
+		System.out.println(r.getRef1()+"-"+r.getRef2());
+		
 		Object op1=components.get(r.getRef1());
 		Object op2=components.get(r.getRef2());
 
+		System.out.println(typeString(op1.getClass())+"-"+typeString(op2.getClass()));
 		if(op1==null||op2==null){
 			String t1str=op1!=null?op1.getClass().getSimpleName():"not found";
 			String t2str=op2!=null?op2.getClass().getSimpleName():"not found";
@@ -75,14 +80,20 @@ public class Loader4Relations{
 		if(clazz.isAssignableFrom(Material.class))return "Material";
 		if(clazz.isAssignableFrom(Geometry.class))return "Mesh";
 		if(clazz.isAssignableFrom(Skeleton.class))return "Skeleton";
-		if(clazz.isAssignableFrom(Skeleton.class))return "TObject";
+		if(clazz.isAssignableFrom(Node.class))return "TObject";
 		return "XXX";
 	}
 
 	static class KindComparator implements Comparator<RelationExpanded>{
 		// higher priority first
 		String[] order=new String[]{"Material-Mesh", // before Mesh-TObject because mesh could be clone with material (shared in modeler)
-				"TObject-TObject","Mesh-TObject","Material-TObject","Skeleton-TObject","Mesh-Skeleton","Animation-TObject","Animation-Mesh"};
+				"TObject-TObject",
+				"Mesh-TObject",
+				"Material-TObject",
+				"Skeleton-TObject",
+				"Mesh-Skeleton",
+				"Animation-TObject",
+				"Animation-Mesh"};
 
 		@Override
 		public int compare(RelationExpanded o1, RelationExpanded o2) {
@@ -103,6 +114,8 @@ public class Loader4Relations{
 
 	// Translated from xbuf, but need to be cleaned (compact castings)
 	public void merge(RelationExpanded re, Data src, Node root, Map<String, Object> components, Logger log) {
+		System.out.println(re.ref1+"-"+re.ref2);
+
 		Object op1 = re.op1;
 		Object op2 = re.op2;
 		boolean done = false;
@@ -137,23 +150,31 @@ public class Loader4Relations{
 			}
 		} else if (op1 instanceof Material) { // <--> xbuf.Material
 			if (op2 instanceof Geometry) {
+				System.out.println(((Geometry)op2).getParent().getName()+ " set material "+op1.hashCode()+ " "+((Material)op1).getName());
+
 				((Geometry)op2).setMaterial((Material)op1);
-				cloneMaterialOnGeometry((Geometry)op2);
+//				cloneMaterialOnGeometry((Geometry)op2);
 				done = true;
 			} else if (op2 instanceof Node) {
 				((Node)op2).setMaterial((Material)op1);
-				cloneMaterialOnGeometry((Geometry)op2);
+				System.out.println(((Geometry)op2).getParent().getName()+ " set material "+op1.hashCode()+ " "+((Material)op1).getName());
+
+//				cloneMaterialOnGeometry((Geometry)op2);
 				done = true;
 			}
 		} else if (op1 instanceof Geometry) { // <--> xbuf.Mesh
 			if (op2 instanceof Node) {
+				System.out.println(((Geometry)op1).getParent().getName()+ " has material "+((Geometry)op1).getMaterial().hashCode()+ " "+((Geometry)op1).getMaterial().getName());
+
 				// TODO replace clone by instanciation
-				Spatial mesh = ((Geometry)op1).getParent() != null && ((Geometry)op1).getParent()  != root?
+				Geometry mesh = ((Geometry)op1).getParent() != null && ((Geometry)op1).getParent()  != root?
 						// TODO use materialReplicator ?
-						(Spatial)((Geometry)op1).clone(true)
+						((Geometry)op1).clone(false)
 					:
-						(Spatial)op1
+						(Geometry)op1
 					;
+						System.out.println(((Geometry)op1).getParent().getName()+ " has now material "+((Geometry)op1).getMaterial().hashCode()+ " "+((Geometry)op1).getMaterial().getName());
+
 						((Node)op2).attachChild(mesh);
 				done = true;
 			} else if (op2 instanceof Skeleton) {
@@ -211,47 +232,48 @@ public class Loader4Relations{
 			else return null;
 		}).filter(i -> i!=null).iterator();
 	}
-	public  Spatial mergeToUserData(CustomParam p, Spatial dst, Logger log) {
-		String  name = p.getName();
-		switch (p.getValueCase()) {
+
+	public Spatial mergeToUserData(CustomParam p, Spatial dst, Logger log) {
+		String name=p.getName();
+		switch(p.getValueCase()){
 			case VALUE_NOT_SET:
-				dst.setUserData(name, null);
+				dst.setUserData(name,null);
 				break;
 			case VBOOL:
-				dst.setUserData(name, p.getVbool());				break;
-
+				dst.setUserData(name,p.getVbool());
+				break;
 			case VCOLOR:
-				dst.setUserData(name, cnv(p.getVcolor(), new ColorRGBA()));				break;
-
+				dst.setUserData(name,cnv(p.getVcolor(),new ColorRGBA()));
+				break;
 			case VFLOAT:
-				dst.setUserData(name, p.getVfloat());				break;
-
+				dst.setUserData(name,p.getVfloat());
+				break;
 			case VINT:
-				dst.setUserData(name, p.getVint());				break;
-
+				dst.setUserData(name,p.getVint());
+				break;
 			case VMAT4:
-				dst.setUserData(name, cnv(p.getVmat4(), new Matrix4f()));				break;
-
+				dst.setUserData(name,cnv(p.getVmat4(),new Matrix4f()));
+				break;
 			case VQUAT:
-				dst.setUserData(name, cnv(p.getVquat(), new Vector4f()));				break;
-
+				dst.setUserData(name,cnv(p.getVquat(),new Vector4f()));
+				break;
 			case VSTRING:
-				dst.setUserData(name, p.getVstring());				break;
-
+				dst.setUserData(name,p.getVstring());
+				break;
 			case VTEXTURE:
-				dst.setUserData(name, loader4Materials.getValue(p.getVtexture(), log));				break;
-
+				dst.setUserData(name,loader4Materials.getValue(p.getVtexture(),log));
+				break;
 			case VVEC2:
-				dst.setUserData(name, cnv(p.getVvec2(), new Vector2f()));				break;
-
+				dst.setUserData(name,cnv(p.getVvec2(),new Vector2f()));
+				break;
 			case VVEC3:
-				dst.setUserData(name, cnv(p.getVvec3(), new Vector3f()));				break;
-
+				dst.setUserData(name,cnv(p.getVvec3(),new Vector3f()));
+				break;
 			case VVEC4:
-				dst.setUserData(name, cnv(p.getVvec4(), new Vector4f()));				break;
-
+				dst.setUserData(name,cnv(p.getVvec4(),new Vector4f()));
+				break;
 			default:
-				log.warn("Material doesn't support parameter : {} of type {}", name, p.getValueCase().name());
+				log.warn("Material doesn't support parameter : {} of type {}",name,p.getValueCase().name());
 		}
 		return dst;
 	}
@@ -259,9 +281,10 @@ public class Loader4Relations{
 	// TO avoid "java.lang.UnsupportedOperationException: Material instances cannot be shared when hardware skinning is used. Ensure all models use unique material instances."
 
 	public void cloneMaterialOnGeometry(Spatial v) {
-		if(v instanceof Geometry) if(!materialReplicator.isReplica(((Geometry)v).getMaterial())) v.setMaterial(materialReplicator.newReplica(((Geometry)v).getMaterial()));
-
-		else if(v instanceof Node) ((Node)v).getChildren().forEach(this::cloneMaterialOnGeometry);
+		
+//		if(v instanceof Geometry) if(!materialReplicator.isReplica(((Geometry)v).getMaterial())) v.setMaterial(materialReplicator.newReplica(((Geometry)v).getMaterial()));
+//
+//		else if(v instanceof Node) ((Node)v).getChildren().forEach(this::cloneMaterialOnGeometry);
 
 	}
 

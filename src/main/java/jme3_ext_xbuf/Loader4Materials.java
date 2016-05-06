@@ -43,10 +43,12 @@ public class Loader4Materials{
 	}
 	
 	public Material newDefaultMaterial() {
+		new Exception().printStackTrace();
 		Material m=new Material(assetManager,"MatDefs/MatCap.j3md");
 		m.setTexture("DiffuseMap",assetManager.loadTexture("Textures/generator8.jpg"));
 		m.setColor("Multiply_Color",ColorRGBA.Pink);
 		m.setFloat("ChessSize",0.5f);
+		m.setName("DEFAULT");
 		return m;
 	}
 
@@ -194,7 +196,7 @@ public class Loader4Materials{
 			components.put(id,mat);
 			mat.setName(m.hasName()?m.getName():m.getId());
 			mergeToMaterial(m,mat,log);
-			materialReplicator.syncReplicas(mat);
+//			materialReplicator.syncReplicas(mat);
 		});
 
 	}
