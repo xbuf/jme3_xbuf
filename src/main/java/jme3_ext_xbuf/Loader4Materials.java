@@ -21,7 +21,6 @@ import com.jme3.texture.Texture.WrapMode;
 import com.jme3.texture.Texture2D;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import xbuf.Datas.Data;
 import xbuf.Materials;
@@ -29,7 +28,6 @@ import xbuf.Primitives;
 import xbuf.Primitives.Color;
 import xbuf.Primitives.Texture2DInline;
 
-@RequiredArgsConstructor
 public class Loader4Materials{
 	protected final AssetManager assetManager;
 	protected @Setter @Getter Texture defaultTexture;
@@ -37,6 +35,13 @@ public class Loader4Materials{
 
 	protected final MaterialReplicator materialReplicator;
 
+	public Loader4Materials(AssetManager assetManager, MaterialReplicator materialReplicator) {
+		this.assetManager = assetManager;
+		this.materialReplicator = materialReplicator !=null?materialReplicator: new MaterialReplicator();
+		defaultTexture = newDefaultTexture();
+		defaultMaterial = newDefaultMaterial();
+	}
+	
 	public Material newDefaultMaterial() {
 		Material m=new Material(assetManager,"MatDefs/MatCap.j3md");
 		m.setTexture("DiffuseMap",assetManager.loadTexture("Textures/generator8.jpg"));
