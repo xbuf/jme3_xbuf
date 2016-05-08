@@ -2,7 +2,6 @@ package jme3_ext_xbuf;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 
@@ -22,20 +21,14 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.VertexBuffer;
-import com.jme3.scene.VertexBuffer.Type;
-import com.jme3.util.TangentBinormalGenerator_31;
 
 import jme3_ext_animation.NamedBoneTrack;
+import jme3_ext_xbuf.relations.Loader4Relations;
 import lombok.experimental.ExtensionMethod;
 import xbuf.Datas.Data;
 import xbuf.Lights;
-import xbuf.Meshes;
-import xbuf.Meshes.Skin;
 import xbuf.Primitives;
 import xbuf.Relations.Relation;
 import xbuf.Skeletons;
@@ -45,7 +38,7 @@ import xbuf_ext.AnimationsKf.AnimationKF;
 import xbuf_ext.AnimationsKf.SampledTransform;
 import xbuf_ext.CustomParams;
 
-@ExtensionMethod({jme3_ext_xbuf.ext.ListExt.class})
+@ExtensionMethod({jme3_ext_xbuf.ext.ListExt.class,jme3_ext_xbuf.ext.XbufMeshExt.class})
 // TODO use a Validation object (like in scala/scalaz) with option to log/dump stacktrace
 public class Xbuf{
 	protected final AssetManager assetManager;
@@ -63,7 +56,7 @@ public class Xbuf{
 	public Xbuf(AssetManager assetManager,ExtensionRegistry registry,Loader4Materials loader4Materials,Loader4Relations loader4Relations){
 		this.assetManager=assetManager;
 		this.loader4Materials=loader4Materials!=null?loader4Materials:new Loader4Materials(assetManager,null);
-		this.loader4Relations=loader4Relations!=null?loader4Relations:new Loader4Relations(this.loader4Materials.materialReplicator,this.loader4Materials);
+		this.loader4Relations=loader4Relations!=null?loader4Relations:new Loader4Relations(this.loader4Materials);
 		this.registry=registry!=null?registry:ExtensionRegistry.newInstance();
 		setupExtensionRegistry(this.registry);
 	}
@@ -78,122 +71,21 @@ public class Xbuf{
 		return r;
 	}
 
-	public Mesh cnv(Meshes.Mesh src, Mesh dst, Logger log) {
-		if(src.getIndexArraysCount()>1) throw new IllegalArgumentException("doesn't support more than 1 index array");
-		if(src.getLod()>1) throw new IllegalArgumentException("doesn't support lod > 1 : "+src.getLod());
-
-		dst.setMode(Converters.cnv(src.getPrimitive()));
-		src.getVertexArraysList().forEach(va -> {
-			Type type=Converters.cnv(va.getAttrib());
-			dst.setBuffer(type,va.getFloats().getStep(),Converters.hack_cnv(va.getFloats()));
-			log.debug("add {}",dst.getBuffer(type));
-		});
-		src.getIndexArraysList().forEach(va -> dst.setBuffer(VertexBuffer.Type.Index,va.getInts().getStep(),Converters.hack_cnv(va.getInts())));
-
-		if(src.hasSkin()) applySkin(src.getSkin(),dst,log);
-
-		//		// basic check
-		//		val nbVertices = dst.getBuffer(VertexBuffer.Type.Position).getNumElements()
-		//		for(IntMap.Entry<VertexBuffer> evb : dst.getBuffers()) {
-		//			if (evb.getKey() != VertexBuffer.Type.Index.ordinal()) {
-		//				if (nbVertices != evb.getValue().getNumElements()) {
-		//					log.warn("size of vertex buffer {} is not equals to vertex buffer for position: {} != {}", VertexBuffer.Type.values().get(evb.getKey()), evb.getValue().getNumElements(), nbVertices)
-		//				}
-		//			}
-		//		}
-		// TODO optimize lazy create Tangent when needed (for normal map ?)
-		if((dst.getBuffer(VertexBuffer.Type.Tangent)==null||dst.getBuffer(VertexBuffer.Type.Binormal)==null)&&dst.getBuffer(VertexBuffer.Type.Normal)!=null&&dst.getBuffer(VertexBuffer.Type.TexCoord)!=null){
-			TangentBinormalGenerator_31.setToleranceAngle(179);// remove warnings
-			TangentBinormalGenerator_31.generate(dst);
-		}
-
-		dst.updateCounts();
-		dst.updateBound();
-		return dst;
-	}
-
-	public Mesh applySkin(Skin skin, Mesh dst, Logger log) {
-		dst.clearBuffer(Type.BoneIndex);
-		dst.clearBuffer(Type.BoneWeight);
-		int nb=skin.getBoneCountCount();
-		// val maxWeightPerVert = Math.min(4, skin.boneCountList.reduce[p1, p2|Math.max(p1,p2)])
-		int maxWeightPerVert=4;// jME 3.0 only support fixed 4 weights per vertex
-		byte[] indexPad=new byte[nb*maxWeightPerVert];
-		float weightPad[]=new float[nb*maxWeightPerVert];
-		int isrc=0;
-		for(int i=0;i<nb;i++){
-			float totalWeightPad=0f;
-			int cnt=skin.getBoneCountList().get(i);
-			int k0=i*maxWeightPerVert;
-			for(int j=0;j<maxWeightPerVert;j++){
-				int k=k0+j;
-				byte index=0;
-				float weight=0f;
-				if(j<cnt){
-					weight=skin.getBoneWeightList().get(isrc+j);
-					index=skin.getBoneIndexList().get(isrc+j).byteValue();
-				}
-				totalWeightPad+=weight;
-				indexPad[k]=index;
-				weightPad[k]=weight;
-			}
-			if(totalWeightPad>0){
-				float totalWeight=0.0f;
-				for(int j=0;j<cnt;j++)
-					totalWeight+=skin.getBoneWeightList().get(isrc+j);
-
-				float normalizer=totalWeight/totalWeightPad;
-				int wpv=Math.min(maxWeightPerVert,cnt);
-				for(int j=0;j<wpv;j++){
-					int k=k0+j;
-					weightPad[k]=weightPad[k]*normalizer;
-				}
-				if(cnt>maxWeightPerVert&&totalWeight!=totalWeightPad){
-					log.warn("vertex influenced by more than {} bones : {}, only the {} higher are keep for total weight keep/orig: {}/{}.",new Object[]{maxWeightPerVert,cnt,wpv,totalWeightPad,totalWeight});
-				}
-			}
-			isrc+=cnt;
-		}
-		dst.setBuffer(Type.BoneIndex,maxWeightPerVert,indexPad);
-		dst.setBuffer(Type.BoneWeight,maxWeightPerVert,weightPad);
-		dst.setMaxNumWeights(maxWeightPerVert);
-
-		// creating empty buffers for HW skinning
-		// the buffers will be setup if ever used.
-		VertexBuffer weightsHW=new VertexBuffer(Type.HWBoneWeight);
-		VertexBuffer indicesHW=new VertexBuffer(Type.HWBoneIndex);
-		// setting usage to cpuOnly so that the buffer is not send empty to the GPU
-		indicesHW.setUsage(VertexBuffer.Usage.CpuOnly);
-		weightsHW.setUsage(VertexBuffer.Usage.CpuOnly);
-		dst.setBuffer(weightsHW);
-		dst.setBuffer(indicesHW);
-		dst.generateBindPose(true);
-		return dst;
-	}
-
-	// TODO support multi mesh, may replace geometry by node and use one Geometry per mesh
-	public Geometry cnv(Meshes.Mesh src, Geometry dst, Logger log) {
-		dst.setName(src.hasName()?src.getName():src.getId());
-		Mesh mesh=cnv(src,new Mesh(),log);
-		dst.setMesh(mesh);
-		dst.updateModelBound();
-		return dst;
-	}
 
 	// TODO optimize to create less intermediate node
-	public void merge(Data src, Node root, Map<String,Object> components, Logger log) {
-		mergeTObjects(src,root,components,log);
-		mergeMeshes(src,root,components,log);
-		loader4Materials.mergeMaterials(src,components,log);
-		mergeLights(src,root,components,log);
-		mergeSkeletons(src,root,components,log);
-		mergeCustomParams(src,components,log);
-		mergeAnimations(src,components,log);
+	public void merge(Data src, Node root, XbufContext context, Logger log) {
+		mergeTObjects(src,root,context,log);
+		mergeMeshes(src,root,context,log);
+		loader4Materials.mergeMaterials(src,context,log);
+		mergeLights(src,root,context,log);
+		mergeSkeletons(src,root,context,log);
+		mergeCustomParams(src,context,log);
+		mergeAnimations(src,context,log);
 		// relations should be the last because it reuse data provide by other (put in components)
-		loader4Relations.merge(src,root,components,log);
+		loader4Relations.merge(src,root,context,log);
 	}
 
-	public void mergeAnimations(Data src, Map<String,Object> components, Logger log) {
+	public void mergeAnimations(Data src, XbufContext components, Logger log) {
 		for(AnimationsKf.AnimationKF e:src.getAnimationsKfList()){
 			java.lang.String id=e.getId();
 			// TODO: merge with existing
@@ -364,7 +256,7 @@ public class Xbuf{
 	//			}
 	//		}
 	//	}
-	public void mergeSkeletons(Data src, Node root, Map<String,Object> components, Logger log) {
+	public void mergeSkeletons(Data src, Node root, XbufContext components, Logger log) {
 		for(xbuf.Skeletons.Skeleton e:src.getSkeletonsList()){
 			// TODO manage parent hierarchy
 			String id=e.getId();
@@ -395,14 +287,14 @@ public class Xbuf{
 		return sk;
 	}
 
-	public void mergeCustomParams(Data src, Map<String,Object> components, Logger log) {
+	public void mergeCustomParams(Data src,XbufContext components, Logger log) {
 		for(CustomParams.CustomParamList srccp:src.getCustomParamsList()){
 			// TODO merge with existing
 			components.put(srccp.getId(),srccp);
 		}
 	}
 
-	public void mergeLights(Data src, Node root, Map<String,Object> components, Logger log) {
+	public void mergeLights(Data src, Node root, XbufContext components, Logger log) {
 		for(xbuf.Lights.Light srcl:src.getLightsList()){
 			// TODO manage parent hierarchy
 			String id=srcl.getId();
@@ -498,7 +390,7 @@ public class Xbuf{
 		return l0;
 	}
 
-	public void mergeTObjects(Data src, Node root, Map<String,Object> components, Logger log) {
+	public void mergeTObjects(Data src, Node root, XbufContext components, Logger log) {
 		for(TObject n:src.getTobjectsList()){
 			String id=n.getId();
 			Spatial child=(Spatial)components.get(id);
@@ -512,21 +404,8 @@ public class Xbuf{
 		}
 	}
 
-	public void mergeMeshes(Data src, Node root, Map<String,Object> components, Logger log) {
-		for(xbuf.Meshes.Mesh g:src.getMeshesList()){
-			// TODO manage parent hierarchy
-			String id=g.getId();
-			Geometry child=(Geometry)components.get(id);
-			if(child==null){
-				child=new Geometry();
-				// child.setMaterial(materialReplicator.newReplica(defaultMaterial))
-				child.setMaterial(loader4Materials.newDefaultMaterial());
-				root.attachChild(child);
-				// log.debug("add Geometry for xbuf.Mesh.id: {}", id)
-				components.put(id,child);
-			}
-			child=cnv(g,child,log);
-		}
+	public void mergeMeshes(Data src, Node root,XbufContext context, Logger log) {
+		for(xbuf.Meshes.Mesh g:src.getMeshesList())	context.put(g.getId(),g.toJME(context,log));		
 	}
 
 	public void merge(Primitives.Transform src, Spatial dst, Logger log) {

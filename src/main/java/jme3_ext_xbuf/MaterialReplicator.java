@@ -1,12 +1,5 @@
 package jme3_ext_xbuf;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import com.jme3.material.Material;
-
 public class MaterialReplicator{
 //	protected Multimap<Material,Material> replicas=  ArrayListMultimap.create();
 //	protected Map<Material, Material> sources = new HashMap<Material, Material> ();

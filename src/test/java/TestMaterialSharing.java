@@ -4,6 +4,10 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.asset.plugins.UrlLocator;
+import com.jme3.light.AmbientLight;
+import com.jme3.light.DirectionalLight;
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 
@@ -46,6 +50,11 @@ public class TestMaterialSharing extends SimpleApplication{
     }
 	@Override
 	public void simpleInitApp() {
+		
+		DirectionalLight dl=new DirectionalLight(new Vector3f(0f, -1f, 0),new ColorRGBA(.72f,.97f,1f,1f).mult(1.4f));
+		rootNode.addLight(dl);
+		dl=new DirectionalLight(new Vector3f(0f, 1f, 0),new ColorRGBA(.72f,.97f,1f,1f).mult(1.4f));
+		rootNode.addLight(dl);
 		loadTestData(assetManager);
 		assetManager.registerLoader(XbufLoader.class,"xbuf");
 		flyCam.setMoveSpeed(200f);
@@ -54,9 +63,10 @@ public class TestMaterialSharing extends SimpleApplication{
 		rootNode.depthFirstTraversal(s -> {
 			if(s instanceof Geometry){
 				Geometry g=(Geometry)s;
-				System.out.println(g.getParent().getName());
+				System.out.println(g.getParent().getName()+ "  ["+g.getName()+"]");
 				System.out.println("   Material: "+g.getMaterial().hashCode()+" "+g.getMaterial().getName());
 				System.out.println("   Mesh: "+g.getMesh().hashCode());
+				System.out.println("   Position: "+g.getWorldTranslation());
 			}
 		});
 	}

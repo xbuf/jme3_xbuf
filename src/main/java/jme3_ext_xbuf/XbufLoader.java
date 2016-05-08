@@ -2,7 +2,6 @@ package jme3_ext_xbuf;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.function.Function;
 
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,9 @@ public class XbufLoader implements AssetLoader {
 		try {
 			in = assetInfo.openStream();
 			Data src = Data.parseFrom(in, xbuf.registry);
-			xbuf.merge(src, root, new HashMap<String, Object>(), logger);
+			XbufContext context=new XbufContext();
+			xbuf.merge(src, root, context, logger);
+			logger.info(context.toString());
 		} finally {
 			if(in!=null)in.close();
 		}

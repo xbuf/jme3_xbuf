@@ -2,8 +2,6 @@ package jme3_ext_xbuf;
 
 import static jme3_ext_xbuf.Converters.cnv;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 
 import com.jme3.asset.AssetManager;
@@ -43,7 +41,6 @@ public class Loader4Materials{
 	}
 	
 	public Material newDefaultMaterial() {
-		new Exception().printStackTrace();
 		Material m=new Material(assetManager,"MatDefs/MatCap.j3md");
 		m.setTexture("DiffuseMap",assetManager.loadTexture("Textures/generator8.jpg"));
 		m.setColor("Multiply_Color",ColorRGBA.Pink);
@@ -189,7 +186,7 @@ public class Loader4Materials{
 		return dst;
 	}
 
-	public void mergeMaterials(Data src, Map<String,Object> components, Logger log) {
+	public void mergeMaterials(Data src, XbufContext components, Logger log) {
 		src.getMaterialsList().stream().forEach(m -> {
 			String id=m.getId();
 			Material mat=newMaterial(m,log);
