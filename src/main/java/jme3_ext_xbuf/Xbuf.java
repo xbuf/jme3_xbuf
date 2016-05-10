@@ -19,16 +19,17 @@ import jme3_ext_xbuf.mergers.NodesMerger;
 import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.SkeletonsMerger;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import xbuf.Datas.Data;
 import xbuf_ext.AnimationsKf;
 import xbuf_ext.CustomParams;
 
+@Log4j2
 public class Xbuf{
 	protected final AssetManager assetManager;
 	protected final ExtensionRegistry registry;
-	MaterialsMerger mmerger;
-	private final @Getter List<Merger> mergers;
-
+	protected MaterialsMerger mmerger;
+	protected final @Getter List<Merger> mergers;
 	/**
 	 * A full constructor that allow to define every service (to injection).
 	 * @param assetManager the AssetManager used to load assets (texture, sound,...)
@@ -68,9 +69,9 @@ public class Xbuf{
 	}
 
 	// TODO optimize to create less intermediate node
-	public void merge(Data src, Node root, XbufContext context, Logger log) {
+	public void merge(Data src, Node root, XbufContext context) {
 		for(Merger m:mergers){
-			m.apply(src,root,context,log);
+			m.apply(src,root,context);
 		}
 	}
 

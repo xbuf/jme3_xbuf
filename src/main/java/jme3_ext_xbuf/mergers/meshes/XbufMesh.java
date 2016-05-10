@@ -34,14 +34,14 @@ public class XbufMesh{
 		});
 		
 		src.getIndexArraysList().forEach(va -> dst.setBuffer(VertexBuffer.Type.Index,va.getInts().getStep(),Converters.hack_cnv(va.getInts())));
-		if(src.hasSkin()) applySkin(src.getSkin(),dst,log);
+		if(src.hasSkin()) applySkin(src.getSkin(),dst);
 
 		dst.updateCounts();
 		dst.updateBound();
 		return dst;
 	}
 	
-	protected Mesh applySkin(Skin skin, Mesh dst, Logger log) {
+	protected Mesh applySkin(Skin skin, Mesh dst) {
 		dst.clearBuffer(Type.BoneIndex);
 		dst.clearBuffer(Type.BoneWeight);
 		int nb=skin.getBoneCountCount();

@@ -16,21 +16,23 @@ import com.jme3.scene.Spatial;
 import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
+import lombok.extern.log4j.Log4j2;
 import xbuf_ext.CustomParams.CustomParam;
 import xbuf_ext.CustomParams.CustomParamList;
 
+@Log4j2
 public class CustomParamToSpatial implements Linker{
 
 	@Override
-	public boolean doLink(RelationsMerger loader,RefData data, Logger log) {
+	public boolean doLink(RelationsMerger loader,RefData data) {
 		CustomParamList op1=getRef1(data,CustomParamList.class);
 		Spatial op2=getRef2(data,Spatial.class);
 		if(op1==null||op2==null) return false;
-		for(CustomParam p:op1.getParamsList())merge(loader,p,op2,log);
+		for(CustomParam p:op1.getParamsList())merge(loader,p,op2);
 		return true;
 	}
 		
-	protected Spatial merge(RelationsMerger loader,CustomParam p, Spatial dst, Logger log) {
+	protected Spatial merge(RelationsMerger loader,CustomParam p, Spatial dst) {
 		String name=p.getName();
 		switch(p.getValueCase()){
 			case VALUE_NOT_SET:
@@ -58,7 +60,7 @@ public class CustomParamToSpatial implements Linker{
 				dst.setUserData(name,p.getVstring());
 				break;
 			case VTEXTURE:
-				dst.setUserData(name,loader.loader4Materials.getValue(p.getVtexture(),log));
+				dst.setUserData(name,loader.loader4Materials.getValue(p.getVtexture()));
 				break;
 			case VVEC2:
 				dst.setUserData(name,cnv(p.getVvec2(),new Vector2f()));

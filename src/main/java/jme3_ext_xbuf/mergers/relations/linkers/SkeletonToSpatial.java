@@ -22,14 +22,15 @@ import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
 import lombok.experimental.ExtensionMethod;
+import lombok.extern.log4j.Log4j2;
 
 @ExtensionMethod({jme3_ext_xbuf.ext.AnimControlExt.class})
-
+@Log4j2
 public class SkeletonToSpatial implements Linker{
 	// see http://hub.jmonkeyengine.org/t/skeletoncontrol-or-animcontrol-to-host-skeleton/31478/4
 
 	@Override
-	public boolean doLink(RelationsMerger loader, RefData data, Logger log) {
+	public boolean doLink(RelationsMerger loader, RefData data) {
 		Object op1=getRef1(data,Geometry.class);
 		Object op2=getRef2(data,Skeleton.class);
 
@@ -64,13 +65,13 @@ public class SkeletonToSpatial implements Linker{
 		// always add AnimControl else NPE when SkeletonControl.clone
 		if(!atLeastOne)v.addControl(new AnimControl(sk));
 		
-		cloneMatWhenNeeded((Spatial)op1,data,log);
+		cloneMatWhenNeeded((Spatial)op1,data);
 		return true;
 	}
 
 
 	
-	private void cloneMatWhenNeeded(Spatial op2, RefData data, Logger log) {
+	private void cloneMatWhenNeeded(Spatial op2, RefData data) {
 		op2.depthFirstTraversal(s -> {
 			if(s instanceof Geometry){
 				Material m=((Geometry)s).getMaterial();

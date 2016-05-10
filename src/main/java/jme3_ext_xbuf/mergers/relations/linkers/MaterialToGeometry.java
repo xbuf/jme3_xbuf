@@ -4,8 +4,6 @@ import static jme3_ext_xbuf.mergers.relations.LinkerHelpers.getRef2;
 
 import java.util.Optional;
 
-import org.apache.logging.log4j.Logger;
-
 import com.jme3.animation.SkeletonControl;
 import com.jme3.material.Material;
 import com.jme3.scene.Geometry;
@@ -17,7 +15,7 @@ import jme3_ext_xbuf.mergers.relations.RefData;
 public class MaterialToGeometry  implements Linker{
  
 	@Override
-	public boolean doLink(RelationsMerger loader, RefData data, Logger log) {
+	public boolean doLink(RelationsMerger loader, RefData data) {
 		Material op1=getRef1(data,Material.class);
 		Geometry op2=getRef2(data,Geometry.class);
 		if(op1==null||op2==null) return false;

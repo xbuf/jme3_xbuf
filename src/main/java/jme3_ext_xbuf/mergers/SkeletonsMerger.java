@@ -19,18 +19,18 @@ import xbuf.Skeletons;
 public class SkeletonsMerger implements Merger{
 
 	@Override
-	public void apply(Data src, Node root, XbufContext context, Logger log) {
+	public void apply(Data src, Node root, XbufContext context) {
 		for(xbuf.Skeletons.Skeleton e:src.getSkeletonsList()){
 			// TODO manage parent hierarchy
 			String id=e.getId();
 			// TODO: merge with existing
-			Skeleton child=makeSkeleton(e,log);
+			Skeleton child=makeSkeleton(e);
 			context.put(id,child);
 			// Skeleton child = (Skeleton)components.get(id);
 		}
 	}
 
-	private Skeleton makeSkeleton(Skeletons.Skeleton e, Logger log) {
+	private Skeleton makeSkeleton(Skeletons.Skeleton e) {
 		Bone[] bones=new Bone[e.getBonesCount()];
 		HashMap<String,Bone> db=new HashMap<String,Bone>();
 		for(int i=0;i<bones.length;i++){

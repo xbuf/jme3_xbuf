@@ -19,6 +19,31 @@ import com.jme3.scene.debug.SkeletonDebugger;
 
 public class UnitTests{
 	public boolean headless=true;
+
+	@Test
+	public void testMultiMat() {
+		SimpleApplication app=TestHelpers.buildApp(headless);
+		TestHelpers.hijackUpdateThread(app);
+
+		Spatial scene=app.getAssetManager().loadModel("unit_tests/xbuf/multi_mat.xbuf");
+		app.getRootNode().attachChild(scene);
+
+		// All material instances
+		LinkedList<Material> materials_instances=new LinkedList<Material>();
+		scene.depthFirstTraversal(s -> {
+			if(s instanceof Geometry){
+				Geometry geom=(Geometry)s;
+				Material mat=geom.getMaterial();
+				materials_instances.add(mat);
+			}
+		});
+
+		TestHelpers.releaseUpdateThread(app);
+		if(!headless)TestHelpers.waitFor(app);
+		TestHelpers.closeApp(app);
+
+	}
+	
 	@Test
 	public void testHwSkinning() {
 		SimpleApplication app=TestHelpers.buildApp(headless);

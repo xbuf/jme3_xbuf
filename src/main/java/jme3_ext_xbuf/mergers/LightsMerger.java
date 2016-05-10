@@ -13,18 +13,19 @@ import com.jme3.scene.Node;
 
 import jme3_ext_xbuf.Converters;
 import jme3_ext_xbuf.XbufContext;
+import lombok.extern.log4j.Log4j2;
 import xbuf.Datas.Data;
 import xbuf.Lights;
-
+@Log4j2
 public class LightsMerger implements Merger{
 
-	public void apply(Data src, Node root, XbufContext context, Logger log) {
+	public void apply(Data src, Node root, XbufContext context) {
 		for(xbuf.Lights.Light srcl:src.getLightsList()){
 			// TODO manage parent hierarchy
 			String id=srcl.getId();
 			Light light=context.get(id);
 			if(light==null) {
-				light=makeLight(srcl,log);
+				light=makeLight(srcl);
 				context.put(id,light);
 			}
 
@@ -87,7 +88,7 @@ public class LightsMerger implements Merger{
 		}
 	}
 
-	private Light makeLight(Lights.Light srcl, Logger log) {
+	private Light makeLight(Lights.Light srcl) {
 		Light l0=null;
 		switch(srcl.getKind()){
 			case ambient:

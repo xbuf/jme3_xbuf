@@ -10,7 +10,16 @@ import java.util.Map.Entry;
 public class XbufContext {
 	private Map<String,Object> storage=new HashMap<String,Object> ();
 	private Map<String,List<String>> links=new HashMap<String,List<String>>();
-
+	private XbufKey settings;
+	
+	public synchronized void setSettings(XbufKey s){
+		settings=s;
+	}
+	
+	public synchronized XbufKey getSettings(){
+		return settings;
+	}
+	
 	public synchronized <T> T get(String ref){
 		return (T)storage.get(ref);
 	}

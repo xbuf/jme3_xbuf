@@ -18,9 +18,11 @@ import jme3_ext_xbuf.mergers.relations.linkers.MaterialToGeometry;
 import jme3_ext_xbuf.mergers.relations.linkers.NodeToNode;
 import jme3_ext_xbuf.mergers.relations.linkers.SkeletonToSpatial;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import xbuf.Datas.Data;
 import xbuf.Relations.Relation;
 
+@Log4j2
 @SuppressWarnings("serial")
 @RequiredArgsConstructor
 public class RelationsMerger implements Merger{
@@ -38,13 +40,13 @@ public class RelationsMerger implements Merger{
 		}
 	};
 
-	public void apply(Data src, Node root, XbufContext components, Logger log) {
+	public void apply(Data src, Node root, XbufContext components) {
 		for(Relation r:src.getRelationsList()){
-			merge(new RefData(r.getRef1(),r.getRef2(),src,root,components),log);
+			merge(new RefData(r.getRef1(),r.getRef2(),src,root,components));
 		} 
 	}
 
-	public void merge(RefData data, Logger log) {
+	public void merge(RefData data) {
 		if(data.ref1.equals(data.ref2)){
 			log.warn("can't link {} to itself",data.ref1);
 			return;
@@ -68,7 +70,7 @@ public class RelationsMerger implements Merger{
 				data.ref1=ref1;
 				data.ref2=ref2;
 				for(Linker linker:linkers){
-					if(linker.doLink(this,data,log)){
+					if(linker.doLink(this,data)){
 						linked=true;
 						log.info("{} linked to {} with {}",data.ref1,data.ref2,linker.getClass());
 						break;

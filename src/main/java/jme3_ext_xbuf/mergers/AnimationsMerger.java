@@ -3,8 +3,6 @@ package jme3_ext_xbuf.mergers;
 import java.lang.reflect.Array;
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
-
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
@@ -21,7 +19,7 @@ import xbuf_ext.AnimationsKf.SampledTransform;
 public class AnimationsMerger implements Merger{
 
 	@Override
-	public void apply(Data src, Node root, XbufContext context, Logger log) {
+	public void apply(Data src, Node root, XbufContext context) {
 		for(AnimationsKf.AnimationKF e:src.getAnimationsKfList()){
 			java.lang.String id=e.getId();
 			// TODO: merge with existing

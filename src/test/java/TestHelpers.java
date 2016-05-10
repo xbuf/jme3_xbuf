@@ -3,6 +3,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -22,6 +23,10 @@ public class TestHelpers{
 				run_tab.remove(this);
 			}
 			public void simpleInitApp() {
+				AmbientLight al=new AmbientLight();
+				al.setColor(ColorRGBA.White.mult(10f));
+				
+				rootNode.addLight(al);
 				
 				DirectionalLight dl=new DirectionalLight(new Vector3f(0f, -1f, 0),new ColorRGBA(.72f,.97f,1f,1f).mult(1.4f));
 				rootNode.addLight(dl);
