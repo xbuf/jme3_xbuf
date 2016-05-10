@@ -1,10 +1,10 @@
-package jme3_ext_xbuf.relations.linkers;
+package jme3_ext_xbuf.mergers.relations.linkers;
 
 import static jme3_ext_xbuf.Converters.cnv;
-import static jme3_ext_xbuf.relations.LinkerHelpers.getRef1;
-import static jme3_ext_xbuf.relations.LinkerHelpers.getRef2;
+import static jme3_ext_xbuf.mergers.relations.LinkerHelpers.getRef1;
+import static jme3_ext_xbuf.mergers.relations.LinkerHelpers.getRef2;
 
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix4f;
@@ -13,16 +13,16 @@ import com.jme3.math.Vector3f;
 import com.jme3.math.Vector4f;
 import com.jme3.scene.Spatial;
  
-import jme3_ext_xbuf.relations.Linker;
-import jme3_ext_xbuf.relations.Loader4Relations;
-import jme3_ext_xbuf.relations.MergeData;
+import jme3_ext_xbuf.mergers.RelationsMerger;
+import jme3_ext_xbuf.mergers.relations.Linker;
+import jme3_ext_xbuf.mergers.relations.RefData;
 import xbuf_ext.CustomParams.CustomParam;
 import xbuf_ext.CustomParams.CustomParamList;
 
 public class CustomParamToSpatial implements Linker{
 
 	@Override
-	public boolean doLink(Loader4Relations loader,MergeData data, Logger log) {
+	public boolean doLink(RelationsMerger loader,RefData data, Logger log) {
 		CustomParamList op1=getRef1(data,CustomParamList.class);
 		Spatial op2=getRef2(data,Spatial.class);
 		if(op1==null||op2==null) return false;
@@ -30,7 +30,7 @@ public class CustomParamToSpatial implements Linker{
 		return true;
 	}
 		
-	protected Spatial merge(Loader4Relations loader,CustomParam p, Spatial dst, Logger log) {
+	protected Spatial merge(RelationsMerger loader,CustomParam p, Spatial dst, Logger log) {
 		String name=p.getName();
 		switch(p.getValueCase()){
 			case VALUE_NOT_SET:

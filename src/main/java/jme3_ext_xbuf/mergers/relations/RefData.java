@@ -1,4 +1,4 @@
-package jme3_ext_xbuf.relations;
+package jme3_ext_xbuf.mergers.relations;
 
 import com.jme3.scene.Node;
 
@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import xbuf.Datas.Data;
 
 @AllArgsConstructor
-public class MergeData {
+public class RefData {
 //	public Relation rel;
 	public String ref1,ref2;
 	public Data src;

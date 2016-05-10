@@ -16,7 +16,7 @@ public class XbufContext {
 	}
 	
 		
-	public synchronized String refOf(Object val){
+	public synchronized String idOf(Object val){
 		for(Entry<String,Object> entry:storage.entrySet()){
 			if(entry.getValue()==val)return entry.getKey();
 		}
@@ -57,7 +57,7 @@ public class XbufContext {
 	}
 
 	
-	public String toString(){
+	public synchronized String toString(){
 		StringBuilder sb=new StringBuilder();
 		LinkedList<String> ignore=new LinkedList<String>();
 		storage.forEach((k,v)->{

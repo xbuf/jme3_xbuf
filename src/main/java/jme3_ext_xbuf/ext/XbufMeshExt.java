@@ -1,6 +1,6 @@
 package jme3_ext_xbuf.ext;
 
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
@@ -49,7 +49,7 @@ public class XbufMeshExt{
 					weightPad[k]=weightPad[k]*normalizer;
 				}
 				if(cnt>maxWeightPerVert&&totalWeight!=totalWeightPad){
-					log.warn("vertex influenced by more than {} bones : {}, only the {} higher are keep for total weight keep/orig: {}/{}.",new Object[]{maxWeightPerVert,cnt,wpv,totalWeightPad,totalWeight});
+					log.warn("vertex influenced by more than {} bones : {}, only the {} higher are keep for total weight keep/orig: {}/{}.",maxWeightPerVert,cnt,wpv,totalWeightPad,totalWeight);
 				}
 			}
 			isrc+=cnt;

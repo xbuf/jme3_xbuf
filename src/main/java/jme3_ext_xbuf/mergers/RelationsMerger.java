@@ -1,29 +1,30 @@
-package jme3_ext_xbuf.relations;
+package jme3_ext_xbuf.mergers;
 
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.jme3.scene.Node;
 
-import jme3_ext_xbuf.Loader4Materials;
 import jme3_ext_xbuf.XbufContext;
-import jme3_ext_xbuf.relations.linkers.AnimationToSpatial;
-import jme3_ext_xbuf.relations.linkers.CustomParamToSpatial;
-import jme3_ext_xbuf.relations.linkers.GeometryToNode;
-import jme3_ext_xbuf.relations.linkers.LightToGeometry;
-import jme3_ext_xbuf.relations.linkers.MaterialToGeometry;
-import jme3_ext_xbuf.relations.linkers.NodeToNode;
-import jme3_ext_xbuf.relations.linkers.SkeletonToSpatial;
+import jme3_ext_xbuf.mergers.relations.Linker;
+import jme3_ext_xbuf.mergers.relations.RefData;
+import jme3_ext_xbuf.mergers.relations.linkers.AnimationToSpatial;
+import jme3_ext_xbuf.mergers.relations.linkers.CustomParamToSpatial;
+import jme3_ext_xbuf.mergers.relations.linkers.GeometryToNode;
+import jme3_ext_xbuf.mergers.relations.linkers.LightToGeometry;
+import jme3_ext_xbuf.mergers.relations.linkers.MaterialToGeometry;
+import jme3_ext_xbuf.mergers.relations.linkers.NodeToNode;
+import jme3_ext_xbuf.mergers.relations.linkers.SkeletonToSpatial;
 import lombok.RequiredArgsConstructor;
 import xbuf.Datas.Data;
 import xbuf.Relations.Relation;
 
 @SuppressWarnings("serial")
 @RequiredArgsConstructor
-public class Loader4Relations{
-	public final Loader4Materials loader4Materials;
+public class RelationsMerger implements Merger{
+	public final MaterialsMerger loader4Materials;
 
 	protected final Collection<Linker> linkers=new LinkedList<Linker>(){
 		{
@@ -37,13 +38,13 @@ public class Loader4Relations{
 		}
 	};
 
-	public void merge(Data src, Node root, XbufContext components, Logger log) {
+	public void apply(Data src, Node root, XbufContext components, Logger log) {
 		for(Relation r:src.getRelationsList()){
-			merge(new MergeData(r.getRef1(),r.getRef2(),src,root,components),log);
+			merge(new RefData(r.getRef1(),r.getRef2(),src,root,components),log);
 		} 
 	}
 
-	public void merge(MergeData data, Logger log) {
+	public void merge(RefData data, Logger log) {
 		if(data.ref1.equals(data.ref2)){
 			log.warn("can't link {} to itself",data.ref1);
 			return;
@@ -69,12 +70,12 @@ public class Loader4Relations{
 				for(Linker linker:linkers){
 					if(linker.doLink(this,data,log)){
 						linked=true;
-						log.debug("{} linked to {} with {}",new Object[]{data.ref1,data.ref2,linker.getClass()});
+						log.info("{} linked to {} with {}",data.ref1,data.ref2,linker.getClass());
 						break;
 					}
 				}
 			}
 		}
-		if(!linked) log.warn("can't link:   {} -- {}\n",new Object[]{data.ref1,data.ref2});
+		if(!linked) log.warn("can't link:   {} -- {}\n",data.ref1,data.ref2);
 	}
 }

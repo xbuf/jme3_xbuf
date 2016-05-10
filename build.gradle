@@ -21,9 +21,10 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 dependencies {
-  //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.5'
- // compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.5'
-	 compile "org.slf4j:slf4j-simple:1.6.1"
+    testCompile 'junit:junit:4.12'
+   compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.5'
+   compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.5'
+	// compile "org.slf4j:slf4j-simple:1.6.1"
 	   compile 'org.xbuf.jme3_xbuf:jme3_xbuf_rt:-SNAPSHOT'
 	compile "org.xbuf:xbuf:0.7.2"
 	compile "com.google.guava:guava:19.0"

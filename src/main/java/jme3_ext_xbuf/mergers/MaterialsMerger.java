@@ -1,8 +1,8 @@
-package jme3_ext_xbuf;
+package jme3_ext_xbuf.mergers;
 
 import static jme3_ext_xbuf.Converters.cnv;
 
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.AssetNotFoundException;
@@ -10,12 +10,16 @@ import com.jme3.material.MatParam;
 import com.jme3.material.Material;
 import com.jme3.material.MaterialDef;
 import com.jme3.math.ColorRGBA;
+import com.jme3.scene.Node;
 import com.jme3.shader.VarType;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
 import com.jme3.texture.Texture.MinFilter;
 import com.jme3.texture.Texture.WrapMode;
+
+import jme3_ext_xbuf.XbufContext;
+
 import com.jme3.texture.Texture2D;
 
 import lombok.Getter;
@@ -26,16 +30,14 @@ import xbuf.Primitives;
 import xbuf.Primitives.Color;
 import xbuf.Primitives.Texture2DInline;
 
-public class Loader4Materials{
+public class MaterialsMerger implements Merger{
 	protected final AssetManager assetManager;
 	protected @Setter @Getter Texture defaultTexture;
 	protected @Setter @Getter Material defaultMaterial;
 
-	protected final MaterialReplicator materialReplicator;
 
-	public Loader4Materials(AssetManager assetManager, MaterialReplicator materialReplicator) {
+	public MaterialsMerger(AssetManager assetManager) {
 		this.assetManager = assetManager;
-		this.materialReplicator = materialReplicator !=null?materialReplicator: new MaterialReplicator();
 		defaultTexture = newDefaultTexture();
 		defaultMaterial = newDefaultMaterial();
 	}
@@ -79,7 +81,7 @@ public class Loader4Materials{
 			if(name!=null){
 				dst.setColor(name,cnv(src,new ColorRGBA()));
 			}else{
-				log.warn("can't find a matching name for : [{}] ({})",",",new Object[]{names,VarType.Vector4});
+				log.warn("can't find a matching name for : [{}] ({})",",",names,VarType.Vector4);
 			}
 		}
 	}
@@ -90,7 +92,7 @@ public class Loader4Materials{
 			if(name!=null){
 				dst.setBoolean(name,src);
 			}else{
-				log.warn("can't find a matching name for : [{}] ({})",",",new Object[]{names,VarType.Vector4});
+				log.warn("can't find a matching name for : [{}] ({})",",",names,VarType.Vector4);
 			}
 		}
 	}
@@ -140,7 +142,7 @@ public class Loader4Materials{
 			if(name!=null){
 				dst.setTexture(name,getValue(src,log));
 			}else{
-				log.warn("can't find a matching name for : [{}] ({})",",",new Object[]{names,VarType.Texture2D});
+				log.warn("can't find a matching name for : [{}] ({})",",",names,VarType.Texture2D);
 			}
 		}
 	}
@@ -151,7 +153,7 @@ public class Loader4Materials{
 			if(name!=null){
 				dst.setFloat(name,src);
 			}else{
-				log.warn("can't find a matching name for : [{}] ({})",",",new Object[]{names,VarType.Float});
+				log.warn("can't find a matching name for : [{}] ({})",",",names,VarType.Float);
 			}
 		}
 	}
@@ -186,15 +188,17 @@ public class Loader4Materials{
 		return dst;
 	}
 
-	public void mergeMaterials(Data src, XbufContext components, Logger log) {
+	public void apply(Data src, Node root, XbufContext context, Logger log) {
 		src.getMaterialsList().stream().forEach(m -> {
 			String id=m.getId();
 			Material mat=newMaterial(m,log);
-			components.put(id,mat);
+			context.put(id,mat);
 			mat.setName(m.hasName()?m.getName():m.getId());
 			mergeToMaterial(m,mat,log);
 //			materialReplicator.syncReplicas(mat);
 		});
 
 	}
+
+
 }

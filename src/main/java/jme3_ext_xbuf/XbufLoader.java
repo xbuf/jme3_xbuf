@@ -4,15 +4,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Function;
 
-import org.slf4j.LoggerFactory;
 
 import com.jme3.asset.AssetInfo;
 import com.jme3.asset.AssetLoader;
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
+import com.jme3.util.mikktspace.MikktspaceTangentGenerator;
 
+import lombok.extern.log4j.Log4j2;
 import xbuf.Datas.Data;
 
+@Log4j2
 public class XbufLoader implements AssetLoader {
 	public static  Function<AssetManager,Xbuf> xbufFactory = Xbuf::new;
 
@@ -21,23 +23,23 @@ public class XbufLoader implements AssetLoader {
 		Xbuf xbuf = XbufLoader.xbufFactory.apply(assetInfo.getManager());
 		Node root = new Node(assetInfo.getKey().getName());
 		InputStream in = null ;
-		LoggerCollector logger = new LoggerCollector("parse:" + assetInfo.getKey().getName());
 		try {
 			in = assetInfo.openStream();
 			Data src = Data.parseFrom(in, xbuf.registry);
 			XbufContext context=new XbufContext();
-			xbuf.merge(src, root, context, logger);
-			logger.info(context.toString());
+			xbuf.merge(src, root, context, log);
+			log.debug("Context:\n{}",context.toString());
 		} finally {
 			if(in!=null)in.close();
 		}
-		logger.dumpTo(LoggerFactory.getLogger(this.getClass()));
-		// TODO check and transfert Lights on root if quantity == 1
-		if (root.getQuantity() == 1) {
-			return root.getChild(0);
-		} else {
-			return root;
-		}
+		// if
+//		MikktspaceTangentGenerator.generate(root);
+		//		if (root.getQuantity() == 1) { < not good. will cause inconsistent behaviour ...
+		//			return root.getChild(0);
+		//		} else {
+		//			return root;
+		//		}
+		return root;
 	}
 
 }
