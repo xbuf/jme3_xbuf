@@ -1,8 +1,9 @@
 package jme3_ext_xbuf.mergers.relations;
 
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial;
+
+import jme3_ext_xbuf.mergers.meshes.XbufMesh;
 
 public class LinkerHelpers{
 	public static <T> T getRef1(RefData data, Class<T> as) {
@@ -19,7 +20,7 @@ public class LinkerHelpers{
 		if(op1_o==null||!(as.isAssignableFrom(op1_o.getClass()))){
 //			System.out.println("Got "+op1_o.getClass()+ " expected "+as);
 			// If we are picking a mesh as if it were a geometry, return a geometry automagically.
-			if(op1_o instanceof Mesh&&(as.isAssignableFrom(Spatial.class)||as.isAssignableFrom(Geometry.class))){
+			if(op1_o instanceof XbufMesh&&(as.isAssignableFrom(Spatial.class)||as.isAssignableFrom(Geometry.class))){
 				op1_o=getGeometry(id,data);
 			}else op1_o=null;
 		}		
@@ -42,11 +43,11 @@ public class LinkerHelpers{
 		Geometry geo=(Geometry)data.context.get("G~"+ref);
 		if(geo==null){
 			Object m=data.context.get(ref);
-			if(m==null||!(m instanceof Mesh)) return null;
+			if(m==null||!(m instanceof XbufMesh)) return null;
 			
-
-			geo=new Geometry("",(Mesh)m);
-			geo.setName(data.context.get("G~meshName~"+m.hashCode()));
+			XbufMesh xbufm=(XbufMesh)m;
+			geo=new Geometry("",xbufm.toJME());
+			geo.setName(xbufm.getName());
 
 			data.context.put("G~"+ref,geo);
 		}

@@ -77,7 +77,6 @@ public class UnitTests{
 
 	@Test
 	public void testMeshSharing() {
-		boolean headless=true;
 		SimpleApplication app=TestHelpers.buildApp(headless);
 		TestHelpers.hijackUpdateThread(app);
 
@@ -104,7 +103,6 @@ public class UnitTests{
 	
 	@Test
 	public void testMatSharing() {
-		boolean headless=true;
 		SimpleApplication app=TestHelpers.buildApp(headless);
 		TestHelpers.hijackUpdateThread(app);
 

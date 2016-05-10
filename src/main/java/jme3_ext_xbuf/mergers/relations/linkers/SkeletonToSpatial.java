@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.Skeleton;
 import com.jme3.animation.SkeletonControl;
-import com.jme3.animation.SkeletonControl_31;
 import com.jme3.material.Material;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;

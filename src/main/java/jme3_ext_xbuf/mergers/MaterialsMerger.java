@@ -17,11 +17,9 @@ import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
 import com.jme3.texture.Texture.MinFilter;
 import com.jme3.texture.Texture.WrapMode;
-
-import jme3_ext_xbuf.XbufContext;
-
 import com.jme3.texture.Texture2D;
 
+import jme3_ext_xbuf.XbufContext;
 import lombok.Getter;
 import lombok.Setter;
 import xbuf.Datas.Data;

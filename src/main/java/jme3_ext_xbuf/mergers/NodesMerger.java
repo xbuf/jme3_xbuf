@@ -7,8 +7,8 @@ import com.jme3.scene.Spatial;
 
 import jme3_ext_xbuf.Converters;
 import jme3_ext_xbuf.XbufContext;
-import xbuf.Primitives.Transform;
 import xbuf.Datas.Data;
+import xbuf.Primitives.Transform;
 import xbuf.Tobjects.TObject;
 
 public class NodesMerger implements Merger{

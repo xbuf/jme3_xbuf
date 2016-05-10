@@ -13,8 +13,8 @@ import com.jme3.scene.Node;
 
 import jme3_ext_xbuf.Converters;
 import jme3_ext_xbuf.XbufContext;
-import xbuf.Lights;
 import xbuf.Datas.Data;
+import xbuf.Lights;
 
 public class LightsMerger implements Merger{
 

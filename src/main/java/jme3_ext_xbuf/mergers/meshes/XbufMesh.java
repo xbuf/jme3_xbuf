@@ -1,4 +1,4 @@
-package jme3_ext_xbuf.ext;
+package jme3_ext_xbuf.mergers.meshes;
 
 import org.apache.logging.log4j.Logger;
 
@@ -7,12 +7,41 @@ import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.VertexBuffer.Type;
 
 import jme3_ext_xbuf.Converters;
-import jme3_ext_xbuf.XbufContext;
+import lombok.Data;
+import lombok.extern.log4j.Log4j2;
 import xbuf.Meshes.Skin;
 
-public class XbufMeshExt{
+@Data @Log4j2
+public class XbufMesh{
+	protected final xbuf.Meshes.Mesh src;
+	
+	public String getName(){
+		return src.getName();
+	}
+	
+	public Mesh toJME() throws IllegalArgumentException {
+		if(src.getIndexArraysCount()>1) throw new IllegalArgumentException("doesn't support more than 1 index array");
+		if(src.getLod()>1) throw new IllegalArgumentException("doesn't support lod > 1 : "+src.getLod());
+		
+		Mesh dst=new Mesh();
 
-	private static Mesh applySkin(Skin skin, Mesh dst, Logger log) {
+		//		context.put("G~meshName~"+dst.hashCode(),src.getName());
+		dst.setMode(Converters.cnv(src.getPrimitive()));
+		src.getVertexArraysList().forEach(va -> {
+			Type type=Converters.cnv(va.getAttrib());
+			dst.setBuffer(type,va.getFloats().getStep(),Converters.hack_cnv(va.getFloats()));
+			log.debug("add {}",dst.getBuffer(type));
+		});
+		
+		src.getIndexArraysList().forEach(va -> dst.setBuffer(VertexBuffer.Type.Index,va.getInts().getStep(),Converters.hack_cnv(va.getInts())));
+		if(src.hasSkin()) applySkin(src.getSkin(),dst,log);
+
+		dst.updateCounts();
+		dst.updateBound();
+		return dst;
+	}
+	
+	protected Mesh applySkin(Skin skin, Mesh dst, Logger log) {
 		dst.clearBuffer(Type.BoneIndex);
 		dst.clearBuffer(Type.BoneWeight);
 		int nb=skin.getBoneCountCount();
@@ -71,26 +100,5 @@ public class XbufMeshExt{
 		return dst;
 	}
 
-	public static Mesh toJME(xbuf.Meshes.Mesh src,XbufContext context, Logger log) throws IllegalArgumentException {
-		if(src.getIndexArraysCount()>1) throw new IllegalArgumentException("doesn't support more than 1 index array");
-		if(src.getLod()>1) throw new IllegalArgumentException("doesn't support lod > 1 : "+src.getLod());
-		
-		Mesh dst=new Mesh();
-		// TODO maybe this should be do in a better way.
-		context.put("G~meshName~"+dst.hashCode(),src.getName());
-		dst.setMode(Converters.cnv(src.getPrimitive()));
-		src.getVertexArraysList().forEach(va -> {
-			Type type=Converters.cnv(va.getAttrib());
-			dst.setBuffer(type,va.getFloats().getStep(),Converters.hack_cnv(va.getFloats()));
-			log.debug("add {}",dst.getBuffer(type));
-		});
-		src.getIndexArraysList().forEach(va -> dst.setBuffer(VertexBuffer.Type.Index,va.getInts().getStep(),Converters.hack_cnv(va.getInts())));
-
-		if(src.hasSkin()) applySkin(src.getSkin(),dst,log);
-
-		dst.updateCounts();
-		dst.updateBound();
-		return dst;
-	}
 
 }

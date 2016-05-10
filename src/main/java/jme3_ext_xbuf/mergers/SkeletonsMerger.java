@@ -1,4 +1,4 @@
-package jme3_ext_xbuf.mergers.animations;
+package jme3_ext_xbuf.mergers;
 
 import java.util.HashMap;
 
@@ -12,10 +12,9 @@ import com.jme3.scene.Node;
 
 import jme3_ext_xbuf.Converters;
 import jme3_ext_xbuf.XbufContext;
-import jme3_ext_xbuf.mergers.Merger;
-import xbuf.Skeletons;
 import xbuf.Datas.Data;
 import xbuf.Relations.Relation;
+import xbuf.Skeletons;
 
 public class SkeletonsMerger implements Merger{
 
