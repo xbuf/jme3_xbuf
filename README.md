@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/xbuf/jme3_xbuf.svg?branch=master)](https://travis-ci.org/xbuf/jme3_xbuf)
+
 # jme3_xbuf
 
 xbuf libs, tools, samples for jMonkeyEngine (jme3)
