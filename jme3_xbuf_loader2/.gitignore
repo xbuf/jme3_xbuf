@@ -1,0 +1,15 @@
+bin
+.classpath
+build
+gradle
+gradlew
+.project
+gradlew.bat
+.settings
+*.class
+*~
+~*
+*.so
+*.log
+.gradle
+.blend1
