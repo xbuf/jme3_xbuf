@@ -1,7 +1,7 @@
 apply plugin: 'java'
 
 
-def jme_version ="3.2.0-SNAPSHOT"
+def jme_version ="-SNAPSHOT"
 def jme_group =  "org.jmonkeyengine"
 
 def javaVersion='1.8'
@@ -11,23 +11,28 @@ sourceCompatibility = javaVersion
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 			
 repositories {
-    mavenLocal()
     jcenter()
     maven { url "http://updates.jmonkeyengine.org/maven/"}
-		maven { url "http://dl.bintray.com/davidb/jme3stuff" }
-		maven { url "https://jitpack.io" }
+	maven { url "http://dl.bintray.com/davidb/jme3stuff" }
+	maven { url "https://jitpack.io" }
 }	
+
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
+
 dependencies {
+    compileOnly "org.projectlombok:lombok:1.16.8"        
+
+    compile 'org.apache.logging.log4j:log4j-api:2.5'
+    compile 'org.apache.logging.log4j:log4j-core:2.5'
+    compile "com.google.guava:guava:19.0"
+            
+	compile 'org.xbuf:xbuf:0.7+'
+
+    compileOnly "${jme_group}:jme3-core:${jme_version}"
+    testCompile "${jme_group}:jme3-lwjgl:${jme_version}"
+    testCompile "${jme_group}:jme3-desktop:${jme_version}"
+    
     testCompile 'junit:junit:4.12'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.5'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.5'
-	compile "org.xbuf:xbuf:0.7.2"
-	compile "com.google.guava:guava:19.0"
-	compileOnly "org.projectlombok:lombok:1.16.8"
-    compile "${jme_group}:jme3-core:${jme_version}"
-    compile "${jme_group}:jme3-lwjgl:${jme_version}"
-    compile "${jme_group}:jme3-desktop:${jme_version}"
   }
