@@ -30,7 +30,7 @@ dependencies {
             
 	compile 'org.xbuf:xbuf:0.7+'
 
-    compileOnly "${jme_group}:jme3-core:${jme_version}"
+    provided "${jme_group}:jme3-core:${jme_version}"
     testCompile "${jme_group}:jme3-lwjgl:${jme_version}"
     testCompile "${jme_group}:jme3-desktop:${jme_version}"
     
