@@ -22,9 +22,6 @@ def description = "A standalone viewer for xbuf (and some other format supported
 
 sourceSets.main.resources.srcDir 'src/main/java'
 
-def v_slf4j = '1.7.7'
-def v_jme3 = '3.0.10'
-
 dependencies {
 	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.9.+'
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
@@ -33,10 +30,10 @@ dependencies {
 	compile "org.slf4j:jul-to-slf4j:${v_slf4j}"
 	compile 'net.alchim31.jme3:jme3_ext_spatial_explorer:0.8+'
 	compile 'com.beust:jcommander:1.35'
-	compile "com.jme3:jme3-core:${v_jme3}"
-	compile "com.jme3:jme3-blender:${v_jme3}"
-	runtime "com.jme3:jme3-desktop:${v_jme3}"
-	runtime "com.jme3:jme3-lwjgl:${v_jme3}"
+	compile "org.jmonkeyengine:jme3-core:${v_jme3}"
+	compile "org.jmonkeyengine:jme3-blender:${v_jme3}"
+	runtime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
+	runtime "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
 	runtime 'ch.qos.logback:logback-classic:1.1.2'
 	testCompile 'junit:junit:4.12'
 }

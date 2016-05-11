@@ -14,12 +14,12 @@ class FloatKeyPoints implements Savable {
 	/**
 	 * The times of the animations frames.
 	 */
-	var float[] times
+	protected var float[] times
 
 	/**
 	 * The values of the animations frames.
 	 */
-	var float[] values
+	protected var float[] values
 
 	/**
 	 * The between frame, eases[i] to use for values[i] and values[i+1];

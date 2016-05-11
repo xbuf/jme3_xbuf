@@ -10,19 +10,16 @@ def description = "An experimental remote display of a jMonkeyEngine application
 
 sourceSets.main.resources.srcDir 'src/main/java'
 
-def v_slf4j = '1.7.7'
-def v_jme3 = '3.0.10'
-
 dependencies {
 	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.9.+'
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile 'org.xbuf:xbuf:0.7+'
 	compile project(':jme3_xbuf_rt')
-	provided "com.jme3:jme3-core:${v_jme3}"
+	provided "org.jmonkeyengine:jme3-core:${v_jme3}"
 	testCompile 'junit:junit:4.12'
 	testRuntime 'ch.qos.logback:logback-classic:1.1.2'
-	testRuntime "com.jme3:jme3-desktop:${v_jme3}"
-	testRuntime "com.jme3:jme3-lwjgl:${v_jme3}"
+	testRuntime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
+	testRuntime "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
 
 }
 

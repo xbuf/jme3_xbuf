@@ -36,10 +36,10 @@ dependencies {
 	// jme
 	compile "org.xbuf.jme3_xbuf:jme3_xbuf_loader:${v_xbuf}"
 	//compile "org.xbuf:jme3_xbuf:${v_xbuf}"
-	compile "com.jme3:jme3-core:${v_jme3}"
-	compile "com.jme3:jme3-effects:${v_jme3}"
-	runtime "com.jme3:jme3-desktop:${v_jme3}"
-	runtime "com.jme3:jme3-lwjgl:${v_jme3}"
+	compile "org.jmonkeyengine:jme3-core:${v_jme3}"
+	compile "org.jmonkeyengine:jme3-effects:${v_jme3}"
+	runtime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
+	runtime "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
 
 	//utils
 }
