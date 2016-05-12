@@ -85,4 +85,9 @@ class FloatKeyPointsTrack implements Track {
 		val ic = im.getCapsule(this)
 		points = ic.readSavable("points", null) as FloatKeyPoints
 	}
+
+	override float[] getKeyFrameTimes() {
+		points.times;
+	}
+
 }

@@ -34,9 +34,9 @@ dependencies {
 
 	// jme
 	compile 'org.xbuf.jme3_xbuf:jme3_xbuf_loader:213c6a499d'
-	compile "com.jme3:jme3-core:${v_jme3}"
-	runtime "com.jme3:jme3-desktop:${v_jme3}"
-	runtime "com.jme3:jme3-lwjgl:${v_jme3}"
+	compile "org.jmonkeyengine:jme3-core:${v_jme3}"
+	runtime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
+	runtime "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
 
 	//utils
 }

@@ -46,4 +46,8 @@ class CompositeTrack implements Track {
 			tracks.addAll(ts)
 		}
 	}
+	
+	override float[] getKeyFrameTimes() {
+		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	}
 }

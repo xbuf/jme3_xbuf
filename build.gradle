@@ -16,7 +16,7 @@ buildscript {
 
 allprojects {
 	project.version = "git describe --always --dirty".execute().text.trim()
-println("version : '${project.version}'")
+	println("version : '${project.version}'")
 	group = "org.xbuf.jme3_xbuf"
 	def description = 'xbuf lib and tools for jMonkeyEngine (jme3)'
 }
@@ -24,12 +24,11 @@ println("version : '${project.version}'")
 subprojects {
 	apply plugin: 'java' // assets are managed like java resource + code
 	apply plugin: 'maven'
-    apply plugin: 'eclipse'
+	apply plugin: 'eclipse'
 
 	repositories {
 		mavenLocal()
 		jcenter()
-		maven { url "http://updates.jmonkeyengine.org/maven/"}
 		maven { url "http://dl.bintray.com/davidb/jme3stuff" }
 		maven { url "https://jitpack.io" }
 	}
@@ -40,24 +39,24 @@ subprojects {
 	}
 
 	task writeNewPom << {
-	    pom {
-	        project {
-            inceptionYear '2015'
-						description project.description
-						licenses {
-							license {
-								name "Public domain (CC0-1.0)"
-								url "http://creativecommons.org/publicdomain/zero/1.0/"
-								distribution "repo"
-							}
-						}
-						developers {
-							developer {
-								id "davidB"
-								name "David Bernard"
-							}
-						}
-        }
-	    }.writeTo("$buildDir/newpom.xml")
+		pom {
+			project {
+				inceptionYear '2015'
+				description project.description
+				licenses {
+					license {
+						name "Public domain (CC0-1.0)"
+						url "http://creativecommons.org/publicdomain/zero/1.0/"
+						distribution "repo"
+					}
+				}
+				developers {
+					developer {
+						id "davidB"
+						name "David Bernard"
+					}
+				}
+			}
+		}.writeTo("$buildDir/newpom.xml")
 	}
 }
