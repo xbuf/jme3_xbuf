@@ -1,4 +1,4 @@
-package jme3_ext_xbuf.mergers.animations;
+package jme3_ext_xbuf.animations;
 
 import com.jme3.animation.Bone;
 import com.jme3.animation.BoneTrack;

@@ -7,8 +7,8 @@ import com.jme3.animation.AnimControl;
 import com.jme3.animation.SkeletonControl;
 import com.jme3.scene.Spatial;
 
+import jme3_ext_xbuf.animations.XbufAnimation;
 import jme3_ext_xbuf.mergers.RelationsMerger;
-import jme3_ext_xbuf.mergers.animations.XbufAnimation;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
 

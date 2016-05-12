@@ -12,7 +12,6 @@ import jme3_ext_xbuf.mergers.BulletPhysicsMerger;
 import jme3_ext_xbuf.mergers.CustomParamsMerger;
 import jme3_ext_xbuf.mergers.LightsMerger;
 import jme3_ext_xbuf.mergers.MaterialsMerger;
-import jme3_ext_xbuf.mergers.Merger;
 import jme3_ext_xbuf.mergers.MeshesMerger;
 import jme3_ext_xbuf.mergers.NodesMerger;
 import jme3_ext_xbuf.mergers.RelationsMerger;

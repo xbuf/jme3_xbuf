@@ -2,11 +2,8 @@ package jme3_ext_xbuf.ext;
 
 import java.lang.reflect.Field;
 
-import org.slf4j.Logger;
-
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.Skeleton;
-
 
 import lombok.extern.slf4j.Slf4j;
 

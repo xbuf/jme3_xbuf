@@ -1,4 +1,4 @@
-package jme3_ext_xbuf.mergers.light;
+package jme3_ext_xbuf.scene;
 
 import java.io.IOException;
 

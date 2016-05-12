@@ -8,9 +8,9 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 
 import jme3_ext_xbuf.mergers.RelationsMerger;
-import jme3_ext_xbuf.mergers.light.XbufLightControl;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
+import jme3_ext_xbuf.scene.XbufLightControl;
 import lombok.extern.slf4j.Slf4j;
 
 

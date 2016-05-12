@@ -8,7 +8,6 @@ import xbuf.Datas.Data;
 
 @AllArgsConstructor
 public class RefData {
-//	public Relation rel;
 	public String ref1,ref2;
 	public Data src;
 	public Node root;

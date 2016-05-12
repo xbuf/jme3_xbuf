@@ -2,18 +2,18 @@ package jme3_ext_xbuf.mergers;
 
 import java.util.HashMap;
 
-
 import com.jme3.animation.Bone;
 import com.jme3.animation.Skeleton;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 
-import jme3_ext_xbuf.Converters;
+import jme3_ext_xbuf.Merger;
 import jme3_ext_xbuf.XbufContext;
+import lombok.experimental.ExtensionMethod;
 import xbuf.Datas.Data;
 import xbuf.Relations.Relation;
 import xbuf.Skeletons;
+
+@ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class})
 
 public class SkeletonsMerger implements Merger{
 
@@ -35,7 +35,7 @@ public class SkeletonsMerger implements Merger{
 		for(int i=0;i<bones.length;i++){
 			xbuf.Skeletons.Bone src=e.getBones(i);
 			Bone b=new Bone(src.getName());
-			b.setBindTransforms(Converters.cnv(src.getTransform().getTranslation(),new Vector3f()),Converters.cnv(src.getTransform().getRotation(),new Quaternion()),Converters.cnv(src.getTransform().getScale(),new Vector3f()));
+			b.setBindTransforms(src.getTransform().getTranslation().toJME(),src.getTransform().getRotation().toJME(),src.getTransform().getScale().toJME());
 			db.put(src.getId(),b);
 			bones[i]=b;
 		}

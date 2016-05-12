@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import com.jme3.scene.Node;
 
+import jme3_ext_xbuf.Merger;
 import jme3_ext_xbuf.XbufContext;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
@@ -17,7 +18,6 @@ import jme3_ext_xbuf.mergers.relations.linkers.NodeToNode;
 import jme3_ext_xbuf.mergers.relations.linkers.PhysicsToSpatial;
 import jme3_ext_xbuf.mergers.relations.linkers.SkeletonToSpatial;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import xbuf.Datas.Data;
 import xbuf.Relations.Relation;

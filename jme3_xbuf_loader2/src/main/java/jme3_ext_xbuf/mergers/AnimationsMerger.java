@@ -7,9 +7,10 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 
+import jme3_ext_xbuf.Merger;
 import jme3_ext_xbuf.XbufContext;
-import jme3_ext_xbuf.mergers.animations.XbufAnimation;
-import jme3_ext_xbuf.mergers.animations.XbufTrack;
+import jme3_ext_xbuf.animations.XbufAnimation;
+import jme3_ext_xbuf.animations.XbufTrack;
 import xbuf.Datas.Data;
 import xbuf_ext.AnimationsKf;
 import xbuf_ext.AnimationsKf.SampledTransform;

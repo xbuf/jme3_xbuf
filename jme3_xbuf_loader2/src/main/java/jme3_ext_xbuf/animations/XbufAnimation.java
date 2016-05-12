@@ -1,4 +1,4 @@
-package jme3_ext_xbuf.mergers.animations;
+package jme3_ext_xbuf.animations;
 
 import java.util.LinkedList;
 import java.util.List;

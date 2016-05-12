@@ -1,7 +1,5 @@
-package jme3_ext_xbuf;
+package jme3_ext_xbuf.ext;
 
-import com.google.common.primitives.Floats;
-import com.google.common.primitives.Ints;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix4f;
 import com.jme3.math.Quaternion;
@@ -9,50 +7,39 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.math.Vector4f;
 import com.jme3.scene.Mesh;
-import com.jme3.scene.Mesh.Mode;
 import com.jme3.scene.VertexBuffer;
+import com.jme3.scene.Mesh.Mode;
 import com.jme3.scene.VertexBuffer.Type;
 
 import xbuf.Meshes;
-import xbuf.Meshes.FloatBuffer;
-import xbuf.Meshes.UintBuffer;
-import xbuf.Meshes.VertexArray;
 import xbuf.Primitives;
+import xbuf.Meshes.VertexArray;
 import xbuf.Primitives.Mat4;
 
-public class Converters{
+public class PrimitiveExt{
 
-	public static Vector2f cnv(Primitives.Vec2 src, Vector2f dst) {
-		dst.set(src.getX(),src.getY());
-		return dst;
+	public static Vector2f toJME(Primitives.Vec2 src) {
+		return new Vector2f(src.getX(),src.getY());
 	}
 
-	public static Vector3f cnv(Primitives.Vec3 src, Vector3f dst) {
-		dst.set(src.getX(),src.getY(),src.getZ());
-		return dst;
+	public static Vector3f toJME(Primitives.Vec3 src) {
+		return new Vector3f(src.getX(),src.getY(),src.getZ());
 	}
 
-	public static Vector4f cnv(Primitives.Vec4 src, Vector4f dst) {
-		dst.set(src.getX(),src.getY(),src.getZ(),src.getW());
-		return dst;
+	public static Vector4f toJME(Primitives.Vec4 src) {
+		return new Vector4f(src.getX(),src.getY(),src.getZ(),src.getW());
 	}
 
-	public static Quaternion cnv(Primitives.Quaternion src, Quaternion dst) {
-		dst.set(src.getX(),src.getY(),src.getZ(),src.getW());
-		return dst;
+	public static Quaternion toJME(Primitives.Quaternion src) {
+		return new Quaternion(src.getX(),src.getY(),src.getZ(),src.getW());
 	}
 
-	public static Vector4f cnv(Primitives.Quaternion src, Vector4f dst) {
-		dst.set(src.getX(),src.getY(),src.getZ(),src.getW());
-		return dst;
+	public static ColorRGBA toJME(Primitives.Color src) {
+		return new ColorRGBA(src.getR(),src.getG(),src.getB(),src.getA());
 	}
 
-	public static ColorRGBA cnv(Primitives.Color src, ColorRGBA dst) {
-		dst.set(src.getR(),src.getG(),src.getB(),src.getA());
-		return dst;
-	}
-
-	public static Matrix4f cnv(Mat4 src, Matrix4f dst) {
+	public static Matrix4f toJME(Mat4 src) {
+		Matrix4f dst=new Matrix4f();
 		dst.m00=src.getC00();
 		dst.m10=src.getC10();
 		dst.m20=src.getC20();
@@ -72,7 +59,7 @@ public class Converters{
 		return dst;
 	}
 
-	public static Mesh.Mode cnv(Meshes.Mesh.Primitive v) {
+	public static Mesh.Mode toJME(Meshes.Mesh.Primitive v) {
 		switch(v){
 			case line_strip:
 				return Mode.LineStrip;
@@ -89,7 +76,7 @@ public class Converters{
 		}
 	}
 
-	public static VertexBuffer.Type cnv(VertexArray.Attrib v) {
+	public static VertexBuffer.Type toJME(VertexArray.Attrib v) {
 		switch(v){
 			case position:
 				return Type.Position;
@@ -122,13 +109,4 @@ public class Converters{
 		}
 	}
 
-	//TODO use an optim version: including a patch for no autoboxing : https://code.google.com/p/protobuf/issues/detail?id=464
-	public static float[] hack_cnv(FloatBuffer src) {
-		return Floats.toArray(src.getValuesList());
-	}
-
-	//TODO use an optim version: including a patch for no autoboxing : https://code.google.com/p/protobuf/issues/detail?id=464
-	public static int[] hack_cnv(UintBuffer src) {
-		return Ints.toArray(src.getValuesList());
-	}
 }

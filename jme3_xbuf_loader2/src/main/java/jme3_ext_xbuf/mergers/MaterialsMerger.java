@@ -1,9 +1,5 @@
 package jme3_ext_xbuf.mergers;
 
-import static jme3_ext_xbuf.Converters.cnv;
-
-import org.slf4j.Logger;
-
 
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.AssetNotFoundException;
@@ -18,12 +14,14 @@ import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
 import com.jme3.texture.Texture.MinFilter;
 import com.jme3.texture.Texture.WrapMode;
-import com.jme3.texture.image.ColorSpace;
 import com.jme3.texture.Texture2D;
+import com.jme3.texture.image.ColorSpace;
 
+import jme3_ext_xbuf.Merger;
 import jme3_ext_xbuf.XbufContext;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 import xbuf.Datas.Data;
 import xbuf.Materials;
@@ -31,6 +29,7 @@ import xbuf.Primitives;
 import xbuf.Primitives.Color;
 import xbuf.Primitives.Texture2DInline;
 
+@ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class})
 
 @Slf4j
 public class MaterialsMerger implements Merger{
@@ -82,7 +81,7 @@ public class MaterialsMerger implements Merger{
 		if(has){
 			String name=findMaterialParamName(names,VarType.Vector4,scope);
 			if(name!=null){
-				dst.setColor(name,cnv(src,new ColorRGBA()));
+				dst.setColor(name,src.toJME());
 			}else{
 				log.warn("can't find a matching name for : [{}] ({})",",",names,VarType.Vector4);
 			}

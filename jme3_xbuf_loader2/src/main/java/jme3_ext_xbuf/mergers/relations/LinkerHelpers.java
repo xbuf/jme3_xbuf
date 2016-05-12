@@ -3,7 +3,7 @@ package jme3_ext_xbuf.mergers.relations;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 
-import jme3_ext_xbuf.mergers.meshes.XbufMesh;
+import jme3_ext_xbuf.scene.XbufMesh;
 
 public class LinkerHelpers{
 	public static <T> T getRef1(RefData data, Class<T> as) {

@@ -1,16 +1,17 @@
 package jme3_ext_xbuf.mergers;
 
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.plugins.physics4loaders.PhysicsData;
 import com.jme3.scene.plugins.physics4loaders.PhysicsData.PhysicsShape;
 import com.jme3.scene.plugins.physics4loaders.PhysicsData.PhysicsType;
 
-import jme3_ext_xbuf.Converters;
+import jme3_ext_xbuf.Merger;
 import jme3_ext_xbuf.XbufContext;
+import lombok.experimental.ExtensionMethod;
 import xbuf.Datas.Data;
 import xbuf_ext.Bullet.BulletPhysics;
 
+@ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class})
 public class BulletPhysicsMerger implements Merger{
 
 	@Override
@@ -25,8 +26,8 @@ public class BulletPhysicsMerger implements Merger{
 			phydata.linearDamping=p.getLinearDamping();
 			phydata.margin=p.getMargin();
 			phydata.restitution=p.getRestitution();
-			phydata.angularFactor=Converters.cnv(p.getAngularFactor(),new Vector3f());
-			phydata.linearFactor=Converters.cnv(p.getLinearFactor(),new Vector3f());
+			phydata.angularFactor=p.getAngularFactor().toJME();
+			phydata.linearFactor=p.getLinearFactor().toJME();
 			phydata.isGhost=p.getIsGhost();
 			phydata.isKinematic=p.getIsKinematic();
 			phydata.collisionGroup=p.getCollisionGroup();

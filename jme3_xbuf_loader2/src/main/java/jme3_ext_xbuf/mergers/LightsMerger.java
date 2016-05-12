@@ -9,12 +9,14 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.scene.Node;
 
-import jme3_ext_xbuf.Converters;
+import jme3_ext_xbuf.Merger;
 import jme3_ext_xbuf.XbufContext;
+import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 import xbuf.Datas.Data;
 import xbuf.Lights;
 
+@ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class})
 @Slf4j
 public class LightsMerger implements Merger{
 
@@ -29,7 +31,7 @@ public class LightsMerger implements Merger{
 			}
 
 			if(srcl.hasColor()){
-				light.setColor(Converters.cnv(srcl.getColor(),new ColorRGBA()).mult(srcl.getIntensity()));
+				light.setColor(srcl.getColor().toJME().mult(srcl.getIntensity()));
 			}
 
 			// TODO manage attenuation
