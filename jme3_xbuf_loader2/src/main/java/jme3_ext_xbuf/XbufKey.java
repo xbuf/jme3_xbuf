@@ -1,6 +1,6 @@
 package jme3_ext_xbuf;
 
-import com.jme3.scene.plugins.physics4loaders.impl.PhysicsLoaderModelKey;
+import com.jme3.physicsloader.impl.PhysicsLoaderModelKey;
 
 
 public class XbufKey extends PhysicsLoaderModelKey{

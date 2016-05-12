@@ -11,7 +11,12 @@ configurations.all {
 	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
+repositories {
+	maven { url "https://jitpack.io" }
+}
+
 dependencies {
+	compile 'com.github.riccardobl:jme3_physicsloader:-SNAPSHOT'
 	compileOnly "org.projectlombok:lombok:1.16.8"
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile "com.google.guava:guava:19.0"

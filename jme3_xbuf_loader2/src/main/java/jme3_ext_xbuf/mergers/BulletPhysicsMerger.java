@@ -1,9 +1,9 @@
 package jme3_ext_xbuf.mergers;
 
+import com.jme3.physicsloader.PhysicsData;
+import com.jme3.physicsloader.PhysicsData.PhysicsShape;
+import com.jme3.physicsloader.PhysicsData.PhysicsType;
 import com.jme3.scene.Node;
-import com.jme3.scene.plugins.physics4loaders.PhysicsData;
-import com.jme3.scene.plugins.physics4loaders.PhysicsData.PhysicsShape;
-import com.jme3.scene.plugins.physics4loaders.PhysicsData.PhysicsType;
 
 import jme3_ext_xbuf.Merger;
 import jme3_ext_xbuf.XbufContext;
