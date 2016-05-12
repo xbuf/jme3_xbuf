@@ -29,9 +29,9 @@ public class XbufTrack{
 			if(boneIndex>-1){
 				Bone bone=skel.getBone(boneIndex);
 				//Convert rotations, translations, scales to the "bind pose" space (BoneTrack combine initialXxx with transformation)
-				Quaternion rotationInv=bone.getWorldBindRotation().inverse();// wrong name : it's the initialRot in PARENT Bone space
-				Vector3f scaleInv=new Vector3f(1f/bone.getWorldBindScale().x,1/bone.getWorldBindScale().y,1/bone.getWorldBindScale().z); // wrong name : it's the initialScale in PARENT Bone space
-				Vector3f translationInv=bone.getWorldBindPosition().mult(-1);// wrong name : it's the initialPos in PARENT Bone space
+				Quaternion rotationInv=bone.getBindRotation().inverse();// it's the initialRot in PARENT Bone space
+				Vector3f scaleInv=new Vector3f(1f/bone.getBindScale().x,1/bone.getBindScale().y,1/bone.getBindScale().z); //it's the initialScale in PARENT Bone space
+				Vector3f translationInv=bone.getBindPosition().mult(-1);// it's the initialPos in PARENT Bone space
 
 				Vector3f actualTranslations[]=new Vector3f[translations.length];
 				for(int i=0;i<translations.length;i++)

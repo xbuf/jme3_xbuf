@@ -15,6 +15,7 @@ import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
 import com.jme3.texture.Texture.MinFilter;
 import com.jme3.texture.Texture.WrapMode;
+import com.jme3.texture.image.ColorSpace;
 import com.jme3.texture.Texture2D;
 
 import jme3_ext_xbuf.XbufContext;
@@ -111,7 +112,8 @@ public class MaterialsMerger implements Merger{
 				break;
 			case TEX2D:{
 				Texture2DInline t2di=t.getTex2D();
-				Image img=new Image(getValue(t2di.getFormat()),t2di.getWidth(),t2di.getHeight(),t2di.getData().asReadOnlyByteBuffer());
+				//TODO read ColorSpace from xbuf data
+				Image img=new Image(getValue(t2di.getFormat()),t2di.getWidth(),t2di.getHeight(),t2di.getData().asReadOnlyByteBuffer(), ColorSpace.Linear);
 				tex=new Texture2D(img);
 				break;
 			}

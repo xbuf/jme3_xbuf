@@ -2,9 +2,6 @@ package jme3_ext_xbuf;
 
 import com.jme3.asset.ModelKey;
 
-import lombok.Data;
-
-
 public class XbufKey extends ModelKey{
 	public XbufKey(){}
 	
