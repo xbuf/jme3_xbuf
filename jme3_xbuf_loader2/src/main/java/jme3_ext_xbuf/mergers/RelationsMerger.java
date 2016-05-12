@@ -17,9 +17,12 @@ import jme3_ext_xbuf.mergers.relations.linkers.NodeToNode;
 import jme3_ext_xbuf.mergers.relations.linkers.PhysicsToSpatial;
 import jme3_ext_xbuf.mergers.relations.linkers.SkeletonToSpatial;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import xbuf.Datas.Data;
 import xbuf.Relations.Relation;
 
+@Slf4j
 public class RelationsMerger implements Merger{
 	protected @Getter final MaterialsMerger matMerger;
 	protected @Getter final Collection<Linker> linkers;
@@ -45,7 +48,7 @@ public class RelationsMerger implements Merger{
 
 	protected void merge(RefData data) {
 		if(data.ref1.equals(data.ref2)){
-			data.context.log.warn("can't link {} to itself",data.ref1);
+			log.warn("can't link {} to itself",data.ref1);
 			return;
 		}
 		boolean linked=false;
@@ -69,12 +72,12 @@ public class RelationsMerger implements Merger{
 				for(Linker linker:linkers){
 					if(linker.doLink(this,data)){
 						linked=true;
-						data.context.log.info("{} linked to {} with {}",data.ref1,data.ref2,linker.getClass());
+						log.info("{} linked to {} with {}",data.ref1,data.ref2,linker.getClass());
 						break;
 					}
 				}
 			}
 		}
-		if(!linked) data.context.log.warn("can't link:   {} -- {}\n",data.ref1,data.ref2);
+		if(!linked) log.warn("can't link:   {} -- {}\n",data.ref1,data.ref2);
 	}
 }

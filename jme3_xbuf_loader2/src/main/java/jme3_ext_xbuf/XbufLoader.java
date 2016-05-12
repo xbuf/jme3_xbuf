@@ -23,7 +23,7 @@ public class XbufLoader implements AssetLoader {
 		InputStream in = null ;
 		try {
 			XbufKey xbufkey=null;
-			AssetKey key=assetInfo.getKey();
+			AssetKey<?> key=assetInfo.getKey();
 			if(key instanceof XbufKey){
 				xbufkey=(XbufKey)key;
 			}else{
@@ -34,7 +34,7 @@ public class XbufLoader implements AssetLoader {
 			Xbuf xbuf = XbufLoader.xbufFactory.apply(assetInfo.getManager());
 			Data src = Data.parseFrom(in, xbuf.registry);		
 			XbufContext context=new XbufContext();
-			context.log=log;
+//			context.log=log;
 			context.setSettings(xbufkey);
 			xbuf.merge(src, root, context);
 			log.debug("Context:\n{}",context.toString());

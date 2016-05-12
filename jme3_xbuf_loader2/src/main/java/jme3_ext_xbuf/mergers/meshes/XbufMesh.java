@@ -3,19 +3,20 @@ package jme3_ext_xbuf.mergers.meshes;
 
 import org.slf4j.Logger;
 
+
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.VertexBuffer.Type;
 
 import jme3_ext_xbuf.Converters;
 import lombok.Data;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import xbuf.Meshes.Skin;
 
-@Data 
+
+@Data @Slf4j
 public class XbufMesh{
 	protected final xbuf.Meshes.Mesh src;
-	protected final Logger log;
 	
 	public String getName(){
 		return src.getName();

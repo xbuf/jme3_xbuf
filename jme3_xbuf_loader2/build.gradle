@@ -12,13 +12,10 @@ configurations.all {
 }
 
 dependencies {
-	compileOnly "org.projectlombok:lombok:1.16.8"        
-
-    compile "org.slf4j:slf4j-api:${v_slf4j}"
+	compileOnly "org.projectlombok:lombok:1.16.8"
+	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile "com.google.guava:guava:19.0"
-
 	compile "org.xbuf:xbuf:${v_xbuf}"
-
 	provided "org.jmonkeyengine:jme3-core:${v_jme3}"
 	testCompile "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
 	testCompile "org.jmonkeyengine:jme3-desktop:${v_jme3}"

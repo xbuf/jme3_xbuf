@@ -8,8 +8,11 @@ import com.jme3.animation.AnimControl;
 import com.jme3.animation.Skeleton;
 
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class AnimControlExt{
-	public static void setSkeleton(AnimControl ac,Skeleton sk,Logger log){
+	public static void setSkeleton(AnimControl ac,Skeleton sk){
 		log.debug("Set skeleton {} to {}",sk,ac);
 		Field field=null;
 		
