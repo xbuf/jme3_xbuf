@@ -11,9 +11,9 @@ import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.light.XbufLightControl;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j2
+@Slf4j
 public class LightToGeometry implements Linker{
 
 	@Override

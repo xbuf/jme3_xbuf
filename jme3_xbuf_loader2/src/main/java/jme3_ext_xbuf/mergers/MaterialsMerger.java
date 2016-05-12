@@ -2,8 +2,6 @@ package jme3_ext_xbuf.mergers;
 
 import static jme3_ext_xbuf.Converters.cnv;
 
-import org.apache.logging.log4j.Logger;
-
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.AssetNotFoundException;
 import com.jme3.material.MatParam;
@@ -22,13 +20,14 @@ import com.jme3.texture.Texture2D;
 import jme3_ext_xbuf.XbufContext;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import xbuf.Datas.Data;
 import xbuf.Materials;
 import xbuf.Primitives;
 import xbuf.Primitives.Color;
 import xbuf.Primitives.Texture2DInline;
-@Log4j2
+
+@Slf4j
 public class MaterialsMerger implements Merger{
 	protected final AssetManager assetManager;
 	protected @Setter @Getter Texture defaultTexture;

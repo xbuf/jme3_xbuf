@@ -5,9 +5,9 @@ import java.lang.reflect.Field;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.Skeleton;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j2
+@Slf4j
 public class AnimControlExt{
 	public static void setSkeleton(AnimControl ac,Skeleton sk){
 		log.debug("Set skeleton {} to {}",sk,ac);

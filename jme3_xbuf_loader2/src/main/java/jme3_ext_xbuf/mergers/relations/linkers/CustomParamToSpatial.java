@@ -4,8 +4,6 @@ import static jme3_ext_xbuf.Converters.cnv;
 import static jme3_ext_xbuf.mergers.relations.LinkerHelpers.getRef1;
 import static jme3_ext_xbuf.mergers.relations.LinkerHelpers.getRef2;
 
-import org.apache.logging.log4j.Logger;
-
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix4f;
 import com.jme3.math.Vector2f;
@@ -16,11 +14,11 @@ import com.jme3.scene.Spatial;
 import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import xbuf_ext.CustomParams.CustomParam;
 import xbuf_ext.CustomParams.CustomParamList;
 
-@Log4j2
+@Slf4j
 public class CustomParamToSpatial implements Linker{
 
 	@Override

@@ -2,8 +2,6 @@ package jme3_ext_xbuf.mergers;
 
 import java.util.HashMap;
 
-import org.apache.logging.log4j.Logger;
-
 import com.jme3.animation.Bone;
 import com.jme3.animation.Skeleton;
 import com.jme3.math.Quaternion;

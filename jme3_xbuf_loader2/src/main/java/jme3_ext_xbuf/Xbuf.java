@@ -3,8 +3,6 @@ package jme3_ext_xbuf;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
-
 import com.google.protobuf.ExtensionRegistry;
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
@@ -19,12 +17,10 @@ import jme3_ext_xbuf.mergers.NodesMerger;
 import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.SkeletonsMerger;
 import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
 import xbuf.Datas.Data;
 import xbuf_ext.AnimationsKf;
 import xbuf_ext.CustomParams;
 
-@Log4j2
 public class Xbuf{
 	protected final AssetManager assetManager;
 	protected final ExtensionRegistry registry;

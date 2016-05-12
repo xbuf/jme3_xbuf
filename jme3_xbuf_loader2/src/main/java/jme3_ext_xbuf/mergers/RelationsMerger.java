@@ -3,8 +3,6 @@ package jme3_ext_xbuf.mergers;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.apache.logging.log4j.Logger;
-
 import com.jme3.scene.Node;
 
 import jme3_ext_xbuf.XbufContext;
@@ -18,11 +16,11 @@ import jme3_ext_xbuf.mergers.relations.linkers.MaterialToGeometry;
 import jme3_ext_xbuf.mergers.relations.linkers.NodeToNode;
 import jme3_ext_xbuf.mergers.relations.linkers.SkeletonToSpatial;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import xbuf.Datas.Data;
 import xbuf.Relations.Relation;
 
-@Log4j2
+@Slf4j
 @SuppressWarnings("serial")
 @RequiredArgsConstructor
 public class RelationsMerger implements Merger{
