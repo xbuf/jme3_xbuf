@@ -3,13 +3,12 @@ package jme3_ext_xbuf;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
-
 import com.google.protobuf.ExtensionRegistry;
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
 
 import jme3_ext_xbuf.mergers.AnimationsMerger;
+import jme3_ext_xbuf.mergers.BulletPhysicsMerger;
 import jme3_ext_xbuf.mergers.CustomParamsMerger;
 import jme3_ext_xbuf.mergers.LightsMerger;
 import jme3_ext_xbuf.mergers.MaterialsMerger;
@@ -19,16 +18,13 @@ import jme3_ext_xbuf.mergers.NodesMerger;
 import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.SkeletonsMerger;
 import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
 import xbuf.Datas.Data;
 import xbuf_ext.AnimationsKf;
 import xbuf_ext.CustomParams;
 
-@Log4j2
 public class Xbuf{
 	protected final AssetManager assetManager;
 	protected final ExtensionRegistry registry;
-	protected MaterialsMerger mmerger;
 	protected final @Getter List<Merger> mergers;
 	/**
 	 * A full constructor that allow to define every service (to injection).
@@ -39,6 +35,8 @@ public class Xbuf{
 	 */
 	public Xbuf(AssetManager assetManager,ExtensionRegistry registry,MaterialsMerger loader4Materials,RelationsMerger loader4Relations){
 		this.assetManager=assetManager;
+		MaterialsMerger mmerger;
+
 		mergers=new LinkedList<Merger>();
 
 		mergers.add(new NodesMerger());
@@ -49,9 +47,10 @@ public class Xbuf{
 		mergers.add(new LightsMerger());
 		mergers.add(new SkeletonsMerger());
 		mergers.add(new AnimationsMerger());
+		mergers.add(new CustomParamsMerger());
+		mergers.add(new BulletPhysicsMerger());
 
 		// relations should be the last because it reuse data provide by other (put in components)
-		mergers.add(new CustomParamsMerger());
 		mergers.add(new RelationsMerger(mmerger));
 
 		this.registry=registry!=null?registry:ExtensionRegistry.newInstance();

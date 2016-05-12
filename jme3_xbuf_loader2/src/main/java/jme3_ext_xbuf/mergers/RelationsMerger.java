@@ -3,8 +3,6 @@ package jme3_ext_xbuf.mergers;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.apache.logging.log4j.Logger;
-
 import com.jme3.scene.Node;
 
 import jme3_ext_xbuf.XbufContext;
@@ -16,29 +14,28 @@ import jme3_ext_xbuf.mergers.relations.linkers.GeometryToNode;
 import jme3_ext_xbuf.mergers.relations.linkers.LightToGeometry;
 import jme3_ext_xbuf.mergers.relations.linkers.MaterialToGeometry;
 import jme3_ext_xbuf.mergers.relations.linkers.NodeToNode;
+import jme3_ext_xbuf.mergers.relations.linkers.PhysicsToSpatial;
 import jme3_ext_xbuf.mergers.relations.linkers.SkeletonToSpatial;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.Getter;
 import xbuf.Datas.Data;
 import xbuf.Relations.Relation;
 
-@Log4j2
-@SuppressWarnings("serial")
-@RequiredArgsConstructor
 public class RelationsMerger implements Merger{
-	public final MaterialsMerger loader4Materials;
-
-	protected final Collection<Linker> linkers=new LinkedList<Linker>(){
-		{
-			add(new AnimationToSpatial());
-			add(new CustomParamToSpatial());
-			add(new LightToGeometry());
-			add(new MaterialToGeometry());
-			add(new GeometryToNode());
-			add(new SkeletonToSpatial());
-			add(new NodeToNode());
-		}
-	};
+	protected @Getter final MaterialsMerger matMerger;
+	protected @Getter final Collection<Linker> linkers;
+	
+	public RelationsMerger(MaterialsMerger mm){
+		matMerger=mm;
+		linkers=new LinkedList<Linker>();
+		linkers.add(new AnimationToSpatial());
+		linkers.add(new CustomParamToSpatial());
+		linkers.add(new LightToGeometry());
+		linkers.add(new MaterialToGeometry());
+		linkers.add(new GeometryToNode());
+		linkers.add(new SkeletonToSpatial());
+		linkers.add(new NodeToNode());
+		linkers.add(new PhysicsToSpatial());
+	}
 
 	public void apply(Data src, Node root, XbufContext components) {
 		for(Relation r:src.getRelationsList()){
@@ -46,23 +43,23 @@ public class RelationsMerger implements Merger{
 		} 
 	}
 
-	public void merge(RefData data) {
+	protected void merge(RefData data) {
 		if(data.ref1.equals(data.ref2)){
-			log.warn("can't link {} to itself",data.ref1);
+			data.context.log.warn("can't link {} to itself",data.ref1);
 			return;
 		}
 		boolean linked=false;
 		String r1=data.ref1;
 		String r2=data.ref2;
 		// Linkers work with one relation per time, we want to process also linked generated relations, so we will do this:
-		LinkedList<String> refs1=new LinkedList<String>(){{
-				add(r1);
-				addAll(data.context.linkedRefs(r1));
-		}};
-		LinkedList<String> refs2=new LinkedList<String>(){{
-				add(r2);
-				addAll(data.context.linkedRefs(r2));
-		}};
+		LinkedList<String> refs1=new LinkedList<String>();
+		refs1.add(r1);
+		refs1.addAll(data.context.linkedRefs(r1));
+		
+		LinkedList<String> refs2=new LinkedList<String>();
+		refs2.add(r2);
+		refs2.addAll(data.context.linkedRefs(r2));
+		
 
 		// Every possible combination
 		for(String ref1:refs1){
@@ -72,12 +69,12 @@ public class RelationsMerger implements Merger{
 				for(Linker linker:linkers){
 					if(linker.doLink(this,data)){
 						linked=true;
-						log.info("{} linked to {} with {}",data.ref1,data.ref2,linker.getClass());
+						data.context.log.info("{} linked to {} with {}",data.ref1,data.ref2,linker.getClass());
 						break;
 					}
 				}
 			}
 		}
-		if(!linked) log.warn("can't link:   {} -- {}\n",data.ref1,data.ref2);
+		if(!linked) data.context.log.warn("can't link:   {} -- {}\n",data.ref1,data.ref2);
 	}
 }

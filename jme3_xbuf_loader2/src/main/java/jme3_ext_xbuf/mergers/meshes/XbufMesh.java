@@ -1,6 +1,7 @@
 package jme3_ext_xbuf.mergers.meshes;
 
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
 
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
@@ -11,9 +12,10 @@ import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import xbuf.Meshes.Skin;
 
-@Data @Log4j2
+@Data 
 public class XbufMesh{
 	protected final xbuf.Meshes.Mesh src;
+	protected final Logger log;
 	
 	public String getName(){
 		return src.getName();

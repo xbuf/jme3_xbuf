@@ -1,6 +1,5 @@
 package jme3_ext_xbuf.mergers;
 
-import org.apache.logging.log4j.Logger;
 
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
@@ -16,7 +15,6 @@ import jme3_ext_xbuf.XbufContext;
 import lombok.extern.log4j.Log4j2;
 import xbuf.Datas.Data;
 import xbuf.Lights;
-@Log4j2
 public class LightsMerger implements Merger{
 
 	public void apply(Data src, Node root, XbufContext context) {
@@ -52,7 +50,7 @@ public class LightsMerger implements Merger{
 							default:{
 								l.setSpotOuterAngle(max);
 								l.setSpotInnerAngle(max);
-								log.warn("doesn't support curve like {} for spot_angle",srcl.getSpotAngle().getCurveCase());
+								context.log.warn("doesn't support curve like {} for spot_angle",srcl.getSpotAngle().getCurveCase());
 							}
 						}
 
@@ -77,7 +75,7 @@ public class LightsMerger implements Merger{
 							}
 							default:{
 								l.setRadius(max);
-								log.warn("doesn't support curve like {} for spot_angle",srcl.getSpotAngle().getCurveCase());
+								context.log.warn("doesn't support curve like {} for spot_angle",srcl.getSpotAngle().getCurveCase());
 							}
 						}
 					}

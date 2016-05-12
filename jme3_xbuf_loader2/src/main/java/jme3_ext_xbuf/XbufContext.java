@@ -6,8 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @SuppressWarnings("unchecked")
 public class XbufContext {
+	public Logger log=LoggerFactory.getLogger("Xbuf");
 	private Map<String,Object> storage=new HashMap<String,Object> ();
 	private Map<String,List<String>> links=new HashMap<String,List<String>>();
 	private XbufKey settings;

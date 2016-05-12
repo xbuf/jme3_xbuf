@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
 
-import org.apache.logging.log4j.Logger;
 
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.Skeleton;
@@ -25,7 +24,6 @@ import lombok.experimental.ExtensionMethod;
 import lombok.extern.log4j.Log4j2;
 
 @ExtensionMethod({jme3_ext_xbuf.ext.AnimControlExt.class})
-@Log4j2
 public class SkeletonToSpatial implements Linker{
 	// see http://hub.jmonkeyengine.org/t/skeletoncontrol-or-animcontrol-to-host-skeleton/31478/4
 
@@ -59,7 +57,7 @@ public class SkeletonToSpatial implements Linker{
 		boolean atLeastOne=false;
 		for(AnimControl c:controls){
 			atLeastOne=true;
-			c.setSkeleton(sk);
+			c.setSkeleton(sk,data.context.log);
 		}				
 			
 		// always add AnimControl else NPE when SkeletonControl.clone
@@ -77,7 +75,7 @@ public class SkeletonToSpatial implements Linker{
 				Material m=((Geometry)s).getMaterial();
 				String matref=data.context.idOf(m);
 				if(matref==null){ // should never happen!
-					log.error("Mat is not referred?");
+					data.context.log.error("Mat is not referred?");
 					return;
 				}
 				String refusage="G~usage~"+matref;

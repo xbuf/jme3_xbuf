@@ -2,7 +2,7 @@ package jme3_ext_xbuf.mergers;
 
 import static jme3_ext_xbuf.Converters.cnv;
 
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.AssetNotFoundException;
@@ -22,13 +22,11 @@ import com.jme3.texture.Texture2D;
 import jme3_ext_xbuf.XbufContext;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j2;
 import xbuf.Datas.Data;
 import xbuf.Materials;
 import xbuf.Primitives;
 import xbuf.Primitives.Color;
 import xbuf.Primitives.Texture2DInline;
-@Log4j2
 public class MaterialsMerger implements Merger{
 	protected final AssetManager assetManager;
 	protected @Setter @Getter Texture defaultTexture;
@@ -74,7 +72,7 @@ public class MaterialsMerger implements Merger{
 		return null;
 	}
 
-	public void setColor(boolean has, Color src, Material dst, String[] names, MaterialDef scope) {
+	public void setColor(boolean has, Color src, Material dst, String[] names, MaterialDef scope,Logger log) {
 		if(has){
 			String name=findMaterialParamName(names,VarType.Vector4,scope);
 			if(name!=null){
@@ -85,7 +83,7 @@ public class MaterialsMerger implements Merger{
 		}
 	}
 
-	public void setBoolean(boolean has, Boolean src, Material dst, String[] names, MaterialDef scope) {
+	public void setBoolean(boolean has, Boolean src, Material dst, String[] names, MaterialDef scope,Logger log) {
 		if(has){
 			String name=findMaterialParamName(names,VarType.Boolean,scope);
 			if(name!=null){
@@ -96,7 +94,7 @@ public class MaterialsMerger implements Merger{
 		}
 	}
 
-	public Texture getValue(Primitives.Texture t) {
+	public Texture getValue(Primitives.Texture t,Logger log) {
 		Texture tex;
 		switch(t.getDataCase()){
 			case DATA_NOT_SET:
@@ -135,18 +133,18 @@ public class MaterialsMerger implements Merger{
 		}
 	}
 
-	public void setTexture2D(boolean has, Primitives.Texture src, Material dst, String[] names, MaterialDef scope) {
+	public void setTexture2D(boolean has, Primitives.Texture src, Material dst, String[] names, MaterialDef scope,Logger log) {
 		if(has){
 			String name=findMaterialParamName(names,VarType.Texture2D,scope);
 			if(name!=null){
-				dst.setTexture(name,getValue(src));
+				dst.setTexture(name,getValue(src,log));
 			}else{
 				log.warn("can't find a matching name for : [{}] ({})",",",names,VarType.Texture2D);
 			}
 		}
 	}
 
-	public void setFloat(boolean has, float src, Material dst, String[] names, MaterialDef scope) {
+	public void setFloat(boolean has, float src, Material dst, String[] names, MaterialDef scope,Logger log) {
 		if(has){
 			String name=findMaterialParamName(names,VarType.Float,scope);
 			if(name!=null){
@@ -157,30 +155,30 @@ public class MaterialsMerger implements Merger{
 		}
 	}
 
-	public Material mergeToMaterial(Materials.Material src, Material dst) {
+	public Material mergeToMaterial(Materials.Material src, Material dst,Logger log) {
 		MaterialDef md=dst.getMaterialDef();
-		setColor(src.hasColor(),src.getColor(),dst,new String[]{"Color","Diffuse"},md);
-		setTexture2D(src.hasColorMap(),src.getColorMap(),dst,new String[]{"ColorMap","DiffuseMap"},md);
+		setColor(src.hasColor(),src.getColor(),dst,new String[]{"Color","Diffuse"},md,log);
+		setTexture2D(src.hasColorMap(),src.getColorMap(),dst,new String[]{"ColorMap","DiffuseMap"},md,log);
 		// setTexture2D(src.hasNormalMap(), src.getNormalMap(), dst, new String[]{"ColorMap", "DiffuseMap"], md, log)
-		setFloat(src.hasOpacity(),src.getOpacity(),dst,new String[]{"Alpha","Opacity"},md);
-		setTexture2D(src.hasOpacityMap(),src.getOpacityMap(),dst,new String[]{"AlphaMap","OpacityMap"},md);
-		setTexture2D(src.hasNormalMap(),src.getNormalMap(),dst,new String[]{"NormalMap"},md);
-		setFloat(src.hasRoughness(),src.getRoughness(),dst,new String[]{"Roughness"},md);
-		setTexture2D(src.hasRoughnessMap(),src.getRoughnessMap(),dst,new String[]{"RoughnessMap"},md);
-		setFloat(src.hasMetalness(),src.getMetalness(),dst,new String[]{"Metalness"},md);
-		setTexture2D(src.hasMetalnessMap(),src.getMetalnessMap(),dst,new String[]{"MetalnessMap"},md);
-		setColor(src.hasSpecular(),src.getSpecular(),dst,new String[]{"Specular"},md);
-		setTexture2D(src.hasSpecularMap(),src.getSpecularMap(),dst,new String[]{"SpecularMap"},md);
-		setFloat(src.hasSpecularPower(),src.getSpecularPower(),dst,new String[]{"SpecularPower","Shininess"},md);
-		setTexture2D(src.hasSpecularPowerMap(),src.getSpecularPowerMap(),dst,new String[]{"SpecularPowerMap","ShininessMap"},md);
-		setColor(src.hasEmission(),src.getEmission(),dst,new String[]{"Emission","GlowColor"},md);
-		setTexture2D(src.hasEmissionMap(),src.getEmissionMap(),dst,new String[]{"EmissionMap","GlowMap"},md);
+		setFloat(src.hasOpacity(),src.getOpacity(),dst,new String[]{"Alpha","Opacity"},md,log);
+		setTexture2D(src.hasOpacityMap(),src.getOpacityMap(),dst,new String[]{"AlphaMap","OpacityMap"},md,log);
+		setTexture2D(src.hasNormalMap(),src.getNormalMap(),dst,new String[]{"NormalMap"},md,log);
+		setFloat(src.hasRoughness(),src.getRoughness(),dst,new String[]{"Roughness"},md,log);
+		setTexture2D(src.hasRoughnessMap(),src.getRoughnessMap(),dst,new String[]{"RoughnessMap"},md,log);
+		setFloat(src.hasMetalness(),src.getMetalness(),dst,new String[]{"Metalness"},md,log);
+		setTexture2D(src.hasMetalnessMap(),src.getMetalnessMap(),dst,new String[]{"MetalnessMap"},md,log);
+		setColor(src.hasSpecular(),src.getSpecular(),dst,new String[]{"Specular"},md,log);
+		setTexture2D(src.hasSpecularMap(),src.getSpecularMap(),dst,new String[]{"SpecularMap"},md,log);
+		setFloat(src.hasSpecularPower(),src.getSpecularPower(),dst,new String[]{"SpecularPower","Shininess"},md,log);
+		setTexture2D(src.hasSpecularPowerMap(),src.getSpecularPowerMap(),dst,new String[]{"SpecularPowerMap","ShininessMap"},md,log);
+		setColor(src.hasEmission(),src.getEmission(),dst,new String[]{"Emission","GlowColor"},md,log);
+		setTexture2D(src.hasEmissionMap(),src.getEmissionMap(),dst,new String[]{"EmissionMap","GlowMap"},md,log);
 		if(!src.getShadeless()){
 			if(!src.hasColorMap()){
 				if(src.hasColor()){
-					setBoolean(true,true,dst,new String[]{"UseMaterialColors"},md);
+					setBoolean(true,true,dst,new String[]{"UseMaterialColors"},md,log);
 				}else{
-					setBoolean(true,true,dst,new String[]{"UseVertexColor"},md);
+					setBoolean(true,true,dst,new String[]{"UseVertexColor"},md,log);
 				}
 			}
 		}
@@ -193,7 +191,7 @@ public class MaterialsMerger implements Merger{
 			Material mat=newMaterial(m);
 			context.put(id,mat);
 			mat.setName(m.hasName()?m.getName():m.getId());
-			mergeToMaterial(m,mat);
+			mergeToMaterial(m,mat,context.log);
 //			materialReplicator.syncReplicas(mat);
 		});
 

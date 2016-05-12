@@ -13,7 +13,6 @@ import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
 import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 public class LightToGeometry implements Linker{
 
 	@Override
@@ -21,7 +20,7 @@ public class LightToGeometry implements Linker{
 		Light op1=getRef1(data,Light.class);
 		Spatial op2=getRef2(data,Spatial.class);
 		if(op1==null||op2==null) return false;
-		if(op2 instanceof Geometry)	log.warn("Do you really want to add this light to a Geometry? [{}]",data.ref1);
+		if(op2 instanceof Geometry)	data.context.log.warn("Do you really want to add this light to a Geometry? [{}]",data.ref1);
 		
 		if(data.context.getSettings().useLightControls()){
 			XbufLightControl xbuflc=new XbufLightControl();
