@@ -8,8 +8,3 @@ cache:
     - netbeans
 jdk:
   - oraclejdk8
-before_install:
-  - wget http://services.gradle.org/distributions/gradle-2.13-bin.zip
-  - unzip gradle-2.13-bin.zip
-  - export GRADLE_HOME=$PWD/gradle-2.13
-  - export PATH=$GRADLE_HOME/bin:$PATH
