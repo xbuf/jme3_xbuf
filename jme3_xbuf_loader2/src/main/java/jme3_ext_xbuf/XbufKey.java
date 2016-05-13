@@ -3,7 +3,7 @@ package jme3_ext_xbuf;
 import com.jme3.physicsloader.impl.PhysicsLoaderModelKey;
 
 
-public class XbufKey extends PhysicsLoaderModelKey{
+public class XbufKey extends PhysicsLoaderModelKey<XbufKey>{
 
 	public XbufKey(){}
 	

@@ -8,7 +8,7 @@ import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
 
 import jme3_ext_xbuf.mergers.AnimationsMerger;
-import jme3_ext_xbuf.mergers.BulletPhysicsMerger;
+import jme3_ext_xbuf.mergers.PhysicsMerger;
 import jme3_ext_xbuf.mergers.CustomParamsMerger;
 import jme3_ext_xbuf.mergers.LightsMerger;
 import jme3_ext_xbuf.mergers.MaterialsMerger;
@@ -47,7 +47,7 @@ public class Xbuf{
 		mergers.add(new SkeletonsMerger());
 		mergers.add(new AnimationsMerger());
 		mergers.add(new CustomParamsMerger());
-		mergers.add(new BulletPhysicsMerger());
+		mergers.add(new PhysicsMerger());
 
 		// relations should be the last because it reuse data provide by other (put in components)
 		mergers.add(new RelationsMerger(mmerger));
