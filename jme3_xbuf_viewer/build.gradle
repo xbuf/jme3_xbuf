@@ -10,7 +10,6 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'nebula.provided-base'
 apply plugin: 'eclipse'
-apply plugin: "org.xtext.xtend"
 
 //WARNING: this project is 1.7 compatible but ModelViewer require javafx and java 8u20+ to run
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -23,7 +22,6 @@ def description = "A standalone viewer for xbuf (and some other format supported
 sourceSets.main.resources.srcDir 'src/main/java'
 
 dependencies {
-	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.9.+'
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile project(':jme3_xbuf_loader')
 	compile project(':jme3_xbuf_remote')
@@ -35,7 +33,6 @@ dependencies {
 	runtime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
 	runtime "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
 	runtime 'ch.qos.logback:logback-classic:1.1.2'
-	testCompile 'junit:junit:4.12'
 }
 
 //------------------------------------------------------------------------------
