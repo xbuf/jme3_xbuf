@@ -6,7 +6,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-def v_xbuf="0.0.1-SNAPSHOT"
+def v_xbuf="master-SNAPSHOT"
 configurations.all {
 	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
@@ -17,7 +17,7 @@ repositories{
 
 dependencies {
 	compile 'com.github.riccardobl:jme3_physicsloader:-SNAPSHOT'
-	provided "org.projectlombok:lombok:1.16.8"
+	compileOnly "org.projectlombok:lombok:${v_lombok}"
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile "com.google.guava:guava:19.0"
 	compile "org.xbuf:xbuf:${v_xbuf}"

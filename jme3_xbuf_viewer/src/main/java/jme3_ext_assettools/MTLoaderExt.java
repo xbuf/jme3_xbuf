@@ -62,7 +62,7 @@ public class MTLoaderExt extends MTLLoader {
 			StringBuilder l = new StringBuilder();
 			for (int i = 0; i < preferedExtension.length; i++) l.append(preferedExtension[i]).append(","); //String.join(",", preferedExtension)
 			logger.log(Level.WARNING, "Cannot locate {0} for material {1}, try extensions : {2}", new Object[]{texKey, key, l.toString()});
-			texture = new Texture2D(PlaceholderAssets.getPlaceholderImage());
+			texture = new Texture2D(PlaceholderAssets.getPlaceholderImage(assetManager));
 			texture.setWrap(WrapMode.Repeat);
 			texture.setKey(texKey);
 		}
