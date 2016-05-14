@@ -8,10 +8,12 @@ import com.jme3.scene.VertexBuffer.Type;
 import lombok.Data;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
+import xbuf.Meshes.IndexArray;
 import xbuf.Meshes.Skin;
+import xbuf.Meshes.VertexArray;
 
-@ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class,jme3_ext_xbuf.ext.FloatBufferExt.class,jme3_ext_xbuf.ext.UintBufferExt.class})
 @Data @Slf4j
+@ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class, jme3_ext_xbuf.ext.FloatBufferExt.class, jme3_ext_xbuf.ext.UintBufferExt.class})
 public class XbufMesh{
 	protected final xbuf.Meshes.Mesh src;
 	
@@ -27,13 +29,17 @@ public class XbufMesh{
 
 		//		context.put("G~meshName~"+dst.hashCode(),src.getName());
 		dst.setMode(src.getPrimitive().toJME());
-		src.getVertexArraysList().forEach(va -> {
+		
+		for(VertexArray va:src.getVertexArraysList()){
 			Type type=va.getAttrib().toJME();
 			dst.setBuffer(type,va.getFloats().getStep(),va.getFloats().array());
 			log.debug("add {}",dst.getBuffer(type));
-		});
+		}
 		
-		src.getIndexArraysList().forEach(va -> dst.setBuffer(VertexBuffer.Type.Index,va.getInts().getStep(),va.getInts().array()));
+		for(IndexArray va:src.getIndexArraysList()){
+			dst.setBuffer(VertexBuffer.Type.Index,va.getInts().getStep(),va.getInts().array());
+		}
+		
 		if(src.hasSkin()) applySkin(src.getSkin(),dst);
 
 		dst.updateCounts();
