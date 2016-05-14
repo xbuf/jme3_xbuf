@@ -19,7 +19,6 @@ dependencies {
 	compile 'com.github.riccardobl:jme3_physicsloader:-SNAPSHOT'
 	provided "org.projectlombok:lombok:${v_lombok}"
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
-	compile "com.google.guava:guava:19.0"
 	compile "org.xbuf:xbuf:${v_xbuf}"
 	compile project(":jme3_xbuf_rt")
 	provided "${g_jme3SNAPSHOT}:jme3-core:${v_jme3SNAPSHOT}"
