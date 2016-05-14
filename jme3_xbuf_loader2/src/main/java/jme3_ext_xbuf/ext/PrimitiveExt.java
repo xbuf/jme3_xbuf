@@ -19,26 +19,32 @@ import xbuf.Primitives.Mat4;
 public class PrimitiveExt{
 
 	public static Vector2f toJME(Primitives.Vec2 src) {
+		if(src==null)return new Vector2f();
 		return new Vector2f(src.getX(),src.getY());
 	}
 
 	public static Vector3f toJME(Primitives.Vec3 src) {
+		if(src==null)return new Vector3f();
 		return new Vector3f(src.getX(),src.getY(),src.getZ());
 	}
 
 	public static Vector4f toJME(Primitives.Vec4 src) {
+		if(src==null)return new Vector4f();
 		return new Vector4f(src.getX(),src.getY(),src.getZ(),src.getW());
 	}
 
 	public static Quaternion toJME(Primitives.Quaternion src) {
+		if(src==null)return new Quaternion();
 		return new Quaternion(src.getX(),src.getY(),src.getZ(),src.getW());
 	}
 
 	public static ColorRGBA toJME(Primitives.Color src) {
+		if(src==null)return new ColorRGBA();
 		return new ColorRGBA(src.getR(),src.getG(),src.getB(),src.getA());
 	}
 
 	public static Matrix4f toJME(Mat4 src) {
+		if(src==null)return new Matrix4f();
 		Matrix4f dst=new Matrix4f();
 		dst.m00=src.getC00();
 		dst.m10=src.getC10();
