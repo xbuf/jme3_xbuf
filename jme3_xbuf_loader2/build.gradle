@@ -6,7 +6,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-def v_xbuf="master-SNAPSHOT"
+def v_xbuf="0.8.0"
 configurations.all {
 	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
@@ -21,6 +21,7 @@ dependencies {
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile "com.google.guava:guava:19.0"
 	compile "org.xbuf:xbuf:${v_xbuf}"
+	compile project(":jme3_xbuf_rt")
 	provided "${g_jme3SNAPSHOT}:jme3-core:${v_jme3SNAPSHOT}"
 	testCompile "${g_jme3SNAPSHOT}:jme3-lwjgl:${v_jme3SNAPSHOT}"
 	testCompile "${g_jme3SNAPSHOT}:jme3-desktop:${v_jme3SNAPSHOT}"

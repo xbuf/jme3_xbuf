@@ -11,7 +11,6 @@ import com.jme3.scene.control.Control;
 import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
-import lombok.extern.slf4j.Slf4j;
 
 public class PhysicsToSpatial  implements Linker{
 

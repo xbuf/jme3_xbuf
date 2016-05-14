@@ -10,8 +10,8 @@ import com.jme3.scene.Spatial;
 import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
-import jme3_ext_xbuf.scene.XbufLightControl;
 import lombok.extern.slf4j.Slf4j;
+import xbuf_rt.XbufLightControl;
 
 
 @Slf4j

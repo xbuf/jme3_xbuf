@@ -1,4 +1,4 @@
-package jme3_ext_xbuf.scene;
+package xbuf_rt;
 
 import java.io.IOException;
 
