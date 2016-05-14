@@ -1,3 +1,5 @@
+def DEV_MODE=true
+
 apply plugin: 'java'
 apply plugin: 'nebula.provided-base'
 
@@ -18,9 +20,16 @@ repositories{
 
 def v_xbuf="0.8.0"
 def v_physicsloader="0.1"
+def g_physicsloader="com.github.riccardobl"
+if (DEV_MODE){
+	v_physicsloader="SNAPSHOT"
+	g_physicsloader="dev"
+	v_xbuf="0.8.0-1-gaa958e2-dirty"
+	
+}
 
 dependencies {
-	compile "com.github.riccardobl:jme3_physicsloader:${v_physicsloader}"
+	compile "${g_physicsloader}:jme3_physicsloader:${v_physicsloader}"
 	provided "org.projectlombok:lombok:${v_lombok}"
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile "org.xbuf:xbuf:${v_xbuf}"

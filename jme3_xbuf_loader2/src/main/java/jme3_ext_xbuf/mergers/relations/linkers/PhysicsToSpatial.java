@@ -25,7 +25,7 @@ public class PhysicsToSpatial  implements Linker{
 		RigidBody op1=getRef1(data,RigidBody.class);
 		Spatial op2=getRef2(data,Spatial.class);
 		if(op1==null||op2==null)return false;
-		PhysicsLoader<?> loader=data.context.getSettings().getPhysicsLoader();
+		PhysicsLoader<?,?> loader=data.context.getSettings().getPhysicsLoader();
 		if(loader!=null){
 			Control pc=(Control)loader.load(data.context.getSettings(),op2,op1);	
 			if(pc!=null)op2.addControl(pc);
