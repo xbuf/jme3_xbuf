@@ -11,6 +11,9 @@ def description = "An experimental remote display of a jMonkeyEngine application
 sourceSets.main.resources.srcDir 'src/main/java'
 
 dependencies {
+	compile 'com.google.protobuf:protobuf-java:2.6.1'
+	compile 'org.eclipse.xtext:org.eclipse.xtext.xbase.lib:2.9.2'
+	compile 'com.google.guava:guava:14.0.1'
 	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.9.+'
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile 'org.xbuf:xbuf:0.7+'

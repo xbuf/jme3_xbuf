@@ -22,6 +22,7 @@ def description = "A standalone viewer for xbuf (and some other format supported
 sourceSets.main.resources.srcDir 'src/main/java'
 
 dependencies {
+	compile 'org.controlsfx:controlsfx:8.40.9'
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile project(':jme3_xbuf_loader')
 	compile project(':jme3_xbuf_remote')

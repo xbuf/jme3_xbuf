@@ -12,9 +12,15 @@ def description = "An experimental remote display of a jMonkeyEngine application
 sourceSets.main.resources.srcDir 'src/main/java'
 
 dependencies {
+	compile 'org.eclipse.xtext:org.eclipse.xtext.xbase.lib:2.9.2'
+	compile 'com.google.guava:guava:14.0.1'
+	compile 'com.google.protobuf:protobuf-java:2.6.1'
+	compile 'io.netty:netty-common:4.0.24.Final'
+	compile 'io.netty:netty-buffer:4.0.24.Final'
+	compile 'io.netty:netty-codec:4.0.24.Final'
+	compile 'io.netty:netty-transport:4.0.24.Final'
 	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.9.+'
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
-	compile 'io.netty:netty-handler:4.0.24.Final'
 	compile project(':jme3_xbuf_loader')
 	compile 'org.xbuf:xbuf:0.7+'
 	provided "org.jmonkeyengine:jme3-core:${v_jme3}"

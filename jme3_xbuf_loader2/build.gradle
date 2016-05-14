@@ -20,6 +20,7 @@ def v_xbuf="0.8.0"
 def v_physicsloader="0.1"
 
 dependencies {
+	compile 'com.google.protobuf:protobuf-java:2.6.1'
 	compile "com.github.riccardobl:jme3_physicsloader:${v_physicsloader}"
 	provided "org.projectlombok:lombok:${v_lombok}"
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
@@ -37,5 +38,3 @@ dependencies {
 	testCompile 'junit:junit:4.12'
 	testRuntime 'ch.qos.logback:logback-classic:1.1.2'
 }
-
-
