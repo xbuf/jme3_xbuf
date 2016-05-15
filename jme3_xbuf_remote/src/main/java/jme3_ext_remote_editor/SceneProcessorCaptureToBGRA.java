@@ -132,7 +132,7 @@ class SceneProcessorCaptureToBGRA implements SceneProcessor {
 			this.height = height;
 			fb = new FrameBuffer(width, height, 1);
 			fb.setDepthBuffer(Format.Depth);
-			fb.setColorBuffer(Format.ABGR8);
+			fb.setColorBuffer(Format.BGRA8);
 			byteBuf = BufferUtils.createByteBuffer(width * height * BGRA_size);
 		}
 
@@ -140,7 +140,7 @@ class SceneProcessorCaptureToBGRA implements SceneProcessor {
 		public boolean copyFrameBufferToBGRA(RenderManager rm, Function<ByteBuffer, Boolean> notify) {
 			synchronized (byteBuf) {
 				byteBuf.clear();
-				rm.getRenderer().readFrameBuffer(null, byteBuf);
+				rm.getRenderer().readFrameBufferWithFormat(fb, byteBuf, Format.BGRA8);
 				//System.out.println("copyFrameBufferToBGRA :"+ byteBuf.hashCode() +  " .. " + byteBuf.position() + "/" + byteBuf.limit() + "/" + fb.getNumColorBuffers());
 				//byteBuf.position(0);
 			}
