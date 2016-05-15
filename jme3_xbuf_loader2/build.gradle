@@ -1,25 +1,20 @@
-def DEV_MODE=true
+def DEV_MODE=false
 
 apply plugin: 'java'
 apply plugin: 'nebula.provided-base'
 
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 configurations.all {
 	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 repositories{
-    maven{ url "http://dl.bintray.com/riccardo/v-hacd" }
+	maven{ url "http://dl.bintray.com/riccardo/v-hacd" }
 }
 
-
-
 def v_xbuf="0.8.0"
-def v_physicsloader="0.1"
+def v_physicsloader="0.2"
 def g_physicsloader="com.github.riccardobl"
 if (DEV_MODE){
 	v_physicsloader="SNAPSHOT"
@@ -29,22 +24,22 @@ if (DEV_MODE){
 }
 
 dependencies {
-	compile "${g_physicsloader}:jme3_physicsloader:${v_physicsloader}"
-	provided "org.projectlombok:lombok:${v_lombok}"
+
+	compile 'com.google.protobuf:protobuf-java:2.6.1'
+	compile "com.github.riccardobl:jme3_physicsloader:${v_physicsloader}"
+	compileOnly "org.projectlombok:lombok:${v_lombok}"
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile "org.xbuf:xbuf:${v_xbuf}"
-	
+
 	compile project(":jme3_xbuf_rt")
-	
-	provided "${g_jme3SNAPSHOT}:jme3-core:${v_jme3SNAPSHOT}"
+
+	compileOnly "${g_jme3SNAPSHOT}:jme3-core:${v_jme3SNAPSHOT}"
 	testCompile "${g_jme3SNAPSHOT}:jme3-lwjgl:${v_jme3SNAPSHOT}"
 	testCompile "${g_jme3SNAPSHOT}:jme3-desktop:${v_jme3SNAPSHOT}"
 	testCompile "${g_jme3SNAPSHOT}:jme3-bullet:${v_jme3SNAPSHOT}"
 	testCompile "${g_jme3SNAPSHOT}:jme3-bullet-native:${v_jme3SNAPSHOT}"
-	testCompile 'com.github.riccardobl:jme3-bullet-vhacd:-SNAPSHOT'    
-	
+	testCompile 'com.github.riccardobl:jme3-bullet-vhacd:-SNAPSHOT'
+
 	testCompile 'junit:junit:4.12'
 	testRuntime 'ch.qos.logback:logback-classic:1.1.2'
 }
-
-

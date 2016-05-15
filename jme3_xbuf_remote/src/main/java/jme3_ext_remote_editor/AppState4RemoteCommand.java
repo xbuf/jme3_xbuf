@@ -1,6 +1,7 @@
 package jme3_ext_remote_editor;
 
 import jme3_ext_xbuf.Xbuf;
+import lombok.RequiredArgsConstructor;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -13,29 +14,29 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
-import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 
-@FinalFieldsConstructor
-class AppState4RemoteCommand extends AbstractAppState {
+@RequiredArgsConstructor
+public class AppState4RemoteCommand extends AbstractAppState {
 
-	public val int port
-	public val Xbuf xbuf
+	public final int port;
+	public final Xbuf xbuf;
 
-	var ChannelFuture f;
-	var EventLoopGroup bossGroup
-	var EventLoopGroup workerGroup
-	var SimpleApplication app
+	protected ChannelFuture f;
+	protected EventLoopGroup bossGroup;
+	protected EventLoopGroup workerGroup;
+	protected SimpleApplication app;
 
-	def start() {
+	public void start() throws Exception {
 		bossGroup = new NioEventLoopGroup();
 		workerGroup = new NioEventLoopGroup();
 
-		val b = new ServerBootstrap();
+		ServerBootstrap b = new ServerBootstrap();
 		b.group(bossGroup, workerGroup)
-		.channel(typeof(NioServerSocketChannel))
+		.channel(NioServerSocketChannel.class)
 		.childHandler(new ChannelInitializer<SocketChannel>() {
-			override initChannel(SocketChannel ch) {
-				val rh = new ReqHandler(
+			@Override
+			public void initChannel(SocketChannel ch) {
+				ReqHandler rh = new ReqHandler(
 					AppState4RemoteCommand.this.app
 					, AppState4RemoteCommand.this.xbuf
 				);
@@ -47,30 +48,33 @@ class AppState4RemoteCommand extends AbstractAppState {
 		})
 		.option(ChannelOption.SO_BACKLOG, 128)
 		.childOption(ChannelOption.SO_KEEPALIVE, true)
+		;
 
 		// Bind and start to accept incoming connections.
 		f = b.bind(port).sync();
 
 	}
 
-	def stop(){
-		workerGroup?.shutdownGracefully();
-		bossGroup?.shutdownGracefully();
-		f?.channel().close().sync();
+	public void stop() throws Exception {
+		if (workerGroup != null) workerGroup.shutdownGracefully();
+		if (bossGroup != null) bossGroup.shutdownGracefully();
+		if (f != null) f.channel().close().sync();
 	}
 
-	override initialize(com.jme3.app.state.AppStateManager stateManager0, com.jme3.app.Application app0) {
+	@Override
+	public void initialize(com.jme3.app.state.AppStateManager stateManager0, com.jme3.app.Application app0) {
 		try {
-			app = app0 as SimpleApplication
-			start()
+			app = (SimpleApplication) app0;
+			start();
 		} catch (Exception e) {
-			e.printStackTrace()
+			e.printStackTrace();
 		}
 	}
 
-	override cleanup() {
+	@Override
+	public void cleanup() {
 		try {
-			stop()
+			stop();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

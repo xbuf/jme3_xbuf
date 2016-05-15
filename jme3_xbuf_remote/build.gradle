@@ -1,23 +1,21 @@
-apply plugin: 'java'
-apply plugin: 'nebula.provided-base'
-apply plugin: "org.xtext.xtend"
 apply plugin: "application"
-
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 def description = "An experimental remote display of a jMonkeyEngine application for remote edition (eg: via blender)"
 
 sourceSets.main.resources.srcDir 'src/main/java'
 
 dependencies {
-	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.9.+'
+	compileOnly "org.projectlombok:lombok:${v_lombok}"
+
+	compile 'com.google.protobuf:protobuf-java:2.6.1'
+	compile 'io.netty:netty-common:4.0.24.Final'
+	compile 'io.netty:netty-buffer:4.0.24.Final'
+	compile 'io.netty:netty-codec:4.0.24.Final'
+	compile 'io.netty:netty-transport:4.0.24.Final'
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
-	compile 'io.netty:netty-handler:4.0.24.Final'
 	compile project(':jme3_xbuf_loader')
 	compile 'org.xbuf:xbuf:0.7+'
-	provided "org.jmonkeyengine:jme3-core:${v_jme3}"
+	compileOnly "org.jmonkeyengine:jme3-core:${v_jme3}"
 	testCompile 'junit:junit:4.12'
 	testRuntime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
 	testRuntime "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
