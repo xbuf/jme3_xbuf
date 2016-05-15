@@ -1,8 +1,6 @@
 def DEV_MODE=false
 
 apply plugin: 'java'
-apply plugin: 'nebula.provided-base'
-
 
 
 configurations.all {
