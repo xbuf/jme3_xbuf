@@ -7,16 +7,6 @@ buildscript {
 	}
 }
 
-apply plugin: 'java'
-apply plugin: 'nebula.provided-base'
-apply plugin: 'eclipse'
-
-//WARNING: this project is 1.7 compatible but ModelViewer require javafx and java 8u20+ to run
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-
-
 def description = "A standalone viewer for xbuf (and some other format supported by jme3) + remote xbuf editor support for remote edition (eg: via blender)"
 
 sourceSets.main.resources.srcDir 'src/main/java'

@@ -1,10 +1,4 @@
-apply plugin: 'java'
-apply plugin: 'nebula.provided-base'
 apply plugin: 'org.xtext.xtend'
-
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 def description = "An experimental remote display of a jMonkeyEngine application for remote edition (eg: via blender)"
 
@@ -18,12 +12,11 @@ dependencies {
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	compile 'org.xbuf:xbuf:0.7+'
 	compile project(':jme3_xbuf_rt')
-	provided "org.jmonkeyengine:jme3-core:${v_jme3}"
+	compileOnly "org.jmonkeyengine:jme3-core:${v_jme3}"
 	testCompile 'junit:junit:4.12'
 	testRuntime 'ch.qos.logback:logback-classic:1.1.2'
 	testRuntime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
 	testRuntime "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
-
 }
 
 xtend {

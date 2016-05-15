@@ -4,7 +4,6 @@ buildscript {
 		maven { url "https://plugins.gradle.org/m2/" }
 	}
 	dependencies {
-		classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:3.0.+'
 		classpath "org.xtext:xtext-gradle-plugin:1.0.+"
 		//classpath 'com.netflix.nebula:gradle-lint-plugin:latest.release'
 	}
@@ -36,6 +35,10 @@ subprojects {
 		maven { url "http://dl.bintray.com/davidb/jme3stuff" }
 		maven { url "https://jitpack.io" }
 	}
+
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+	[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 	task sourcesJar(type: Jar) {
 		from sourceSets.main.allSource

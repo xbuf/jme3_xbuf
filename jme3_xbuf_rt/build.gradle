@@ -1,17 +1,10 @@
-apply plugin: 'java'
-apply plugin: 'nebula.provided-base'
-
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-
 def description = "An experimental remote display of a jMonkeyEngine application for remote edition (eg: via blender)"
 
 sourceSets.main.resources.srcDir 'src/main/java'
 
 dependencies {
 	compileOnly "org.projectlombok:lombok:${v_lombok}"
-	provided "org.jmonkeyengine:jme3-core:${v_jme3}"
+	compileOnly "org.jmonkeyengine:jme3-core:${v_jme3}"
 	testCompile 'junit:junit:4.12'
 	testRuntime 'ch.qos.logback:logback-classic:1.1.2'
 	testRuntime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
