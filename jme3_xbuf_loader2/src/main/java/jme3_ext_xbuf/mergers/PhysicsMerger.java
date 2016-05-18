@@ -1,5 +1,8 @@
 package jme3_ext_xbuf.mergers;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import com.jme3.physicsloader.PhysicsShape;
 import com.jme3.physicsloader.rigidbody.RigidBody;
 import com.jme3.physicsloader.rigidbody.RigidBodyType;
@@ -9,6 +12,7 @@ import jme3_ext_xbuf.Merger;
 import jme3_ext_xbuf.XbufContext;
 import lombok.experimental.ExtensionMethod;
 import xbuf.Datas.Data;
+import xbuf_ext.Physics.Constraint;
 
 @ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class})
 public class PhysicsMerger implements Merger{
@@ -16,9 +20,21 @@ public class PhysicsMerger implements Merger{
 	@Override
 	public void apply(Data src, Node root, XbufContext context) {
 		for(xbuf_ext.Physics.PhysicsData data:src.getPhysicsList()){
-			loadRB(data.getRigidbody(),context);
+			if(data.getRigidbody()!=null)loadRB(data.getRigidbody(),context);
+			if(data.getConstraint()!=null)loadCT(data.getConstraint(),context);
 		}
 	}
+	
+	protected void loadCT(Constraint xbufct,XbufContext context) {		
+		Collection<Constraint> constraints=context.get("G~constraints");
+		if(constraints==null){
+			constraints=new LinkedList<Constraint>();
+			context.put("G~constraints",constraints);
+		}
+		constraints.add(xbufct);
+		// do parsing during linking.
+	}
+	
 
 	protected void loadRB( xbuf_ext.Physics.RigidBody xbufrb,XbufContext context) {
 		RigidBody rb=new RigidBody();

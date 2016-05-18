@@ -3,6 +3,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.BulletAppState.ThreadingType;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
@@ -15,6 +17,13 @@ public class TestHelpers{
 	private static  Map<SimpleApplication,Object> run_tab=new ConcurrentHashMap<SimpleApplication,Object>();
 	private static  Map<SimpleApplication,Object> join_tab=new ConcurrentHashMap<SimpleApplication,Object>();
 
+	public static BulletAppState buildBullet(SimpleApplication app,boolean debug){
+		BulletAppState bullet=new BulletAppState();
+		bullet.setThreadingType(ThreadingType.SEQUENTIAL);
+		bullet.setDebugEnabled(debug);
+		 app.getStateManager().attach(bullet);
+		return bullet;
+	}
 	public static SimpleApplication buildApp(boolean headless){
 		SimpleApplication app=new SimpleApplication(){
 			@Override

@@ -10,6 +10,8 @@ import com.jme3.animation.AnimControl;
 import com.jme3.animation.LoopMode;
 import com.jme3.animation.SkeletonControl;
 import com.jme3.app.SimpleApplication;
+import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.joints.PhysicsJoint;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
@@ -17,9 +19,38 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.SkeletonDebugger;
 
+import jme3_ext_xbuf.XbufKey;
+import xbuf_rt.XbufPhysicsLoader;
+
 public class UnitTests{
 	public boolean headless=true;
 
+	@Test
+	public void testConstraints(){
+//		boolean headless=false;
+		SimpleApplication app=TestHelpers.buildApp(headless);
+		BulletAppState bullet=TestHelpers.buildBullet(app,true);
+		
+		TestHelpers.hijackUpdateThread(app);
+		XbufKey key=new XbufKey("unit_tests/xbuf/constraints.xbuf").usePhysics(true).useEnhancedRigidbodies(true);
+		Spatial scene=app.getAssetManager().loadModel(key);
+		app.getRootNode().attachChild(scene);
+		scene.setLocalTranslation(0,-10,0);
+		XbufPhysicsLoader.load(key,scene,bullet.getPhysicsSpace());
+		
+		int i=0;
+		Collection<PhysicsJoint> joints=bullet.getPhysicsSpace().getJointList();
+		for(PhysicsJoint joint:joints){
+			System.out.println(joint);
+			i++;
+		}
+		assertTrue("Found "+i+" constraints, 1 expected",i==1);	
+		
+		TestHelpers.releaseUpdateThread(app);
+		if(!headless)TestHelpers.waitFor(app);
+		TestHelpers.closeApp(app);
+	}
+	
 	@Test
 	public void testMultiMat() {
 		SimpleApplication app=TestHelpers.buildApp(headless);
