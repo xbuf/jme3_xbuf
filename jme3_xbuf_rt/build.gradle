@@ -1,4 +1,4 @@
-def DEV_MODE=true
+def DEV_MODE=false
 
 def description = "An experimental remote display of a jMonkeyEngine application for remote edition (eg: via blender)"
 
