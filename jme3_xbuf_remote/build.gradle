@@ -19,6 +19,8 @@ dependencies {
 	testCompile 'junit:junit:4.12'
 	testRuntime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
 	testRuntime "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
+	testCompile "org.jmonkeyengine:jme3-core:${v_jme3}"
+
 }
 
 mainClassName = System.properties.get('mainClassName', 'sandbox.SimpleViewer')

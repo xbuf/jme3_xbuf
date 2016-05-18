@@ -4,7 +4,8 @@ def description = "An experimental remote display of a jMonkeyEngine application
 
 sourceSets.main.resources.srcDir 'src/main/java'
 
-def v_physicsloader="0.2"
+
+def v_physicsloader="0.3"
 def g_physicsloader="com.github.riccardobl"
 if (DEV_MODE){
 	v_physicsloader="SNAPSHOT"
@@ -16,7 +17,7 @@ dependencies {
 	compileOnly "org.projectlombok:lombok:${v_lombok}"
 	compileOnly "org.jmonkeyengine:jme3-core:${v_jme3}"
 	compileOnly "org.jmonkeyengine:jme3-bullet:${v_jme3}"
-	
+	compile "org.slf4j:slf4j-api:${v_slf4j}"
 	testCompile 'junit:junit:4.12'
 	testRuntime 'ch.qos.logback:logback-classic:1.1.2'
 	testRuntime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
