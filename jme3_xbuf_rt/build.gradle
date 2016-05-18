@@ -22,4 +22,6 @@ dependencies {
 	testRuntime 'ch.qos.logback:logback-classic:1.1.2'
 	testRuntime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
 	testRuntime "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
+	testCompile "org.jmonkeyengine:jme3-core:${v_jme3}"
+
 }
