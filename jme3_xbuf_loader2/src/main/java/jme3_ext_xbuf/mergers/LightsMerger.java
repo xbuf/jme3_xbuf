@@ -25,7 +25,7 @@ public class LightsMerger implements Merger{
 			// TODO manage parent hierarchy
 			String id=srcl.getId();
 			Light light=context.get(id);
-			if(light==null) {
+			if(light==null){
 				light=makeLight(srcl);
 				context.put(id,light);
 			}
@@ -42,25 +42,25 @@ public class LightsMerger implements Merger{
 					if(srcl.hasSpotAngle()){
 						float max=srcl.getSpotAngle().getMax();
 						switch(srcl.getSpotAngle().getCurveCase()){
-							case CURVE_NOT_SET:{
+							case CURVE_NOT_SET:
 								l.setSpotOuterAngle(max);
 								l.setSpotInnerAngle(max);
-							}
-							case LINEAR:{
+								break;
+							case LINEAR:
 								l.setSpotOuterAngle(max*srcl.getSpotAngle().getLinear().getEnd());
 								l.setSpotInnerAngle(max*srcl.getSpotAngle().getLinear().getBegin());
-							}
+								break;
 							default:{
 								l.setSpotOuterAngle(max);
 								l.setSpotInnerAngle(max);
 								log.warn("doesn't support curve like {} for spot_angle",srcl.getSpotAngle().getCurveCase());
 							}
 						}
-
 					}
 					if(srcl.hasRadialDistance()){
 						l.setSpotRange(srcl.getRadialDistance().getMax());
 					}
+					break;
 				}
 				case point:{
 					PointLight l=(PointLight)light;
@@ -69,12 +69,15 @@ public class LightsMerger implements Merger{
 						switch(srcl.getRadialDistance().getCurveCase()){
 							case CURVE_NOT_SET:{
 								l.setRadius(max);
+								break;
 							}
 							case LINEAR:{
 								l.setRadius(max*srcl.getSpotAngle().getLinear().getEnd());
+								break;
 							}
 							case SMOOTH:{
 								l.setRadius(max*srcl.getSpotAngle().getSmooth().getEnd());
+								break;
 							}
 							default:{
 								l.setRadius(max);
@@ -82,9 +85,14 @@ public class LightsMerger implements Merger{
 							}
 						}
 					}
+					break;
 				}
-				case ambient:{}
-				case directional:{}
+				case ambient:{
+					break;
+				}
+				case directional:{
+					break;
+				}
 			}
 		}
 	}
@@ -94,17 +102,21 @@ public class LightsMerger implements Merger{
 		switch(srcl.getKind()){
 			case ambient:
 				l0=new AmbientLight();
+				break;
 			case directional:
 				l0=new DirectionalLight();
+				break;
 			case spot:{
 				SpotLight l=new SpotLight();
 				l.setSpotRange(1000);
 				l.setSpotInnerAngle(5f*FastMath.DEG_TO_RAD);
 				l.setSpotOuterAngle(10f*FastMath.DEG_TO_RAD);
 				l0=l;
+				break;
 			}
 			case point:
 				l0=new PointLight();
+				break;
 		}
 		l0.setColor(ColorRGBA.White.mult(2));
 		l0.setName(srcl.hasName()?srcl.getName():srcl.getId());
