@@ -34,13 +34,9 @@ public class XbufLightControl extends AbstractControl{
 			try{
 				if(light instanceof PointLight){
 					((PointLight)light).setPosition(spatial.getWorldTranslation());
-				}
-
-				if(light instanceof DirectionalLight){
+				}else if(light instanceof DirectionalLight){
 					((DirectionalLight)light).setDirection(spatial.getWorldRotation().multLocal(vars.vect1.set(Vector3f.UNIT_Z)));
-				}
-
-				if(light instanceof SpotLight){
+				}else if(light instanceof SpotLight){
 					((SpotLight)light).setPosition(spatial.getWorldTranslation());
 					((SpotLight)light).setDirection(spatial.getWorldRotation().multLocal(vars.vect1.set(Vector3f.UNIT_Z)));
 				}
