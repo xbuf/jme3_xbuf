@@ -110,6 +110,7 @@ public class PhysicsToSpatial implements Linker{
 
 			generic_ct.upperLinearLimit=xbuf_generic_ct.getUpperLinearLimit().toJME();
 			generic_ct.lowerLinearLimit=xbuf_generic_ct.getLowerLinearLimit().toJME();
+			generic_ct.disableCollisionsBetweenLinkedNodes=xbuf_generic_ct.getDisableCollisions();
 			ct_data=generic_ct;
 		} // else if ... [Only one type.]
 		
