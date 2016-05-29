@@ -85,7 +85,7 @@ public class MaterialsMerger implements Merger{
 			if(name!=null){
 				dst.setColor(name,src.toJME());
 			}else{
-				log.warn("can't find a matching name for : [{}] ({})",names,VarType.Vector4);
+				log.warn("can't find a matching name for : [{}] ({}) in {}",names,VarType.Vector4, dst.getMaterialDef().getName());
 			}
 		}
 	}
@@ -96,7 +96,7 @@ public class MaterialsMerger implements Merger{
 			if(name!=null){
 				dst.setBoolean(name,src);
 			}else{
-				log.warn("can't find a matching name for : [{}] ({})",names,VarType.Vector4);
+				log.warn("can't find a matching name for : [{}] ({}) in {}",names,VarType.Vector4, dst.getMaterialDef().getName());
 			}
 		}
 	}
@@ -147,7 +147,7 @@ public class MaterialsMerger implements Merger{
 			if(name!=null){
 				dst.setTexture(name,getValue(src));
 			}else{
-				log.warn("can't find a matching name for : [{}] ({})",names,VarType.Texture2D);
+				log.warn("can't find a matching name for : [{}] ({}) in {}",names,VarType.Texture2D, dst.getMaterialDef().getName());
 			}
 		}
 	}
@@ -158,7 +158,7 @@ public class MaterialsMerger implements Merger{
 			if(name!=null){
 				dst.setFloat(name,src);
 			}else{
-				log.warn("can't find a matching name for : [{}] ({})",names,VarType.Float);
+				log.warn("can't find a matching name for : [{}] ({}) in {}",names,VarType.Float, dst.getMaterialDef().getName());
 			}
 		}
 	}
