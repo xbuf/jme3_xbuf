@@ -8,22 +8,21 @@ import com.jme3.physicsloader.impl.bullet.BulletPhysicsLoader;
 import lombok.extern.slf4j.Slf4j;
 import xbuf_rt.XbufPhysicsLoaderSettings;
 
-
 @Slf4j
 public class XbufKey extends PhysicsLoaderModelKey<XbufKey> implements XbufPhysicsLoaderSettings{
 
 	public XbufKey(){}
-	
+
 	public XbufKey(String s){
 		super(s);
 	}
-	
-	protected boolean useLightControls;
+
+	protected boolean useLightControls = false;
 	public XbufKey useLightControls(boolean x){
 		useLightControls=x;
 		return this;
 	}
-	
+
 	@Override
 	public XbufKey usePhysics(PhysicsLoader<?,?> l){
 		if(l!=null&&!(l instanceof BulletPhysicsLoader)){
@@ -33,8 +32,8 @@ public class XbufKey extends PhysicsLoaderModelKey<XbufKey> implements XbufPhysi
 		super.usePhysics(l);
 		return this;
 	}
-	
-	
+
+
 	public boolean useLightControls(){
 		return useLightControls;
 	}
@@ -42,10 +41,10 @@ public class XbufKey extends PhysicsLoaderModelKey<XbufKey> implements XbufPhysi
 	private final static Class<?>[] supportedConstraints={
 			GenericConstraint.class
 	};
-	
+
 	@Override
 	public Class<?>[] getSupportedConstraints() {
 		return supportedConstraints;
 	}
-	
+
 }
