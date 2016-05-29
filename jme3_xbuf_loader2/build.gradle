@@ -18,11 +18,9 @@ if (DEV_MODE){
 	v_physicsloader="SNAPSHOT"
 	g_physicsloader="dev"
 	v_xbuf="0.8.0-2-g59d8b75-dirty"
-	
 }
 
 dependencies {
-
 	compile 'com.google.protobuf:protobuf-java:2.6.1'
 	compile "${g_physicsloader}:jme3_physicsloader:${v_physicsloader}"
 	compileOnly "org.projectlombok:lombok:${v_lombok}"
@@ -31,11 +29,11 @@ dependencies {
 
 	compile project(":jme3_xbuf_rt")
 
-	compileOnly "${g_jme3SNAPSHOT}:jme3-core:${v_jme3SNAPSHOT}"
-	testCompile "${g_jme3SNAPSHOT}:jme3-lwjgl:${v_jme3SNAPSHOT}"
-	testCompile "${g_jme3SNAPSHOT}:jme3-desktop:${v_jme3SNAPSHOT}"
-	testCompile "${g_jme3SNAPSHOT}:jme3-bullet:${v_jme3SNAPSHOT}"
-	testCompile "${g_jme3SNAPSHOT}:jme3-bullet-native:${v_jme3SNAPSHOT}"
+	compileOnly "org.jmonkeyengine:jme3-core:${v_jme3}"
+	testCompile "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
+	testCompile "org.jmonkeyengine:jme3-desktop:${v_jme3}"
+	testCompile "org.jmonkeyengine:jme3-bullet:${v_jme3}"
+	testCompile "org.jmonkeyengine:jme3-bullet-native:${v_jme3}"
 	testCompile 'com.github.riccardobl:jme3-bullet-vhacd:-SNAPSHOT'
 
 	testCompile 'junit:junit:4.12'
