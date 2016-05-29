@@ -18,15 +18,14 @@ import jme3_ext_xbuf.mergers.MeshesMerger;
 import jme3_ext_xbuf.mergers.NodesMerger;
 import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.SkeletonsMerger;
-import lombok.Getter;
 import xbuf.Datas.Data;
 import xbuf_ext.AnimationsKf;
 import xbuf_ext.CustomParams;
 
 public class Xbuf{
-	protected final AssetManager assetManager;
-	protected final ExtensionRegistry registry;
-	protected final @Getter List<Merger> mergers;
+	public final AssetManager assetManager;
+	public final ExtensionRegistry registry;
+	public final List<Merger> mergers;
 	/**
 	 * A full constructor that allow to define every service (to injection).
 	 * @param assetManager the AssetManager used to load assets (texture, sound,...)
