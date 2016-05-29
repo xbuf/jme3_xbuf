@@ -11,39 +11,39 @@ public class XbufContext {
 //	public Logger log=LoggerFactory.getLogger("Xbuf");
 	private Map<String,Object> storage=new HashMap<String,Object> ();
 	private Map<String,List<String>> links=new HashMap<String,List<String>>();
-	private XbufKey settings;
-	
+	private XbufKey settings=new XbufKey("default");
+
 	public synchronized void setSettings(XbufKey s){
 		settings=s;
 	}
-	
+
 	public synchronized XbufKey getSettings(){
 		return settings;
 	}
-	
+
 	public synchronized <T> T get(String ref){
 		return (T)storage.get(ref);
 	}
-	
-		
+
+
 	public synchronized String idOf(Object val){
 		for(Entry<String,Object> entry:storage.entrySet()){
 			if(entry.getValue()==val)return entry.getKey();
 		}
 		return null;
 	}
-	
+
 	public synchronized <T> T put(String ref,Object val){
 		T t=(T)storage.put(ref,val);
 		return t;
 	}
-	
+
 	public synchronized <T> T put(String ref,Object val,String link_to){
 		T out=put(ref,val);
 		linkedRefs(link_to).add(ref);
-		return out;		
+		return out;
 	}
-	
+
 
 	public synchronized <T> T removeWithLinks(String ref){
 		List<String> ls=links.get(ref);
@@ -51,7 +51,7 @@ public class XbufContext {
 		for(String l:ls)remove(l);
 		return out;
 	}
-	
+
 	public synchronized <T> T remove(String ref){
 		links.remove(ref);
 		return (T) storage.remove(ref);
@@ -66,7 +66,7 @@ public class XbufContext {
 		return linked;
 	}
 
-	
+
 	public synchronized String toString(){
 		StringBuilder sb=new StringBuilder();
 		LinkedList<String> ignore=new LinkedList<String>();
@@ -82,10 +82,10 @@ public class XbufContext {
 					}catch(Throwable t){
 						sb.append(v.hashCode());
 					}
-					sb.append(")\n");			
+					sb.append(")\n");
 				}
 				ignore.addAll(linked);
-			}			
+			}
 		});
 		return sb.toString();
 	}
