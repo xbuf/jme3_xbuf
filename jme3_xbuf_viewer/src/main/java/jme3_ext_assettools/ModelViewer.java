@@ -18,6 +18,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.plugins.OBJLoader;
 import com.jme3.scene.plugins.blender.BlenderLoader;
+import com.jme3.scene.plugins.fbx.FbxLoader;
 import com.jme3.system.AppSettings;
 import java.io.File;
 import java.net.URL;
@@ -129,7 +130,7 @@ public class ModelViewer {
 	// Object
 	/////////////////////////////////////////////////////////////////////////////////
 
-	public List<File> assetDirs = new LinkedList<>(); 
+	public List<File> assetDirs = new LinkedList<>();
 	public SimpleApplication app;
 	protected Options options;
 
@@ -205,6 +206,7 @@ public class ModelViewer {
 			AssetManager assetManager = app.getAssetManager();
 			assetManager.registerLoader(OBJLoader.class, "obj");
 			assetManager.registerLoader(MTLoaderExt.class, "mtl");
+			assetManager.registerLoader(FbxLoader.class, "fbx");
 			assetManager.registerLoader(BlenderLoader.class, "blend");
 			assetManager.registerLoader(XbufLoader.class, "xbuf");
 			return null;
@@ -266,7 +268,7 @@ public class ModelViewer {
 			cameraLight.setColor(ColorRGBA.White);
 			cameraLight.setRadius(20f);
 			LightNode cameraLightNode = new LightNode("cameraLight", cameraLight);
-			cameraLightNode.addControl(new CameraControl(app.getCamera(), CameraControl.ControlDirection.CameraToSpatial)); 
+			cameraLightNode.addControl(new CameraControl(app.getCamera(), CameraControl.ControlDirection.CameraToSpatial));
 			exp.barActions.add(Helper.makeAction("CameraLight", FontAwesome.Glyph.LIGHTBULB_ALT, (evt) -> {
 				app.enqueue(()->{
 					if (cameraLightNode.getParent() == null) {
