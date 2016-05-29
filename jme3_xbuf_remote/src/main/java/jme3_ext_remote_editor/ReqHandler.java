@@ -33,8 +33,8 @@ import xbuf.Cmds.SetEye.ProjMode;
 import xbuf.Datas;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
+import static jme3_ext_xbuf.ext.PrimitiveExt.*;
 import com.jme3.math.FastMath;
-import static jme3_ext_xbuf.Converters.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -155,13 +155,13 @@ class ReqHandler {
 	public void setEye(ChannelHandlerContext ctx, Cmds.SetEye cmd) {
 		todo((rc)-> {
 			CameraNode cam = rc.cam;
-			Quaternion rot = cnv(cmd.getRotation(), cam.getLocalRotation());
+			Quaternion rot = toJME(cmd.getRotation());
 			cam.setLocalRotation(rot.clone());
-			cam.setLocalTranslation(cnv(cmd.getLocation(), cam.getLocalTranslation()));
+			cam.setLocalTranslation(toJME(cmd.getLocation()));
 			//if (cmd.hasNear()) cam0.setFrustumNear(cmd.getNear())
 			//if (cmd.hasFar()) cam0.setFrustumFar(cmd.getFar())
 			if (cmd.hasProjection()) {
-				Matrix4f proj = cnv(cmd.getProjection(), new Matrix4f());
+				Matrix4f proj = toJME(cmd.getProjection());
 				cam.getCamera().setParallelProjection(cmd.getProjMode() == ProjMode.orthographic);
 				if (cmd.getProjMode() == ProjMode.orthographic) {
 					float[] lr = pairOf(proj.m00, proj.m03);

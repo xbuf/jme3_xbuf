@@ -2,8 +2,6 @@ apply plugin: "application"
 
 def description = "An experimental remote display of a jMonkeyEngine application for remote edition (eg: via blender)"
 
-sourceSets.main.resources.srcDir 'src/main/java'
-
 dependencies {
 	compileOnly "org.projectlombok:lombok:${v_lombok}"
 
@@ -13,14 +11,13 @@ dependencies {
 	compile 'io.netty:netty-codec:4.0.24.Final'
 	compile 'io.netty:netty-transport:4.0.24.Final'
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
-	compile project(':jme3_xbuf_loader')
+	compile project(':jme3_xbuf_loader2')
 	compile 'org.xbuf:xbuf:0.7+'
 	compileOnly "org.jmonkeyengine:jme3-core:${v_jme3}"
 	testCompile 'junit:junit:4.12'
 	testRuntime "org.jmonkeyengine:jme3-desktop:${v_jme3}"
 	testRuntime "org.jmonkeyengine:jme3-lwjgl:${v_jme3}"
 	testCompile "org.jmonkeyengine:jme3-core:${v_jme3}"
-
 }
 
 mainClassName = System.properties.get('mainClassName', 'sandbox.SimpleViewer')
