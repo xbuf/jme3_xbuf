@@ -1,53 +1,54 @@
 package jme3_ext_xbuf.scene;
 
 
+import org.slf4j.Logger;
+
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.VertexBuffer.Type;
 
 import lombok.Data;
 import lombok.experimental.ExtensionMethod;
-import lombok.extern.slf4j.Slf4j;
 import xbuf.Meshes.IndexArray;
 import xbuf.Meshes.Skin;
 import xbuf.Meshes.VertexArray;
 
-@Data @Slf4j
+@Data
 @ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class, jme3_ext_xbuf.ext.FloatBufferExt.class, jme3_ext_xbuf.ext.UintBufferExt.class})
 public class XbufMesh{
 	protected final xbuf.Meshes.Mesh src;
-	
+
 	public String getName(){
 		return src.getName();
 	}
-	
-	public Mesh toJME() throws IllegalArgumentException {
+
+	public Mesh toJME(Logger log) throws IllegalArgumentException {
 		if(src.getIndexArraysCount()>1) throw new IllegalArgumentException("doesn't support more than 1 index array");
 		if(src.getLod()>1) throw new IllegalArgumentException("doesn't support lod > 1 : "+src.getLod());
-		
+
 		Mesh dst=new Mesh();
 
 		//		context.put("G~meshName~"+dst.hashCode(),src.getName());
 		dst.setMode(src.getPrimitive().toJME());
-		
+
 		for(VertexArray va:src.getVertexArraysList()){
 			Type type=va.getAttrib().toJME();
 			dst.setBuffer(type,va.getFloats().getStep(),va.getFloats().array());
 			log.debug("add {}",dst.getBuffer(type));
 		}
-		
+
 		for(IndexArray va:src.getIndexArraysList()){
 			dst.setBuffer(VertexBuffer.Type.Index,va.getInts().getStep(),va.getInts().array());
 		}
-		
-		if(src.hasSkin()) applySkin(src.getSkin(),dst);
+
+		if(src.hasSkin()) applySkin(src.getSkin(),dst, log);
 
 		dst.updateCounts();
 		dst.updateBound();
 		return dst;
 	}
-	
-	protected Mesh applySkin(Skin skin, Mesh dst) {
+
+	protected Mesh applySkin(Skin skin, Mesh dst, Logger log) {
 		dst.clearBuffer(Type.BoneIndex);
 		dst.clearBuffer(Type.BoneWeight);
 		int nb=skin.getBoneCountCount();

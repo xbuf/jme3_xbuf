@@ -1,6 +1,8 @@
 package jme3_ext_xbuf.mergers;
 
 
+import org.slf4j.Logger;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.AssetNotFoundException;
 import com.jme3.material.MatParam;
@@ -43,7 +45,7 @@ public class MaterialsMerger implements Merger{
 		defaultTexture = newDefaultTexture();
 		defaultMaterial = newDefaultMaterial();
 	}
-	
+
 	public Material newDefaultMaterial() {
 		Material m=new Material(assetManager,"MatDefs/MatCap.j3md");
 		m.setTexture("DiffuseMap",assetManager.loadTexture("Textures/generator8.jpg"));
@@ -191,7 +193,7 @@ public class MaterialsMerger implements Merger{
 		return dst;
 	}
 
-	public void apply(Data src, Node root, XbufContext context) {
+	public void apply(Data src, Node root, XbufContext context, Logger log) {
 		src.getMaterialsList().stream().forEach(m -> {
 			String id=m.getId();
 			Material mat=newMaterial(m);

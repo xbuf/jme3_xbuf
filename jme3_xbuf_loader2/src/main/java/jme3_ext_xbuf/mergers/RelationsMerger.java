@@ -3,6 +3,8 @@ package jme3_ext_xbuf.mergers;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.slf4j.Logger;
+
 import com.jme3.scene.Node;
 
 import jme3_ext_xbuf.Merger;
@@ -18,15 +20,13 @@ import jme3_ext_xbuf.mergers.relations.linkers.NodeToNode;
 import jme3_ext_xbuf.mergers.relations.linkers.PhysicsToSpatial;
 import jme3_ext_xbuf.mergers.relations.linkers.SkeletonToSpatial;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import xbuf.Datas.Data;
 import xbuf.Relations.Relation;
 
-@Slf4j
 public class RelationsMerger implements Merger{
 	protected @Getter final MaterialsMerger matMerger;
 	protected @Getter final Collection<Linker> linkers;
-	
+
 	public RelationsMerger(MaterialsMerger mm){
 		matMerger=mm;
 		linkers=new LinkedList<Linker>();
@@ -40,13 +40,13 @@ public class RelationsMerger implements Merger{
 		linkers.add(new PhysicsToSpatial());
 	}
 
-	public void apply(Data src, Node root, XbufContext components) {
+	public void apply(Data src, Node root, XbufContext components, Logger log) {
 		for(Relation r:src.getRelationsList()){
-			merge(new RefData(r.getRef1(),r.getRef2(),src,root,components));
-		} 
+			merge(new RefData(r.getRef1(),r.getRef2(),src,root,components),log);
+		}
 	}
 
-	protected void merge(RefData data) {
+	protected void merge(RefData data, Logger log) {
 		if(data.ref1.equals(data.ref2)){
 			log.warn("can't link {} to itself",data.ref1);
 			return;
@@ -58,11 +58,11 @@ public class RelationsMerger implements Merger{
 		LinkedList<String> refs1=new LinkedList<String>();
 		refs1.add(r1);
 		refs1.addAll(data.context.linkedRefs(r1));
-		
+
 		LinkedList<String> refs2=new LinkedList<String>();
 		refs2.add(r2);
 		refs2.addAll(data.context.linkedRefs(r2));
-		
+
 
 		// Every possible combination
 		for(String ref1:refs1){
@@ -70,7 +70,7 @@ public class RelationsMerger implements Merger{
 				data.ref1=ref1;
 				data.ref2=ref2;
 				for(Linker linker:linkers){
-					if(linker.doLink(this,data)){
+					if(linker.doLink(this,data,log)){
 						linked=true;
 						log.info("{} linked to {} with {}",data.ref1,data.ref2,linker.getClass());
 						break;

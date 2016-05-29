@@ -1,5 +1,7 @@
 package jme3_ext_xbuf.mergers;
 
+import org.slf4j.Logger;
+
 import com.jme3.scene.Node;
 
 import jme3_ext_xbuf.Merger;
@@ -11,7 +13,7 @@ import xbuf.Datas.Data;
 public class MeshesMerger implements Merger{
 
 	@Override
-	public void apply(Data src, Node root, XbufContext context) {
+	public void apply(Data src, Node root, XbufContext context, Logger log) {
 		for(xbuf.Meshes.Mesh g:src.getMeshesList())
 			context.put(g.getId(),new XbufMesh(g));//g.toJME(context,log));
 	}

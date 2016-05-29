@@ -1,5 +1,7 @@
 package jme3_ext_xbuf.mergers;
 
+import org.slf4j.Logger;
+
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.Light;
@@ -12,15 +14,13 @@ import com.jme3.scene.Node;
 import jme3_ext_xbuf.Merger;
 import jme3_ext_xbuf.XbufContext;
 import lombok.experimental.ExtensionMethod;
-import lombok.extern.slf4j.Slf4j;
 import xbuf.Datas.Data;
 import xbuf.Lights;
 
 @ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class})
-@Slf4j
 public class LightsMerger implements Merger{
 
-	public void apply(Data src, Node root, XbufContext context) {
+	public void apply(Data src, Node root, XbufContext context, Logger log) {
 		for(xbuf.Lights.Light srcl:src.getLightsList()){
 			// TODO manage parent hierarchy
 			String id=srcl.getId();

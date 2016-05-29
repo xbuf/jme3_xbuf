@@ -1,5 +1,7 @@
 package jme3_ext_xbuf.mergers;
 
+import org.slf4j.Logger;
+
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
@@ -14,7 +16,7 @@ import xbuf.Tobjects.TObject;
 public class NodesMerger implements Merger{
 
 	@Override
-	public void apply(Data src, Node root, XbufContext context) {
+	public void apply(Data src, Node root, XbufContext context, Logger log) {
 			for(TObject n:src.getTobjectsList()){
 				String id=n.getId();
 				Spatial child=(Spatial)context.get(id);

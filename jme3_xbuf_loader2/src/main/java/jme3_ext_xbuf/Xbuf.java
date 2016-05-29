@@ -3,6 +3,8 @@ package jme3_ext_xbuf;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 import com.google.protobuf.ExtensionRegistry;
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
@@ -67,9 +69,9 @@ public class Xbuf{
 	}
 
 	// TODO optimize to create less intermediate node
-	public void merge(Data src, Node root, XbufContext context) {
+	public void merge(Data src, Node root, XbufContext context, Logger log) {
 		for(Merger m:mergers){
-			m.apply(src,root,context);
+			m.apply(src,root,context,log);
 		}
 	}
 

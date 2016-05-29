@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.Skeleton;
 import com.jme3.animation.SkeletonControl;
@@ -20,56 +22,54 @@ import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
 import lombok.experimental.ExtensionMethod;
-import lombok.extern.slf4j.Slf4j;
 
 @ExtensionMethod({jme3_ext_xbuf.ext.AnimControlExt.class})
-@Slf4j
 public class SkeletonToSpatial implements Linker{
 	// see http://hub.jmonkeyengine.org/t/skeletoncontrol-or-animcontrol-to-host-skeleton/31478/4
 
 	@Override
-	public boolean doLink(RelationsMerger loader, RefData data) {
-		Object op1=getRef1(data,Geometry.class);
-		Object op2=getRef2(data,Skeleton.class);
+	public boolean doLink(RelationsMerger loader, RefData data, Logger log) {
+		Object op1=getRef1(data,Geometry.class,log);
+		Object op2=getRef2(data,Skeleton.class,log);
 
-		if(op1==null||op2==null){ 
-			op2=getRef1(data,Skeleton.class);
-			op1=getRef2(data,Node.class);
+		if(op1==null||op2==null){
+			op2=getRef1(data,Skeleton.class,log);
+			op1=getRef2(data,Node.class,log);
 		}
-		
+
 		if(op1==null||op2==null) return false;
 		Spatial v=(Spatial)op1;
 		Skeleton sk=(Skeleton)op2;
 
 		// TODO: update skel w/o remove
 		v.removeControl(SkeletonControl.class);
-		
+
 		SkeletonControl skc=new SkeletonControl(sk);
 		v.addControl(skc);
 
 		Collection<AnimControl> controls=new LinkedList<AnimControl>();
-		
+
 		for(int i=0;i<v.getNumControls();i++){
 			Control c=v.getControl(i);
 			if( c instanceof AnimControl)controls.add((AnimControl)c);
 		}
-		
+
 		boolean atLeastOne=false;
 		for(AnimControl c:controls){
 			atLeastOne=true;
 			c.setSkeleton(sk);
-		}				
-			
+		}
+
 		// always add AnimControl else NPE when SkeletonControl.clone
 		if(!atLeastOne)v.addControl(new AnimControl(sk));
-		
-		cloneMatWhenNeeded((Spatial)op1,data);
+
+		cloneMatWhenNeeded((Spatial)op1,data,log);
 		return true;
 	}
 
 
-	
-	private void cloneMatWhenNeeded(Spatial op2, RefData data) {
+
+	private void cloneMatWhenNeeded(Spatial op2, RefData data, Logger log) {
 		op2.depthFirstTraversal(s -> {
 			if(s instanceof Geometry){
 				Material m=((Geometry)s).getMaterial();

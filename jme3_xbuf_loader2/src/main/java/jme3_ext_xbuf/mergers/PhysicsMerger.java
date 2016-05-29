@@ -3,6 +3,8 @@ package jme3_ext_xbuf.mergers;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.slf4j.Logger;
+
 import com.jme3.physicsloader.PhysicsShape;
 import com.jme3.physicsloader.rigidbody.RigidBody;
 import com.jme3.physicsloader.rigidbody.RigidBodyType;
@@ -18,14 +20,14 @@ import xbuf_ext.Physics.Constraint;
 public class PhysicsMerger implements Merger{
 
 	@Override
-	public void apply(Data src, Node root, XbufContext context) {
+	public void apply(Data src, Node root, XbufContext context, Logger log) {
 		for(xbuf_ext.Physics.PhysicsData data:src.getPhysicsList()){
 			if(data.getRigidbody()!=null)loadRB(data.getRigidbody(),context);
 			if(data.getConstraint()!=null)loadCT(data.getConstraint(),context);
 		}
 	}
-	
-	protected void loadCT(Constraint xbufct,XbufContext context) {		
+
+	protected void loadCT(Constraint xbufct,XbufContext context) {
 		Collection<Constraint> constraints=context.get("G~constraints");
 		if(constraints==null){
 			constraints=new LinkedList<Constraint>();
@@ -34,7 +36,7 @@ public class PhysicsMerger implements Merger{
 		constraints.add(xbufct);
 		// do parsing during linking.
 	}
-	
+
 
 	protected void loadRB( xbuf_ext.Physics.RigidBody xbufrb,XbufContext context) {
 		RigidBody rb=new RigidBody();
@@ -51,8 +53,8 @@ public class PhysicsMerger implements Merger{
 		rb.isKinematic=xbufrb.getIsKinematic();
 		rb.collisionGroup=xbufrb.getCollisionGroup();
 		rb.collisionMask=xbufrb.getCollisionMask();
-		
+
 		String id=xbufrb.getId();
-		context.put(id,rb);		
+		context.put(id,rb);
 	}
 }

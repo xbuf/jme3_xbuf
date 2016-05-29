@@ -2,6 +2,8 @@ package jme3_ext_xbuf.mergers;
 
 import java.util.HashMap;
 
+import org.slf4j.Logger;
+
 import com.jme3.animation.Bone;
 import com.jme3.animation.Skeleton;
 import com.jme3.scene.Node;
@@ -14,11 +16,10 @@ import xbuf.Relations.Relation;
 import xbuf.Skeletons;
 
 @ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class})
-
 public class SkeletonsMerger implements Merger{
 
 	@Override
-	public void apply(Data src, Node root, XbufContext context) {
+	public void apply(Data src, Node root, XbufContext context, Logger log) {
 		for(xbuf.Skeletons.Skeleton e:src.getSkeletonsList()){
 			// TODO manage parent hierarchy
 			String id=e.getId();

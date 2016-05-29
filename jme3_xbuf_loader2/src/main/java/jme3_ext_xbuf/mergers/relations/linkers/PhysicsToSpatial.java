@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 import com.jme3.export.Savable;
 import com.jme3.physicsloader.ConstraintData;
 import com.jme3.physicsloader.PhysicsLoader;
@@ -31,14 +33,14 @@ import xbuf_rt.XbufPhysicsLoader;
 public class PhysicsToSpatial implements Linker{
 
 	@Override
-	public boolean doLink(RelationsMerger rloader, RefData data) {
-		if(loadRB(rloader,data)) return true;
+	public boolean doLink(RelationsMerger rloader, RefData data, Logger log) {
+		if(loadRB(rloader,data,log)) return true;
 		return false;
 	}
 
-	protected boolean loadRB(RelationsMerger rloader, RefData data) {
-		RigidBody op1=getRef1(data,RigidBody.class);
-		Spatial op2=getRef2(data,Spatial.class);
+	protected boolean loadRB(RelationsMerger rloader, RefData data, Logger log) {
+		RigidBody op1=getRef1(data,RigidBody.class,log);
+		Spatial op2=getRef2(data,Spatial.class,log);
 		if(op1==null||op2==null) return false;
 		PhysicsLoader<?,?> loader=data.context.getSettings().getPhysicsLoader();
 		if(loader!=null){
@@ -113,8 +115,8 @@ public class PhysicsToSpatial implements Linker{
 			generic_ct.disableCollisionsBetweenLinkedNodes=xbuf_generic_ct.getDisableCollisions();
 			ct_data=generic_ct;
 		} // else if ... [Only one type.]
-		
-		
+
+
 		if(ct_data==null){
 			log.warn("Constraint {} not supported",ct);
 			return;
