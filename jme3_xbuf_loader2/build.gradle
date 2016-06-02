@@ -12,7 +12,7 @@ repositories{
 }
 
 def v_xbuf="0.8.2"
-def v_physicsloader="0.4"
+def v_physicsloader="0.5"
 def g_physicsloader="com.github.riccardobl"
 if (DEV_MODE){
 	v_physicsloader="SNAPSHOT"
