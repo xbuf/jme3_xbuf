@@ -23,7 +23,6 @@ import xbuf_ext.AnimationsKf;
 import xbuf_ext.CustomParams;
 
 public class Xbuf{
-	public final AssetManager assetManager;
 	public final ExtensionRegistry registry;
 	public final List<Merger> mergers;
 	/**
@@ -33,17 +32,13 @@ public class Xbuf{
 	 * @param loader4Materials the xbuf way to load materials (null => default implementation)
 	 * @param loader4Relations the xbuf way to load relations (null => default implementation)
 	 */
-	public Xbuf(AssetManager assetManager,ExtensionRegistry registry,MaterialsMerger loader4Materials,RelationsMerger loader4Relations){
-		this.assetManager=assetManager;
-		MaterialsMerger mmerger;
-
+	public Xbuf(AssetManager assetManager, ExtensionRegistry registry, MaterialsMerger loader4Materials, RelationsMerger loader4Relations){
+		loader4Materials = (loader4Materials != null) ?loader4Materials : new MaterialsMerger(assetManager);
+		loader4Relations = (loader4Relations != null) ?loader4Relations : new RelationsMerger(loader4Materials);
 		mergers=new LinkedList<Merger>();
-
 		mergers.add(new NodesMerger());
-		mergers.add(new MeshesMerger());
-		mmerger=new MaterialsMerger(assetManager);
-
-		mergers.add(mmerger);
+		mergers.add(new MeshesMerger(loader4Materials));
+		mergers.add(loader4Materials);
 		mergers.add(new LightsMerger());
 		mergers.add(new SkeletonsMerger());
 		mergers.add(new AnimationsMerger());
@@ -51,7 +46,7 @@ public class Xbuf{
 		mergers.add(new PhysicsMerger());
 
 		// relations should be the last because it reuse data provide by other (put in components)
-		mergers.add(new RelationsMerger(mmerger));
+		mergers.add(loader4Relations);
 
 		this.registry=registry!=null?registry:ExtensionRegistry.newInstance();
 		setupExtensionRegistry(this.registry);
