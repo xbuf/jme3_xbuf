@@ -3,20 +3,22 @@ package jme3_ext_xbuf.scene;
 
 import org.slf4j.Logger;
 
+import com.jme3.material.Material;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.VertexBuffer.Type;
 
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import xbuf.Meshes.IndexArray;
 import xbuf.Meshes.Skin;
 import xbuf.Meshes.VertexArray;
 
-@Data
 @ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class, jme3_ext_xbuf.ext.FloatBufferExt.class, jme3_ext_xbuf.ext.UintBufferExt.class})
+@RequiredArgsConstructor
 public class XbufMesh{
-	protected final xbuf.Meshes.Mesh src;
+	public final xbuf.Meshes.Mesh src;
+	public final Material material;
 
 	public String getName(){
 		return src.getName();

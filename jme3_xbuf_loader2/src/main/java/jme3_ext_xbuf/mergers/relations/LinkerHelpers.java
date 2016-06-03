@@ -47,6 +47,7 @@ public class LinkerHelpers{
 			XbufMesh xbufm=(XbufMesh)m;
 			geo=new Geometry("",xbufm.toJME(log));
 			geo.setName(xbufm.getName());
+			geo.setMaterial(xbufm.material);
 
 			data.context.put("G~"+ref,geo);
 		}
