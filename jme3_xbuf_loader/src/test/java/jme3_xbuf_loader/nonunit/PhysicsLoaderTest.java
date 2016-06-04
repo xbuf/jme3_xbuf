@@ -1,4 +1,4 @@
-package jme3_xbuf_loader2.nonunit;
+package jme3_xbuf_loader.nonunit;
 
 import java.io.File;
 
