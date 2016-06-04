@@ -11,7 +11,7 @@ dependencies {
 	compile 'io.netty:netty-codec:4.0.24.Final'
 	compile 'io.netty:netty-transport:4.0.24.Final'
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
-	compile project(':jme3_xbuf_loader2')
+	compile project(':jme3_xbuf_loader')
 	compile 'org.xbuf:xbuf:0.7+'
 	compileOnly "org.jmonkeyengine:jme3-core:${v_jme3}"
 	testCompile 'junit:junit:4.12'

@@ -1,4 +1,4 @@
-include 'jme3_xbuf_rt', 'jme3_xbuf_loader', 'jme3_xbuf_loader2', 'jme3_xbuf_remote', 'jme3_xbuf_viewer'
+include 'jme3_xbuf_rt', 'jme3_xbuf_loader', 'jme3_xbuf_remote', 'jme3_xbuf_viewer'
 
 //inlcude 'samples:xbuf_jaime'
 
