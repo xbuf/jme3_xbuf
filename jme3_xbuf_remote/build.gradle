@@ -1,5 +1,3 @@
-apply plugin: "application"
-
 def description = "An experimental remote display of a jMonkeyEngine application for remote edition (eg: via blender)"
 
 dependencies {
@@ -20,5 +18,7 @@ dependencies {
 	testCompile "org.jmonkeyengine:jme3-core:${v_jme3}"
 }
 
-mainClassName = System.properties.get('mainClassName', 'sandbox.SimpleViewer')
-applicationDefaultJvmArgs = []
+task run(type:JavaExec) {
+	main = System.getProperty("exec.mainClass") ?: "sandbox.SimpleViewer"
+	classpath = sourceSets.test.runtimeClasspath
+}
