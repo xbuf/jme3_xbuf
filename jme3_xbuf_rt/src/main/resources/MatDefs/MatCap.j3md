@@ -62,8 +62,8 @@ MaterialDef MatCap {
     }
 
     Technique {
-        VertexShader GLSL100:   Shaders/MatCap.vert
-        FragmentShader GLSL100: Shaders/MatCap.frag
+        VertexShader GLSL110:   Shaders/MatCap.vert
+        FragmentShader GLSL110: Shaders/MatCap.frag
  
         WorldParameters {
             WorldViewProjectionMatrix

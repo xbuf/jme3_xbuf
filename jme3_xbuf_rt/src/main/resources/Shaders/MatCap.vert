@@ -21,10 +21,6 @@ void main() {
    vec3 modelSpaceNorm = inNormal;
    vec3 modelSpaceTan  = inTangent.xyz;
 
-    #ifdef NUM_BONES
-      Skinning_Compute(modelSpacePos, modelSpaceNorm, modelSpaceTan);
-    #endif
-
     gl_Position = g_WorldViewProjectionMatrix * modelSpacePos;
     texCoord = inTexCoord;
 
