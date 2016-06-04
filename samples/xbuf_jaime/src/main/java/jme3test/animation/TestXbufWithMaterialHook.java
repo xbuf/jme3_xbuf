@@ -31,12 +31,10 @@
  */
 package jme3test.animation;
 
-import jme3_ext_xbuf.Converters;
-import jme3_ext_xbuf.Loader4Materials;
 import jme3_ext_xbuf.Xbuf;
 import jme3_ext_xbuf.XbufLoader;
-
-import org.slf4j.Logger;
+import jme3_ext_xbuf.mergers.MaterialsMerger;
+import xbuf.Materials;
 
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimationFactory;
@@ -96,14 +94,18 @@ public class TestXbufWithMaterialHook extends SimpleApplication {
 
 	@Override
 	public void simpleInitApp() {
-		Loader4Materials loader4Materials = new Loader4Materials(getAssetManager(), null) {
+		MaterialsMerger loader4Materials = new MaterialsMerger(getAssetManager()) {
 			@Override
-			public Material newMaterial(xbuf.Materials.Material m, Logger log) {
+			public Material newMaterial(xbuf.Materials.Material m) {
 				Material mat = new Material(assetManager, "MatDefs/MatCap.j3md");
 				mat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/generator8.jpg"));
-				mat.setColor("Multiply_Color", Converters.cnv(m.getColor(), new ColorRGBA(ColorRGBA.White)));
+				//mat.setColor("Multiply_Color", PrimitiveExt.toJME(m.getColor()));
 				//mc.toMaterialCustom(super.newMaterial(m, log))
 				return mat;
+			}
+			@Override
+			public Material mergeToMaterial(Materials.Material src, Material dst) {
+				return dst;
 			}
 		};
 		final Xbuf xbuf = new Xbuf(getAssetManager(), null, loader4Materials, null);
@@ -126,7 +128,7 @@ public class TestXbufWithMaterialHook extends SimpleApplication {
 		//Node jaime = (Node)assetManager.loadModel("Models/Jaime/Jaime.j3o");
 		Node jaime = (Node)((Node)assetManager.loadModel("Models/Jaime.xbuf")).getChild("Armature");
 		jaime.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-		showSkeleton(jaime);
+		//showSkeleton(jaime);
 		rootNode.attachChild(jaime);
 		return jaime;
 	}
