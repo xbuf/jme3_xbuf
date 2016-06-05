@@ -23,7 +23,7 @@ sourceSets.main.resources.srcDir 'src/main/java'
 
 def v_slf4j = '1.7.7'
 def v_jme3 = '3.1.0-beta1'
-def v_xbuf = '0.8.3'
+def v_xbuf = '0.8.4'
 
 dependencies {
 	// logging
