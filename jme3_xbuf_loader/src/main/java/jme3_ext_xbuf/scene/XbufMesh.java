@@ -7,6 +7,7 @@ import com.jme3.material.Material;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.VertexBuffer.Type;
+import com.jme3.util.TangentBinormalGenerator;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
@@ -44,7 +45,12 @@ public class XbufMesh{
 		}
 
 		if(src.hasSkin()) applySkin(src.getSkin(),dst, log);
-
+		// TODO optimize lazy create Tangent when needed (for normal map ?)
+		if ((dst.getBuffer(VertexBuffer.Type.Tangent) == null || dst.getBuffer(VertexBuffer.Type.Binormal) == null) &&
+			dst.getBuffer(VertexBuffer.Type.Normal) != null && dst.getBuffer(VertexBuffer.Type.TexCoord) != null) {
+			TangentBinormalGenerator.setToleranceAngle(179); // remove warnings
+			TangentBinormalGenerator.generate(dst);
+		}
 		dst.updateCounts();
 		dst.updateBound();
 		return dst;
