@@ -29,8 +29,8 @@ public class Xbuf{
 	 * A full constructor that allow to define every service (to injection).
 	 * @param assetManager the AssetManager used to load assets (texture, sound,...)
 	 * @param registry the protobuf registry for extensions
-	 * @param loader4Materials the xbuf way to load materials (null => default implementation)
-	 * @param loader4Relations the xbuf way to load relations (null => default implementation)
+	 * @param loader4Materials the xbuf way to load materials (null == use default implementation)
+	 * @param loader4Relations the xbuf way to load relations (null == use default implementation)
 	 */
 	public Xbuf(AssetManager assetManager, ExtensionRegistry registry, MaterialsMerger loader4Materials, RelationsMerger loader4Relations){
 		loader4Materials = (loader4Materials != null) ?loader4Materials : new MaterialsMerger(assetManager);
