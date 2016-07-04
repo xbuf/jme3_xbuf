@@ -8,6 +8,7 @@ import com.jme3.asset.AssetNotFoundException;
 import com.jme3.material.MatParam;
 import com.jme3.material.Material;
 import com.jme3.material.MaterialDef;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
 import com.jme3.shader.VarType;
@@ -167,7 +168,6 @@ public class MaterialsMerger implements Merger{
 		MaterialDef md=dst.getMaterialDef();
 		setColor(src.hasColor(),src.getColor(),dst,new String[]{"Color","Diffuse"},md);
 		setTexture2D(src.hasColorMap(),src.getColorMap(),dst,new String[]{"ColorMap","DiffuseMap"},md);
-		// setTexture2D(src.hasNormalMap(), src.getNormalMap(), dst, new String[]{"ColorMap", "DiffuseMap"], md, log)
 		setFloat(src.hasOpacity(),src.getOpacity(),dst,new String[]{"Alpha","Opacity"},md);
 		setTexture2D(src.hasOpacityMap(),src.getOpacityMap(),dst,new String[]{"AlphaMap","OpacityMap"},md);
 		setTexture2D(src.hasNormalMap(),src.getNormalMap(),dst,new String[]{"NormalMap"},md);
@@ -190,6 +190,15 @@ public class MaterialsMerger implements Merger{
 				}
 			}
 		}
+		if (src.hasOpacity()) {
+				if (src.hasOpacityMap()) {
+					setFloat(src.hasOpacity(),src.getOpacity(),dst,new String[]{"AlphaDiscardThreshold"},md);
+					//dst.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+				} else {
+					dst.getAdditionalRenderState().setBlendMode(BlendMode.AlphaAdditive);
+				}
+		}
+		
 		return dst;
 	}
 
