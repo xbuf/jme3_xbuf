@@ -95,7 +95,7 @@ class ReqHandler {
 	public void askScreenshot(ChannelHandlerContext ctx, ByteBuf msg) {
 		int w = msg.readInt();
 		int h = msg.readInt();
-		todo((rc) -> {
+		todo("askScreenshot", (rc) -> {
 			rc.view.askReshape.set(new SceneProcessorCaptureToBGRA.ReshapeInfo(w, h, true));
 			//TODO run notify in async (in an executor)
 			rc.view.askNotify.set((bytes)-> {
@@ -137,7 +137,7 @@ class ReqHandler {
 	}
 
 	public void setData(ChannelHandlerContext ctx, Datas.Data data) {
-		todo((rc)-> {
+		todo("setData", (rc)-> {
 			LoggerCollector xbufLogger = new LoggerCollector("xbuf");
 			xbuf.merge(data, rc.root, rc.components, xbufLogger);
 			xbufLogger.dumpTo(log);
@@ -153,7 +153,7 @@ class ReqHandler {
 	}
 
 	public void setEye(ChannelHandlerContext ctx, Cmds.SetEye cmd) {
-		todo((rc)-> {
+		todo("setEye", (rc)-> {
 			CameraNode cam = rc.cam;
 			Quaternion rot = toJME(cmd.getRotation());
 			cam.setLocalRotation(rot.clone());
@@ -194,7 +194,7 @@ class ReqHandler {
 	}
 
 	public void changeAssetFolders(ChannelHandlerContext ctx, Cmds.ChangeAssetFolders cmd) {
-		todo((rc)-> {
+		todo("changeAssetFolders", (rc)-> {
 			AssetManager am = app.getAssetManager();
 			if (cmd.getUnregisterOther()) {
 				for (String p: folders.keySet()) {
@@ -227,7 +227,7 @@ class ReqHandler {
 	}
 
 	public void playAnimation(ChannelHandlerContext ctx, Cmds.PlayAnimation cmd) {
-		todo((rc)-> {
+		todo("playAnimation", (rc)-> {
 			Spatial target = (Spatial) rc.components.get(cmd.getRef());
 			if (target != null) {
 				Cinematic cinematic = new Cinematic(rc.root, LoopMode.DontLoop);
@@ -258,14 +258,19 @@ class ReqHandler {
 		});
 	}
 
-	public void todo(Consumer<RemoteCtx> job) {
+	public void todo(String label, Consumer<RemoteCtx> job) {
 		app.enqueue(()->{
+			//log.trace("todo {} start", label);
+			//long startAt = System.currentTimeMillis();
 			try {
 				job.accept(remoteCtx);
 				return true;
 			} catch(Exception exc) {
 				log.warn("todo exception", exc);
 				return false;
+			} finally {
+				//long duration = System.currentTimeMillis() - startAt;
+				//log.debug("todo {} duration: {}", label, duration);
 			}
 		});
 	}
