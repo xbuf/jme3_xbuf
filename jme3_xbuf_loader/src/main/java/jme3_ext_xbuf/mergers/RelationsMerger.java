@@ -12,6 +12,7 @@ import jme3_ext_xbuf.XbufContext;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
 import jme3_ext_xbuf.mergers.relations.linkers.AnimationToSpatial;
+import jme3_ext_xbuf.mergers.relations.linkers.CustomParamToMaterial;
 import jme3_ext_xbuf.mergers.relations.linkers.CustomParamToSpatial;
 import jme3_ext_xbuf.mergers.relations.linkers.GeometryToNode;
 import jme3_ext_xbuf.mergers.relations.linkers.LightToGeometry;
@@ -34,6 +35,7 @@ public class RelationsMerger implements Merger{
 		linkers.add(new CustomParamToSpatial());
 		linkers.add(new LightToGeometry());
 		linkers.add(new MaterialToGeometry());
+		linkers.add(new CustomParamToMaterial());
 		linkers.add(new GeometryToNode());
 		linkers.add(new SkeletonToSpatial());
 		linkers.add(new NodeToNode());
