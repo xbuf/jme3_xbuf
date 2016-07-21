@@ -182,23 +182,15 @@ public class MaterialsMerger implements Merger{
 		setColor(src.hasEmission(),src.getEmission(),dst,new String[]{"Emission","GlowColor"},md);
 		setTexture2D(src.hasEmissionMap(),src.getEmissionMap(),dst,new String[]{"EmissionMap","GlowMap"},md);
 		if(!src.getShadeless()){
-			if(!src.hasColorMap()){
-				if(src.hasColor()){
-					setBoolean(true,true,dst,new String[]{"UseMaterialColors"},md);
-				}else{
-					setBoolean(true,true,dst,new String[]{"UseVertexColor"},md);
-				}
+			if(src.hasColor()){
+				setBoolean(true,true,dst,new String[]{"UseMaterialColors"},md);
+			}else{
+				setBoolean(true,true,dst,new String[]{"UseVertexColor"},md);
 			}
 		}
-		if (src.hasOpacity()) {
-				if (src.hasOpacityMap()) {
-					setFloat(src.hasOpacity(),src.getOpacity(),dst,new String[]{"AlphaDiscardThreshold"},md);
-					//dst.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-				} else {
-					dst.getAdditionalRenderState().setBlendMode(BlendMode.AlphaAdditive);
-				}
+		if ((src.hasOpacity() && src.getOpacity() < 1.0) || src.hasOpacityMap() || (src.hasColor() && src.getColor().hasA() && src.getColor().getA() < 1.0f)) {
+			dst.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 		}
-		
 		return dst;
 	}
 
