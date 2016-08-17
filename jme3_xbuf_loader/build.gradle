@@ -11,7 +11,7 @@ repositories{
 	maven{ url "http://dl.bintray.com/riccardo/v-hacd" }
 }
 
-def v_xbuf="0.8.2"
+def v_xbuf="0.9.0"
 def v_physicsloader="0.5"
 def g_physicsloader="com.github.riccardobl"
 if (DEV_MODE){
@@ -21,7 +21,7 @@ if (DEV_MODE){
 }
 
 dependencies {
-	compile 'com.google.protobuf:protobuf-java:2.6.1'
+	compile 'com.google.protobuf:protobuf-java:3.0.0'
 	compile "${g_physicsloader}:jme3_physicsloader:${v_physicsloader}"
 	compileOnly "org.projectlombok:lombok:${v_lombok}"
 	compile "org.slf4j:slf4j-api:${v_slf4j}"
