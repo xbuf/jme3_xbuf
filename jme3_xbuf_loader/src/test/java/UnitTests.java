@@ -3,6 +3,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.jme3.animation.AnimChannel;
@@ -26,31 +27,32 @@ public class UnitTests{
 	public boolean headless=true;
 
 	@Test
+	@Ignore
 	public void testConstraints(){
 //		boolean headless=false;
 		SimpleApplication app=TestHelpers.buildApp(headless);
 		BulletAppState bullet=TestHelpers.buildBullet(app,true);
-		
+
 		TestHelpers.hijackUpdateThread(app);
 		XbufKey key=new XbufKey("unit_tests/xbuf/constraints.xbuf").usePhysics(true).useEnhancedRigidbodies(true);
 		Spatial scene=app.getAssetManager().loadModel(key);
 		app.getRootNode().attachChild(scene);
 		scene.setLocalTranslation(0,-10,0);
 		XbufPhysicsLoader.load(key,scene,bullet.getPhysicsSpace());
-		
+
 		int i=0;
 		Collection<PhysicsJoint> joints=bullet.getPhysicsSpace().getJointList();
 		for(PhysicsJoint joint:joints){
 			System.out.println(joint);
 			i++;
 		}
-		assertTrue("Found "+i+" constraints, 1 expected",i==1);	
-		
+		assertTrue("Found "+i+" constraints, 1 expected",i==1);
+
 		TestHelpers.releaseUpdateThread(app);
 		if(!headless)TestHelpers.waitFor(app);
 		TestHelpers.closeApp(app);
 	}
-	
+
 	@Test
 	public void testMultiMat() {
 		SimpleApplication app=TestHelpers.buildApp(headless);
@@ -74,12 +76,12 @@ public class UnitTests{
 		TestHelpers.closeApp(app);
 
 	}
-	
+
 	@Test
 	public void testHwSkinning() {
 		SimpleApplication app=TestHelpers.buildApp(headless);
 		TestHelpers.hijackUpdateThread(app);
-		
+
 		boolean created=false;
 		try{
 			Spatial scene=app.getAssetManager().loadModel("unit_tests/xbuf/hw_skinning.xbuf");
@@ -100,11 +102,11 @@ public class UnitTests{
 				    app.getRootNode().attachChild(skeletonDebug);
 				    skeletonDebug.setLocalTranslation(s.getWorldTranslation());
 				}
-				
+
 				AnimControl ac=s.getControl(AnimControl.class);
 
 				if(ac!=null){
-				
+
 					System.out.println("Found animcontrol: "+ac+" on "+s);
 
 					Collection<String> anims=ac.getAnimationNames();
@@ -120,7 +122,7 @@ public class UnitTests{
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		
+
 		TestHelpers.releaseUpdateThread(app);
 		if(!headless)TestHelpers.waitFor(app);
 		TestHelpers.closeApp(app);
@@ -155,8 +157,8 @@ public class UnitTests{
 		assertTrue("Two different meshes are used, but loaded "+meshes.size(),meshes.size()==2);
 	}
 
-	
-	
+
+
 	@Test
 	public void testMatSharing() {
 		SimpleApplication app=TestHelpers.buildApp(headless);
@@ -188,7 +190,7 @@ public class UnitTests{
 			if(m.getName().equals("not_shared")) n_not_shared++;
 
 		}
-		
+
 		TestHelpers.releaseUpdateThread(app);
 		if(!headless)TestHelpers.waitFor(app);
 		TestHelpers.closeApp(app);
