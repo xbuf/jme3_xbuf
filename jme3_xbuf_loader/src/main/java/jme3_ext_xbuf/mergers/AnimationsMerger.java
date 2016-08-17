@@ -27,8 +27,8 @@ public class AnimationsMerger implements Merger{
 			// TODO: merge with existing
 			XbufAnimation a=new XbufAnimation(e.getName(),((float)e.getDuration())/1000f);
 			for(AnimationsKf.Clip clip:e.getClipsList()){
-				if(clip.hasSampledTransform()){
-					XbufTrack t=makeTrack(clip.getSampledTransform().hasBoneName(),clip.getSampledTransform());
+				if(clip.getSampledTransform() != null){
+					XbufTrack t=makeTrack(clip.getSampledTransform().getBoneName() != null, clip.getSampledTransform());
 					a.getTracks().add(t);
 				}
 			}

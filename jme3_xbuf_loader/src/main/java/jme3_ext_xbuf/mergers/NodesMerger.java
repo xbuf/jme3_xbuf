@@ -25,7 +25,7 @@ public class NodesMerger implements Merger{
 					root.attachChild(child);
 					context.put(id,child);
 				}
-				child.setName(n.hasName()?n.getName():n.getId());
+				child.setName((n.getName() != null)?n.getName():n.getId());
 				Transform transform=n.getTransform();
 				child.setLocalRotation(transform.getRotation().toJME());
 				child.setLocalTranslation(transform.getTranslation().toJME());

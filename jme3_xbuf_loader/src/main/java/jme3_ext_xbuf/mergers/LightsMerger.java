@@ -37,6 +37,10 @@ public class LightsMerger implements Merger{
 			// TODO manage attenuation
 			// TODO manage conversion of type
 			switch(srcl.getKind()){
+				case UNRECOGNIZED:
+				case undef: {
+					throw new IllegalArgumentException("ligth.kind is not supported '"+ srcl.getKind().name() +"'");
+				}
 				case spot:{
 					SpotLight l=(SpotLight)light;
 					if(srcl.hasSpotAngle()){
@@ -100,6 +104,10 @@ public class LightsMerger implements Merger{
 	private Light makeLight(Lights.Light srcl) {
 		Light l0=null;
 		switch(srcl.getKind()){
+			case UNRECOGNIZED:
+			case undef: {
+				throw new IllegalArgumentException("ligth.kind is not supported '"+ srcl.getKind().name() +"'");
+			}
 			case ambient:
 				l0=new AmbientLight();
 				break;
@@ -119,7 +127,7 @@ public class LightsMerger implements Merger{
 				break;
 		}
 		l0.setColor(ColorRGBA.White.mult(2));
-		l0.setName(srcl.hasName()?srcl.getName():srcl.getId());
+		l0.setName((srcl.getName() != null)?srcl.getName():srcl.getId());
 		return l0;
 	}
 

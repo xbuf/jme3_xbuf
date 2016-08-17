@@ -168,16 +168,16 @@ public class MaterialsMerger implements Merger{
 		MaterialDef md=dst.getMaterialDef();
 		setColor(src.hasColor(),src.getColor(),dst,new String[]{"Color","Diffuse"},md);
 		setTexture2D(src.hasColorMap(),src.getColorMap(),dst,new String[]{"ColorMap","DiffuseMap"},md);
-		setFloat(src.hasOpacity(),src.getOpacity(),dst,new String[]{"Alpha","Opacity"},md);
+		setFloat(src.getOpacity() != 0,src.getOpacity(),dst,new String[]{"Alpha","Opacity"},md);
 		setTexture2D(src.hasOpacityMap(),src.getOpacityMap(),dst,new String[]{"AlphaMap","OpacityMap"},md);
 		setTexture2D(src.hasNormalMap(),src.getNormalMap(),dst,new String[]{"NormalMap"},md);
-		setFloat(src.hasRoughness(),src.getRoughness(),dst,new String[]{"Roughness"},md);
+		setFloat(src.getRoughness() != 0 ,src.getRoughness(),dst,new String[]{"Roughness"},md);
 		setTexture2D(src.hasRoughnessMap(),src.getRoughnessMap(),dst,new String[]{"RoughnessMap"},md);
-		setFloat(src.hasMetalness(),src.getMetalness(),dst,new String[]{"Metalness"},md);
+		setFloat(src.getMetalness() != 0,src.getMetalness(),dst,new String[]{"Metalness"},md);
 		setTexture2D(src.hasMetalnessMap(),src.getMetalnessMap(),dst,new String[]{"MetalnessMap"},md);
 		setColor(src.hasSpecular(),src.getSpecular(),dst,new String[]{"Specular"},md);
 		setTexture2D(src.hasSpecularMap(),src.getSpecularMap(),dst,new String[]{"SpecularMap"},md);
-		setFloat(src.hasSpecularPower(),src.getSpecularPower(),dst,new String[]{"SpecularPower","Shininess"},md);
+		setFloat(src.getSpecularPower() != 0,src.getSpecularPower(),dst,new String[]{"SpecularPower","Shininess"},md);
 		setTexture2D(src.hasSpecularPowerMap(),src.getSpecularPowerMap(),dst,new String[]{"SpecularPowerMap","ShininessMap"},md);
 		setColor(src.hasEmission(),src.getEmission(),dst,new String[]{"Emission","GlowColor"},md);
 		setTexture2D(src.hasEmissionMap(),src.getEmissionMap(),dst,new String[]{"EmissionMap","GlowMap"},md);
@@ -188,7 +188,7 @@ public class MaterialsMerger implements Merger{
 				setBoolean(true,true,dst,new String[]{"UseVertexColor"},md);
 			}
 		}
-		if ((src.hasOpacity() && src.getOpacity() < 1.0) || src.hasOpacityMap() || (src.hasColor() && src.getColor().hasA() && src.getColor().getA() < 1.0f)) {
+		if ((src.getOpacity() > 0.0 && src.getOpacity() < 1.0) || src.hasOpacityMap() || (src.hasColor() && src.getColor().getA() > 0.0 && src.getColor().getA() < 1.0f)) {
 			dst.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 		}
 		return dst;
@@ -199,7 +199,7 @@ public class MaterialsMerger implements Merger{
 			String id=m.getId();
 			Material mat=newMaterial(m);
 			context.put(id,mat);
-			mat.setName(m.hasName()?m.getName():m.getId());
+			mat.setName((m.getName() != null)? m.getName():m.getId());
 			mergeToMaterial(m,mat);
 //			materialReplicator.syncReplicas(mat);
 		});
