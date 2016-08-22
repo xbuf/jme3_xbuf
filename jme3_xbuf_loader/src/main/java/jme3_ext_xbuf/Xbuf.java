@@ -63,7 +63,7 @@ public class Xbuf{
 	}
 
 	// TODO optimize to create less intermediate node
-	public void merge(Data src, Node root, XbufContext context, Logger log) {
+	public void merge(Data src, Node root, XbufContext context, Logger log) throws Exception {
 		for(Merger m:mergers){
 			m.apply(src,root,context,log);
 		}

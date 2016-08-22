@@ -138,16 +138,22 @@ class ReqHandler {
 
 	public void setData(ChannelHandlerContext ctx, Datas.Data data) {
 		todo("setData", (rc)-> {
-			LoggerCollector xbufLogger = new LoggerCollector("xbuf");
-			xbuf.merge(data, rc.root, rc.components, xbufLogger);
-			xbufLogger.dumpTo(log);
-			int errorsCnt = xbufLogger.countOf(LoggerCollector.Level.ERROR);
-			if (errorsCnt > 0) {
-				log.error("xbuf reading, error count : {}", errorsCnt);
-			}
-			int warnsCnt = xbufLogger.countOf(LoggerCollector.Level.WARN);
-			if (warnsCnt > 0) {
-				log.warn("xbuf reading, warn count : {}", warnsCnt);
+			try {
+				LoggerCollector xbufLogger = new LoggerCollector("xbuf");
+				xbuf.merge(data, rc.root, rc.components, xbufLogger);
+				xbufLogger.dumpTo(log);
+				int errorsCnt = xbufLogger.countOf(LoggerCollector.Level.ERROR);
+				if (errorsCnt > 0) {
+					log.error("xbuf reading, error count : {}", errorsCnt);
+				}
+				int warnsCnt = xbufLogger.countOf(LoggerCollector.Level.WARN);
+				if (warnsCnt > 0) {
+					log.warn("xbuf reading, warn count : {}", warnsCnt);
+				}
+			} catch(RuntimeException exc) {
+				throw exc;
+			} catch(Exception exc) {
+				throw new RuntimeException("wrap", exc);
 			}
 		});
 	}

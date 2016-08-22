@@ -40,6 +40,8 @@ public class XbufLoader implements AssetLoader {
 			xbuf.merge(src, root, context, log);
 			log.debug("Context:\n{}",context.toString());
 			log.dumpTo(LoggerFactory.getLogger(this.getClass()));
+		} catch (Exception exc) {
+			throw new IOException("wrap xbuf loading exception", exc);
 		} finally {
 			if(in!=null)in.close();
 		}
