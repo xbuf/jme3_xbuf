@@ -34,8 +34,8 @@ public class RelationsMerger implements Merger{
 		linkers.add(new AnimationToSpatial());
 		linkers.add(new CustomParamToSpatial());
 		linkers.add(new LightToGeometry());
-		linkers.add(new MaterialToGeometry());
 		linkers.add(new CustomParamToMaterial());
+		linkers.add(new MaterialToGeometry());
 		linkers.add(new GeometryToNode());
 		linkers.add(new SkeletonToSpatial());
 		linkers.add(new NodeToNode());
