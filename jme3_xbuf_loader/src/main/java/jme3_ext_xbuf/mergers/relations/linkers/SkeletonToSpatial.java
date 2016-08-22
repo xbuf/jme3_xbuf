@@ -3,8 +3,6 @@ package jme3_ext_xbuf.mergers.relations.linkers;
 import static jme3_ext_xbuf.mergers.relations.LinkerHelpers.getRef1;
 import static jme3_ext_xbuf.mergers.relations.LinkerHelpers.getRef2;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -47,17 +45,13 @@ public class SkeletonToSpatial implements Linker{
 		SkeletonControl skc=new SkeletonControl(sk);
 		v.addControl(skc);
 
-		Collection<AnimControl> controls=new LinkedList<AnimControl>();
-
+		boolean atLeastOne=false;
 		for(int i=0;i<v.getNumControls();i++){
 			Control c=v.getControl(i);
-			if( c instanceof AnimControl)controls.add((AnimControl)c);
-		}
-
-		boolean atLeastOne=false;
-		for(AnimControl c:controls){
-			atLeastOne=true;
-			c.setSkeleton(sk);
+			if( c instanceof AnimControl) {
+				atLeastOne=true;
+				((AnimControl)c).setSkeleton(sk);
+			}
 		}
 
 		// always add AnimControl else NPE when SkeletonControl.clone
@@ -66,8 +60,6 @@ public class SkeletonToSpatial implements Linker{
 		cloneMatWhenNeeded((Spatial)op1,data,log);
 		return true;
 	}
-
-
 
 	private void cloneMatWhenNeeded(Spatial op2, RefData data, Logger log) {
 		op2.depthFirstTraversal(s -> {

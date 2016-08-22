@@ -14,7 +14,7 @@ import jme3_ext_xbuf.mergers.RelationsMerger;
 import jme3_ext_xbuf.mergers.relations.Linker;
 import jme3_ext_xbuf.mergers.relations.RefData;
 
-public class MaterialToGeometry  implements Linker{
+public class MaterialToGeometry  implements Linker {
 
 	@Override
 	public boolean doLink(RelationsMerger loader, RefData data, Logger log) {
@@ -29,7 +29,6 @@ public class MaterialToGeometry  implements Linker{
 			int n=(int)Optional.ofNullable(data.context.get(refusage)).orElse(0);
 			data.context.put(refusage,n++);
 		}
-
 		op2.setMaterial(op1);
 		return true;
 	}

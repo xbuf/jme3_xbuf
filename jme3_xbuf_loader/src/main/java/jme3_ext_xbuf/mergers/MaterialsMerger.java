@@ -22,8 +22,6 @@ import com.jme3.texture.image.ColorSpace;
 
 import jme3_ext_xbuf.Merger;
 import jme3_ext_xbuf.XbufContext;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 import xbuf.Datas.Data;
@@ -37,8 +35,8 @@ import xbuf.Primitives.Texture2DInline;
 @Slf4j
 public class MaterialsMerger implements Merger{
 	protected final AssetManager assetManager;
-	protected @Setter @Getter Texture defaultTexture;
-	protected @Setter @Getter Material defaultMaterial;
+	protected final Texture defaultTexture;
+	protected final Material defaultMaterial;
 
 
 	public MaterialsMerger(AssetManager assetManager) {
@@ -47,7 +45,7 @@ public class MaterialsMerger implements Merger{
 		defaultMaterial = newDefaultMaterial();
 	}
 
-	public Material newDefaultMaterial() {
+	private Material newDefaultMaterial() {
 		Material m=new Material(assetManager,"MatDefs/MatCap.j3md");
 		m.setTexture("DiffuseMap",assetManager.loadTexture("Textures/generator8.jpg"));
 		m.setColor("Multiply_Color",ColorRGBA.Pink);
@@ -56,7 +54,7 @@ public class MaterialsMerger implements Merger{
 		return m;
 	}
 
-	public Texture newDefaultTexture() {
+	private Texture newDefaultTexture() {
 		Texture t=assetManager.loadTexture("Textures/debug_8_64.png");
 		t.setWrap(WrapMode.Repeat);
 		t.setMagFilter(MagFilter.Nearest);
