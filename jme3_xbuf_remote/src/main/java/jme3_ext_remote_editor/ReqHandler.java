@@ -126,10 +126,10 @@ class ReqHandler {
 				case SETEYE: setEye(ctx, cmd0.getSetEye()); break;
 				case SETDATA: setData(ctx, cmd0.getSetData()); break;
 				case CHANGEASSETFOLDERS: changeAssetFolders(ctx, cmd0.getChangeAssetFolders()); break;
-				case PLAYANIMATION: playAnimation(ctx, cmd0.getPlayAnimation());
+				case PLAYANIMATION: playAnimation(ctx, cmd0.getPlayAnimation()); break;
 				//case : setCamera(ctx, cmd0); break;
 				default:
-					log.warn("unsupported cmd : {}", cmd0.getCmdCase().name() );
+					log.warn("unsupported cmd : {} ({})", cmd0.getCmdCase().name(), cmd0.getCmdCase().ordinal() );
 			}
 		} catch(Exception exc) {
 			log.warn("xbuf cmd", exc);
