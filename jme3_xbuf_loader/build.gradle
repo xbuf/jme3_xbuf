@@ -11,13 +11,11 @@ repositories{
 	maven{ url "http://dl.bintray.com/riccardo/v-hacd" }
 }
 
-def v_xbuf="0.9.0"
 def v_physicsloader="0.5"
 def g_physicsloader="com.github.riccardobl"
 if (DEV_MODE){
 	v_physicsloader="SNAPSHOT"
 	g_physicsloader="dev"
-	v_xbuf="0.8.0-2-g59d8b75-dirty"
 }
 
 dependencies {
