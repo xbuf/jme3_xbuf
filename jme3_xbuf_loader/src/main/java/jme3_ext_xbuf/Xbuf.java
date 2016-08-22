@@ -65,8 +65,11 @@ public class Xbuf{
 	// TODO optimize to create less intermediate node
 	public void merge(Data src, Node root, XbufContext context, Logger log) throws Exception {
 		for(Merger m:mergers){
+			log.debug("{} begin", m.getClass());
+			long beginAt = System.currentTimeMillis();
 			m.apply(src,root,context,log);
+			long endAt = System.currentTimeMillis();
+			log.info("{} end: duration {} ms", m.getClass(), endAt - beginAt);
 		}
 	}
-
 }
