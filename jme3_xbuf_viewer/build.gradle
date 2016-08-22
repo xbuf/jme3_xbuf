@@ -19,6 +19,7 @@ dependencies {
 	compile "org.slf4j:jul-to-slf4j:${v_slf4j}"
 	compile 'com.github.davidb:jme3_ext_spatial_explorer:0.9.2'
 	compile 'com.beust:jcommander:1.35'
+	compile 'com.google.protobuf:protobuf-java-util:3.0.0'
 	compile "org.jmonkeyengine:jme3-core:${v_jme3}"
 	compile "org.jmonkeyengine:jme3-blender:${v_jme3}"
 	compile "org.jmonkeyengine:jme3-plugins:${v_jme3}"
