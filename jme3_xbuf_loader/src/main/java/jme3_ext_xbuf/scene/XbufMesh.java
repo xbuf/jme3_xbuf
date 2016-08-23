@@ -1,6 +1,5 @@
 package jme3_ext_xbuf.scene;
 
-
 import org.slf4j.Logger;
 
 import com.jme3.material.Material;
@@ -11,9 +10,11 @@ import com.jme3.util.TangentBinormalGenerator;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
+import xbuf.Meshes.FloatBuffer;
 import xbuf.Meshes.IndexArray;
 import xbuf.Meshes.Skin;
 import xbuf.Meshes.VertexArray;
+import xbuf.Meshes.VertexArray.Attrib;
 
 @ExtensionMethod({jme3_ext_xbuf.ext.PrimitiveExt.class, jme3_ext_xbuf.ext.FloatBufferExt.class, jme3_ext_xbuf.ext.UintBufferExt.class})
 @RequiredArgsConstructor
@@ -33,24 +34,36 @@ public class XbufMesh{
 
 		//		context.put("G~meshName~"+dst.hashCode(),src.getName());
 		dst.setMode(src.getPrimitive().toJME());
-
+		FloatBuffer tbns = null;
 		for(VertexArray va:src.getVertexArraysList()){
-			Type type=va.getAttrib().toJME();
-			dst.setBuffer(type,va.getFloats().getStep(),va.getFloats().array());
-			log.debug("add {}",dst.getBuffer(type));
+			Attrib attrib = va.getAttrib();
+			if (attrib == Attrib.tbn_to_model_quat) {
+				tbns = va.getFloats();
+				dst.setBuffer(Type.Normal, 3, tbns.arrayQuatMult(0.0f, 0.0f, 1.0f));
+			} else {
+				dst.setBuffer(attrib.toJME(), va.getFloats().getStep(), va.getFloats().array());
+			}
 		}
 
 		for(IndexArray va:src.getIndexArraysList()){
 			dst.setBuffer(VertexBuffer.Type.Index,va.getInts().getStep(),va.getInts().array());
 		}
 
-		if(src.hasSkin()) applySkin(src.getSkin(),dst, log);
 		// TODO optimize lazy create Tangent when needed (for normal map ?)
 		if ((dst.getBuffer(VertexBuffer.Type.Tangent) == null || dst.getBuffer(VertexBuffer.Type.Binormal) == null) &&
 			dst.getBuffer(VertexBuffer.Type.Normal) != null && dst.getBuffer(VertexBuffer.Type.TexCoord) != null) {
-			TangentBinormalGenerator.setToleranceAngle(179); // remove warnings
-			TangentBinormalGenerator.generate(dst);
+			if (tbns != null) {
+				log.info("generate tangent and binormal from tbns_to_model_quat");
+				dst.setBuffer(Type.Binormal, 3, tbns.arrayQuatMult(0.0f, 1.0f, 0.0f));
+				dst.setBuffer(Type.Tangent,  3, tbns.arrayQuatMult(1.0f, 0.0f, 0.0f));
+			} else {
+				log.info("generate tangent and binormal with TangentBinormalGenerator");
+				TangentBinormalGenerator.setToleranceAngle(179); // remove warnings
+				TangentBinormalGenerator.generate(dst);
+			}
 		}
+		//applying skin also generate bindPoseTangent,... so it should be done after set of tangent, binormal
+		if(src.hasSkin()) applySkin(src.getSkin(),dst, log);
 		dst.updateCounts();
 		dst.updateBound();
 		return dst;
@@ -114,6 +127,4 @@ public class XbufMesh{
 		dst.generateBindPose(true);
 		return dst;
 	}
-
-
 }
