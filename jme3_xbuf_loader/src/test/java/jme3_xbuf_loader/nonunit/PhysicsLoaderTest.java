@@ -4,8 +4,6 @@ import java.io.File;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
-import com.jme3.bullet.control.RigidBodyControl;
-import com.jme3.bullet.joints.PhysicsJoint;
 import com.jme3.bullet.vhacd.VHACDCollisionShapeFactory;
 import com.jme3.bullet.vhacd.cache.PersistentByBuffersCaching;
 import com.jme3.math.Vector3f;
