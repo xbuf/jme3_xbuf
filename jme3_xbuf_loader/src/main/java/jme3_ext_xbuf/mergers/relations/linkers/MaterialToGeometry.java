@@ -23,11 +23,11 @@ public class MaterialToGeometry  implements Linker {
 		if(op1==null||op2==null) return false;
 		if(op2.getControl(SkeletonControl.class)!=null){
 			op1=op1.clone();
-			data.context.put("G~"+data.ref1+"~cloned~"+System.currentTimeMillis(),op1,data.ref1);
-		}else{
-			String refusage="G~usage~"+data.ref1;
-			int n=(int)Optional.ofNullable(data.context.get(refusage)).orElse(0);
-			data.context.put(refusage,n++);
+//			data.context.put("G~"+data.ref1+"~cloned~"+System.currentTimeMillis(),op1,data.ref1);
+//		}else{
+//			String refusage="G~usage~"+data.ref1;
+//			int n=(int)Optional.ofNullable(data.context.get(refusage)).orElse(0);
+//			data.context.put(refusage,n++);
 		}
 		op2.setMaterial(op1);
 		return true;
