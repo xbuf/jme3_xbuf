@@ -10,10 +10,13 @@ import com.jme3.asset.plugins.FileLocator;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.PointLight;
+import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.LightNode;
 import com.jme3.scene.Node;
+import com.jme3.scene.SceneGraphVisitorAdapter;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.plugins.OBJLoader;
@@ -21,6 +24,7 @@ import com.jme3.scene.plugins.blender.BlenderLoader;
 import com.jme3.scene.plugins.fbx.FbxLoader;
 import com.jme3.system.AppSettings;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -30,6 +34,8 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+
+import javafx.scene.control.TreeItem;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import jme3_ext_remote_editor.AppState4RemoteCommand;
@@ -38,6 +44,10 @@ import jme3_ext_spatial_explorer.Helper;
 import jme3_ext_spatial_explorer.SpatialExplorer;
 import jme3_ext_xbuf.Xbuf;
 import jme3_ext_xbuf.XbufLoader;
+import jme3tools.optimize.LodGenerator;
+import jme3tools.optimize.LodGenerator.TriangleReductionMethod;
+
+import org.controlsfx.control.action.Action;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -278,6 +288,23 @@ public class ModelViewer {
 						app.getRootNode().removeLight(cameraLight);
 						app.getRootNode().detachChild(cameraLightNode);
 					}
+					return null;
+				});
+			}));
+			exp.treeItemActions.add(new Action("Generate LoD 0.5", (evt) -> {
+				Spatial target = ((TreeItem<Spatial>)evt.getSource()).getValue();
+				app.enqueue(() -> {
+					target.breadthFirstTraversal(new SceneGraphVisitorAdapter(){
+						public void visit(Geometry geom) {
+							try {
+								LodGenerator generator = new LodGenerator(geom);
+								generator.bakeLods(TriangleReductionMethod.COLLAPSE_COST, 0.5f);
+								System.out.println(geom.getName() +" has " + geom.getMesh().getNumLodLevels() + " LoD levels");
+							} catch(Exception exc) {
+								exc.printStackTrace();
+							}
+						}
+					});
 					return null;
 				});
 			}));

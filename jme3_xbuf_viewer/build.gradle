@@ -3,7 +3,7 @@ buildscript {
 		jcenter()
 	}
 	dependencies {
-		classpath 'net.alchim31.gradle:gradle-getdown-plugin:0.4.1'
+		classpath 'net.alchim31.gradle:gradle-getdown-plugin:0.4.6'
 	}
 }
 

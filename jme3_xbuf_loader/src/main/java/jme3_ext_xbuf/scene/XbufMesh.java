@@ -43,6 +43,7 @@ public class XbufMesh{
 			} else {
 				dst.setBuffer(attrib.toJME(), va.getFloats().getStep(), va.getFloats().array());
 			}
+			dst.setStatic();
 		}
 
 		for(IndexArray va:src.getIndexArraysList()){
