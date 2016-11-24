@@ -39,7 +39,7 @@ public class LightsMerger implements Merger{
 			switch(srcl.getKind()){
 				case UNRECOGNIZED:
 				case undef: {
-					throw new IllegalArgumentException("ligth.kind is not supported '"+ srcl.getKind().name() +"'");
+					throw new IllegalArgumentException("light.kind is not supported '"+ srcl.getKind().name() +"'");
 				}
 				case spot:{
 					SpotLight l=(SpotLight)light;
@@ -106,7 +106,7 @@ public class LightsMerger implements Merger{
 		switch(srcl.getKind()){
 			case UNRECOGNIZED:
 			case undef: {
-				throw new IllegalArgumentException("ligth.kind is not supported '"+ srcl.getKind().name() +"'");
+				throw new IllegalArgumentException("light.kind is not supported '"+ srcl.getKind().name() +"'");
 			}
 			case ambient:
 				l0=new AmbientLight();
